@@ -1,4 +1,5 @@
 import { RENOV, occColor } from '../lib/constants'
+import { SCHOOL_ORIGINS } from '../data/origins'
 
 function Field({ label, value, mock }) {
   return (
@@ -9,8 +10,37 @@ function Field({ label, value, mock }) {
   )
 }
 
+// Elevhärkomst per primärområde + genomsnittlig resväg (aggregerat, ej individdata)
+function Origins({ school }) {
+  const o = SCHOOL_ORIGINS[school.id]
+  if (!o) return null
+  const total = o.areas.reduce((t, a) => t + a.antal, 0) + (o.ovriga ? o.ovriga.antal : 0)
+  return (
+    <div className="field">
+      <div className="k">Elevernas härkomst <span className="mockflag">exempel</span></div>
+      <div className="v">
+        <div className="origins">
+          {o.areas.map((a) => (
+            <div className="origin-row" key={a.primaromrade}>
+              <span>{a.primaromrade}</span>
+              <span className="origin-meta">{a.antal} st · {Math.round((a.antal / total) * 100)}% · {a.medelKm} km</span>
+            </div>
+          ))}
+          {o.ovriga && (
+            <div className="origin-row muted">
+              <span>Övriga/spridda</span>
+              <span className="origin-meta">{o.ovriga.antal} st · {o.ovriga.medelKm} km</span>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function InfoPanel({ school, onClose }) {
   const komm = school && school.huvudman === 'Kommunal'
+  const origin = school ? SCHOOL_ORIGINS[school.id] : null
   return (
     <aside className={'panel' + (school ? ' open' : '')}>
       {school && (
@@ -28,6 +58,8 @@ export default function InfoPanel({ school, onClose }) {
             <Field label="Mellanområde" value={school.mellanomrade} />
             <Field label="Primärområde" value={school.primaromrade} />
             <Field label="Adress" value={school.adress} />
+            {origin && <Field label="Genomsnittlig resväg (vägnät)" value={origin.meanKm + ' km'} mock />}
+            <Origins school={school} />
             <Field label="Närmaste skola" value={school.nearestNamn + ' · ' + school.nearestKm + ' km'} />
             <Field label="Årskurser" value={school.arskurser} />
             <Field label="Fastighetsbeteckning" value={'GÖTEBORG ' + school.fastighet} mock />

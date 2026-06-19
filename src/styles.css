@@ -111,3 +111,7 @@ tbody tr:hover { background:#f8fafc; cursor:pointer; }
 .field .k { font-size:12px; color:var(--muted); }
 .field .v { font-size:13px; font-weight:600; text-align:right; }
 .mockflag { font-size:9px; font-weight:700; text-transform:uppercase; background:#fef3c7; color:#92400e; padding:1px 5px; border-radius:4px; margin-left:6px; vertical-align:middle; }
+.origins { display:flex; flex-direction:column; gap:5px; min-width:230px; text-align:left; font-weight:500; }
+.origin-row { display:flex; justify-content:space-between; gap:12px; font-size:12px; }
+.origin-row.muted { color:var(--muted); }
+.origin-meta { color:var(--muted); white-space:nowrap; }

@@ -11,15 +11,13 @@
         staden.
 
      2. ELEVMÖNSTER (flödesmatris) — historiskt mönster för vilka skolor ett
-        områdes elever faktiskt söker sig till. Byggs i framskrivning.js som
-        en avståndsbaserad gravitationsmodell (närområdesskolan fångar
-        flest, resten fördelas på närliggande skolor, en andel läcker till
-        friskola/annan kommun).
+        områdes elever faktiskt söker sig till. Hämtas från data/origins.js
+        (observerad härkomst: antal elever per skola och primärområde) och
+        omvandlas i framskrivning.js till andelar per område och stadie.
 
    ALLT ÄR EXEMPELDATA. Skarp användning kräver Göteborgs Stads verkliga
-   befolkningsprognos per primärområde/åldersklass samt ett verkligt
-   elevmönster (var områdets barn är folkbokförda × var de går i skola).
-   Båda byts in på ett ställe: BEFOLKNING nedan resp. flödesmatrisen.
+   befolkningsprognos per primärområde/åldersklass (denna fil) samt det
+   verkliga elevmönstret (data/origins.js). Båda byts in på var sitt ställe.
 =========================================================================== */
 
 // Åldersstadier (knyts till årskurser). Ett barns stadie följer dess årskurs.
@@ -49,12 +47,8 @@ export function schoolStages(span) {
   return STAGE_KEYS.filter((k) => set.has(k))
 }
 
-// Modellparametrar (mock — kalibreras mot verkligt elevmönster vid skarp drift)
-export const PARTICIPATION = 0.965 // andel av åldersgruppen i grundskola
-export const LEAKAGE = 0.07        // andel som lämnar modellerade skolor (friskola annan ort, särskola, pendling ut)
-export const HOME_BOOST = 1.8      // närområdesskolans extra dragningskraft
-export const DECAY_KM = 1.5        // avståndsdämpning i gravitationsmodellen
-export const RADIUS_KM = 6         // ett områdes elever söker sig inte längre än så
+// Deltagandegrad: andel av åldersgruppen som går i grundskola.
+export const PARTICIPATION = 0.965
 
 // Befolkningsprognos per primärområde: barn i skolåldern per stadie (basår 2026)
 // + årlig förändringstakt. Nyckeln matchar skolornas `primaromrade`.

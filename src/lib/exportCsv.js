@@ -1,5 +1,7 @@
 // Exporterar en lista skolor till CSV som öppnas korrekt i svenskt Excel:
 // semikolon-separator + UTF-8 BOM så att åäö och kolumner hamnar rätt.
+import { SCHOOL_ORIGINS } from '../data/origins'
+
 const COLUMNS = [
   ['namn', 'Skola'],
   ['stadsomrade', 'Stadsområde'],
@@ -26,6 +28,7 @@ const COLUMNS = [
   ['renovbehov', 'Renoveringsbehov (1-5)'],
   ['underhallsskuld', 'Underhållsskuld (Mkr)'],
   ['energiklass', 'Energiklass'],
+  ['medelresvag', 'Genomsnittlig resväg (km, vägnät)'],
 ]
 
 function cell(v) {
@@ -33,9 +36,12 @@ function cell(v) {
   return /[";\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s
 }
 
+const valueOf = (s, key) =>
+  key === 'medelresvag' ? (SCHOOL_ORIGINS[s.id]?.meanKm ?? '') : s[key]
+
 export function exportCsv(schools, filename = 'skolportfolj.csv') {
   const header = COLUMNS.map(([, label]) => cell(label)).join(';')
-  const rows = schools.map((s) => COLUMNS.map(([key]) => cell(s[key])).join(';'))
+  const rows = schools.map((s) => COLUMNS.map(([key]) => cell(valueOf(s, key))).join(';'))
   const csv = '﻿' + [header, ...rows].join('\r\n')
 
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })

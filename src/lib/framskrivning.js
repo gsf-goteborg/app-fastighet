@@ -1,9 +1,6 @@
-import { haversineKm } from './geo'
 import { BASE_YEAR } from '../data/schools'
-import {
-  BEFOLKNING, STAGE_KEYS, schoolStages,
-  PARTICIPATION, LEAKAGE, HOME_BOOST, DECAY_KM, RADIUS_KM,
-} from '../data/prognos'
+import { BEFOLKNING, STAGE_KEYS, schoolStages, PARTICIPATION } from '../data/prognos'
+import { AREA_INTAKE } from '../data/origins'
 
 /* ===========================================================================
    Befolkningsbaserad elevframskrivning.
@@ -13,51 +10,32 @@ import {
 
      pop(område, stadie, år) = befolkning_basår × (1 + områdets takt)^(år−basår)
      elever som genereras     = pop × deltagandegrad (PARTICIPATION)
-     fördelning på skola       = flödesmatris (historiskt elevmönster)
+     fördelning på skola       = flödesmatris ur observerat elevmönster
      skolans prognos           = Σ över område×stadie  ×  basårskalibrering
 
-   Flödesmatrisen är en gravitationsmodell över skolornas koordinater: varje
-   primärområde fördelar sina elever (per stadie) på skolor som tar emot det
-   stadiet, viktat på avstånd med extra dragning till närområdesskolan; en
-   andel (LEAKAGE) lämnar de modellerade skolorna.
+   Flödesmatrisen byggs ur den OBSERVERADE elevhärkomsten (data/origins.js):
+   för varje primärområde och stadie fördelas områdets elever på de skolor som
+   tar emot stadiet, i proportion till hur många elever skolan faktiskt drar
+   från området idag. Det är alltså uppmätt mönster, inte en modellgissning.
 
    Basårskalibreringen skalar varje skola så att modellen i basåret återger
-   skolans faktiska elevtal exakt — prognosen utgår alltså från dagens
-   verklighet och rör sig därifrån enligt demografin.
+   skolans faktiska elevtal exakt — prognosen utgår från dagens verklighet och
+   rör sig därifrån enligt demografin.
 =========================================================================== */
 export function buildProjector(schools, baseYear = BASE_YEAR) {
   const areas = Object.keys(BEFOLKNING)
-
-  // Områdescentroid ≈ medelläge för skolorna i primärområdet (fallback: stadens mitt)
-  const cityLng = schools.reduce((t, s) => t + s.lng, 0) / schools.length
-  const cityLat = schools.reduce((t, s) => t + s.lat, 0) / schools.length
-  const centroid = {}
-  for (const a of areas) {
-    const inA = schools.filter((s) => s.primaromrade === a)
-    centroid[a] = inA.length
-      ? { lng: inA.reduce((t, s) => t + s.lng, 0) / inA.length, lat: inA.reduce((t, s) => t + s.lat, 0) / inA.length }
-      : { lng: cityLng, lat: cityLat }
-  }
-
   const stagesBySchool = new Map(schools.map((s) => [s.id, new Set(schoolStages(s.arskurser))]))
 
-  // Flödesmatris M[område][stadie] = { skolId: andel }  (tidigare elevmönster)
+  // Flödesmatris M[område][stadie] = { skolId: andel } ur observerad härkomst
   const M = {}
   for (const a of areas) {
-    const c = centroid[a]
+    const intake = AREA_INTAKE[a] || {}   // { skolId: antal elever från området }
     M[a] = {}
     for (const st of STAGE_KEYS) {
-      const elig = []
-      for (const s of schools) {
-        if (!stagesBySchool.get(s.id).has(st)) continue
-        const km = haversineKm(c.lat, c.lng, s.lat, s.lng)
-        if (km > RADIUS_KM) continue
-        const w = (s.primaromrade === a ? HOME_BOOST : 1) * Math.exp(-km / DECAY_KM)
-        elig.push([s.id, w])
-      }
-      const tot = elig.reduce((t, [, w]) => t + w, 0)
+      const elig = schools.filter((s) => stagesBySchool.get(s.id).has(st) && intake[s.id] > 0)
+      const tot = elig.reduce((t, s) => t + intake[s.id], 0)
       M[a][st] = {}
-      if (tot > 0) for (const [id, w] of elig) M[a][st][id] = (w / tot) * (1 - LEAKAGE)
+      if (tot > 0) for (const s of elig) M[a][st][s.id] = intake[s.id] / tot
     }
   }
 
@@ -91,10 +69,6 @@ export function buildProjector(schools, baseYear = BASE_YEAR) {
     // Projicerat elevtal för en skola ett givet år
     project(school, year) {
       return Math.round(raw(school, year) * (calib.get(school.id) ?? 1))
-    },
-    // Total befolkning i skolåldern i ett primärområde ett givet år (för metodikvisning)
-    areaPopulation(a, year) {
-      return STAGE_KEYS.reduce((t, st) => t + popAt(a, st, year), 0)
     },
   }
 }
