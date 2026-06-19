@@ -18,6 +18,7 @@
        skola, primärområde, antal_elever, medelavstånd_km   (små celler maskade)
 =========================================================================== */
 import { SCHOOLS } from './schools'
+import { BEFOLKNING } from './prognos'
 import { haversineKm } from '../lib/geo'
 
 // Mock-parametrar för att generera ett rimligt elevmönster (byts mot riktig data)
@@ -92,4 +93,45 @@ for (const s of SCHOOLS) {
   for (const { primaromrade, antal } of SCHOOL_ORIGINS[s.id].areas) {
     (AREA_INTAKE[primaromrade] ||= {})[s.id] = antal
   }
+}
+
+/* ---------------------------------------------------------------------------
+   Importkontroll — körs när det riktiga uttaget läggs in (måndag).
+   Fångar de vanliga felen vid databyte: skolor utan härkomst, okända skol-id,
+   summa som inte stämmer mot elevtalet, celler under sekretessgränsen, samt
+   primärområden som saknar befolkningsprognos (då ignoreras de av modellen).
+   Loggar en samlad varning i utvecklingsläge; stoppar inte appen.
+--------------------------------------------------------------------------- */
+export function validateOrigins(schools = SCHOOLS, table = SCHOOL_ORIGINS, minCell = MIN_CELL) {
+  const problems = []
+  const ids = new Set(schools.map((s) => s.id))
+  const prognosAreas = new Set(Object.keys(BEFOLKNING))
+  const utanPrognos = new Set()
+
+  for (const s of schools) {
+    const o = table[s.id]
+    if (!o) { problems.push(`Saknar elevhärkomst för "${s.namn}" (id ${s.id})`); continue }
+    const shown = o.areas.reduce((t, a) => t + a.antal, 0)
+    const tot = shown + (o.ovriga ? o.ovriga.antal : 0)
+    if (Math.abs(tot - s.elever) > Math.max(3, s.elever * 0.02))
+      problems.push(`"${s.namn}": härkomst summerar ${tot}, elevtal ${s.elever} (stämmer inte)`)
+    for (const a of o.areas) {
+      if (a.antal < minCell)
+        problems.push(`"${s.namn}": cell ${a.primaromrade}=${a.antal} under sekretessgräns ${minCell}`)
+      if (!(a.medelKm >= 0))
+        problems.push(`"${s.namn}": ogiltigt medelavstånd för ${a.primaromrade}`)
+      if (!prognosAreas.has(a.primaromrade)) utanPrognos.add(a.primaromrade)
+    }
+  }
+  for (const key of Object.keys(table)) {
+    if (!ids.has(+key)) problems.push(`Elevhärkomst för okänd skola-id ${key}`)
+  }
+  if (utanPrognos.size)
+    problems.push(`${utanPrognos.size} primärområden saknar befolkningsprognos och ignoreras av framskrivningen: ${[...utanPrognos].join(', ')}`)
+  return problems
+}
+
+if (import.meta.env && import.meta.env.DEV) {
+  const problems = validateOrigins()
+  if (problems.length) console.warn(`[origins] ${problems.length} problem i elevhärkomstdata:\n- ${problems.join('\n- ')}`)
 }

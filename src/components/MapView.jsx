@@ -2,15 +2,19 @@ import { useEffect, useRef } from 'react'
 import maplibregl from 'maplibre-gl'
 import { THEME_EXPR, THEME_LABELS, LEGENDS } from '../lib/constants'
 
-function toGeoJSON(schools) {
+function toGeoJSON(schools, projFn, year) {
   return {
     type: 'FeatureCollection',
-    features: schools.map((s) => ({
-      type: 'Feature',
-      id: s.id,
-      geometry: { type: 'Point', coordinates: [s.lng, s.lat] },
-      properties: s,
-    })),
+    features: schools.map((s) => {
+      const proj = projFn ? projFn(s, year) : s.elever
+      const forandPct = s.elever ? Math.round((proj / s.elever - 1) * 100) : 0
+      return {
+        type: 'Feature',
+        id: s.id,
+        geometry: { type: 'Point', coordinates: [s.lng, s.lat] },
+        properties: { ...s, projElever: proj, forandPct },
+      }
+    }),
   }
 }
 
@@ -25,7 +29,7 @@ function planFeatures(plan) {
   return { lines: { type: 'FeatureCollection', features: lines }, closed: { type: 'FeatureCollection', features: closed } }
 }
 
-export default function MapView({ schools, theme, setTheme, onSelect, active, plan }) {
+export default function MapView({ schools, theme, setTheme, onSelect, active, plan, projFn, year }) {
   const containerRef = useRef(null)
   const mapRef = useRef(null)
   const readyRef = useRef(false)
@@ -33,6 +37,8 @@ export default function MapView({ schools, theme, setTheme, onSelect, active, pl
   selectRef.current = onSelect
   const planRef = useRef(plan)
   planRef.current = plan
+  const projRef = useRef({ projFn, year })
+  projRef.current = { projFn, year }
 
   // Initiera kartan en gång
   useEffect(() => {
@@ -46,7 +52,7 @@ export default function MapView({ schools, theme, setTheme, onSelect, active, pl
     mapRef.current = map
 
     map.on('load', () => {
-      map.addSource('schools', { type: 'geojson', data: toGeoJSON(schools) })
+      map.addSource('schools', { type: 'geojson', data: toGeoJSON(schools, projRef.current.projFn, projRef.current.year) })
       map.addLayer({
         id: 'pt', type: 'circle', source: 'schools',
         paint: {
@@ -73,7 +79,7 @@ export default function MapView({ schools, theme, setTheme, onSelect, active, pl
       map.on('mouseenter', 'pt', () => { map.getCanvas().style.cursor = 'pointer' })
       map.on('mouseleave', 'pt', () => { map.getCanvas().style.cursor = '' })
       readyRef.current = true
-      map.getSource('schools').setData(toGeoJSON(schools))
+      map.getSource('schools').setData(toGeoJSON(schools, projRef.current.projFn, projRef.current.year))
       const f = planFeatures(planRef.current)
       map.getSource('plan-lines').setData(f.lines)
       map.getSource('plan-closed').setData(f.closed)
@@ -83,12 +89,12 @@ export default function MapView({ schools, theme, setTheme, onSelect, active, pl
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // Uppdatera punkter när filtret ändras
+  // Uppdatera punkter när filter, scenario eller horisont ändras
   useEffect(() => {
     if (readyRef.current && mapRef.current.getSource('schools')) {
-      mapRef.current.getSource('schools').setData(toGeoJSON(schools))
+      mapRef.current.getSource('schools').setData(toGeoJSON(schools, projFn, year))
     }
-  }, [schools])
+  }, [schools, projFn, year])
 
   // Byt tematisk färgläggning
   useEffect(() => {
@@ -127,6 +133,9 @@ export default function MapView({ schools, theme, setTheme, onSelect, active, pl
             </div>
           ))}
         </div>
+        {theme === 'forandring' && (
+          <div className="legend-note">Prognos till {year} · scenario väljs under Översikt</div>
+        )}
       </div>
 
       {plan.closures.length > 0 && (

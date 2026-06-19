@@ -55,11 +55,15 @@ export const THEME_EXPR = {
   // tomma platser × hyra/plats = spilld hyra (kr/år). Grå = fristående (ej kommunens kostnad).
   spilldHyra: ['case', ['==', ['get', 'hyraPerM2'], 0], '#cbd5e1',
     ['interpolate', ['linear'], ['get', 'spilldHyra'], 0, '#16a34a', 500000, '#ca8a04', 1500000, '#dc2626']],
+  // projicerad elevförändring till vald horisont (forandPct, sätts i MapView per scenario/år)
+  forandring: ['interpolate', ['linear'], ['get', 'forandPct'],
+    -20, '#dc2626', -8, '#f59e0b', 0, '#e2e8f0', 8, '#86efac', 20, '#16a34a'],
 }
 
 export const THEME_LABELS = {
   renovbehov: 'Renoveringsbehov',
   belagg: 'Beläggningsgrad',
+  forandring: 'Elevförändring (prognos)',
   spilldHyra: 'Outnyttjad lokalkostnad (tomma platser)',
   byggnadsar: 'Byggnadsår',
   huvudman: 'Huvudman',
@@ -67,6 +71,7 @@ export const THEME_LABELS = {
 
 export const LEGENDS = {
   renovbehov: [['Akut', RENOV[5][1]], ['Eftersatt', RENOV[4][1]], ['Acceptabelt', RENOV[3][1]], ['Gott', RENOV[2][1]], ['Nyskick', RENOV[1][1]]],
+  forandring: [['Stark ökning ≥ +20%', '#16a34a'], ['Ökning', '#86efac'], ['Oförändrat', '#e2e8f0'], ['Minskning', '#f59e0b'], ['Stark minskning ≤ −20%', '#dc2626']],
   belagg: [['Överbelagd >100%', '#dc2626'], ['Balanserad 85–100%', '#16a34a'], ['Underbelagd <85%', '#2563eb']],
   spilldHyra: [['> 1,5 Mkr/år outnyttjat', '#dc2626'], ['~0,5 Mkr/år outnyttjat', '#ca8a04'], ['Fullt nyttjad', '#16a34a'], ['Fristående (ej kommunal)', '#cbd5e1']],
   byggnadsar: [['Före 1960', '#dc2626'], ['1960–1990', '#ca8a04'], ['Efter 2010', '#16a34a']],

@@ -79,6 +79,7 @@ export default function App() {
           <MapView
             schools={filtered} theme={theme} setTheme={setTheme}
             onSelect={setSelectedId} active={view === 'map'} plan={plan}
+            projFn={projFn} year={year}
           />
         </div>
         {view === 'table' && <TableView schools={filtered} onSelect={setSelectedId} />}
