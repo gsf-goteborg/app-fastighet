@@ -4,24 +4,27 @@ import { SCENARIOS, HORIZONS, MIN_VIABLE_PER_GRADE, LARARKOSTNAD } from '../data
 
 const AREAS = ['Centrum', 'Nordost', 'Hisingen', 'Sydväst']
 const sum = (a, k) => a.reduce((t, s) => t + s[k], 0)
-const project = (elever, rate, years) => Math.round(elever * Math.pow(1 + rate, years))
 const mkr = (kr) => (kr / 1e6).toFixed(1) // kr → Mkr-sträng
 const teachers = (kr) => Math.round(kr / LARARKOSTNAD)
 
 export default function DashboardView({
   schools, onSelect,
   scenario, setScenario, customRate, setCustomRate, year, setYear,
-  maxDist, setMaxDist, reserve, setReserve, rate, years, plan,
+  maxDist, setMaxDist, reserve, setReserve, rate, years, projFn, plan,
 }) {
   const [refSize, setRefSize] = useState(450)         // pedagogisk kapacitet per skola
   const [atRisk, setAtRisk] = useState(false)         // akut-skick = riskkapacitet
   const [target, setTarget] = useState(95)            // målbeläggning %
 
+  const isCohort = scenario === 'Befolkningsprognos'
+  // Projicerat elevtal för en skola vid vald horisont (kohort- eller uniform takt)
+  const pe = (s) => projFn(s, year)
+
   const { kpis, rows, totGap, totUnits, candidates, econ } = useMemo(() => {
     const cap = sum(schools, 'pedKapacitet')
     const elever = sum(schools, 'elever')
     const bel = cap ? Math.round((elever / cap) * 100) : 0
-    const projTot = project(elever, rate, years)
+    const projTot = schools.reduce((t, s) => t + pe(s), 0)
 
     // --- Lokalekonomi: bara kommunala lokaler (kommunens egen hyreskostnad) ---
     const komm = schools.filter((s) => s.hyraPerM2 > 0)
@@ -33,9 +36,9 @@ export default function DashboardView({
     // projicerat per skola (uniform takt)
     let projElevKomm = 0, spilldProj = 0, tommaProj = 0
     for (const s of komm) {
-      const pe = project(s.elever, rate, years)
-      projElevKomm += pe
-      const tomma = Math.max(0, s.pedKapacitet - pe)
+      const projE = pe(s)
+      projElevKomm += projE
+      const tomma = Math.max(0, s.pedKapacitet - projE)
       tommaProj += tomma
       spilldProj += tomma * s.kostnadPerPlats
     }
@@ -65,7 +68,7 @@ export default function DashboardView({
       const risk = atRisk ? sum(g.filter((s) => s.renovbehov === 5), 'pedKapacitet') : 0
       const cEff = c - risk
       const e = sum(g, 'elever')
-      const proj = project(e, rate, years)
+      const proj = g.reduce((t, s) => t + pe(s), 0)
       const gap = proj - cEff // positiv = brist, negativ = överskott
       const units = Math.round(gap / refSize)
       return { a, n: g.length, c, cEff, risk, e, proj, gap, units, belProj: cEff ? Math.round((proj / cEff) * 100) : 0 }
@@ -76,7 +79,7 @@ export default function DashboardView({
     // Konsolideringskandidater: skolor som blir små/under-belagda eller är i dåligt skick
     const candidates = schools
       .map((s) => {
-        const proj = project(s.elever, rate, years)
+        const proj = pe(s)
         const belProj = proj / s.pedKapacitet
         const perGrade = Math.round(proj / s.arskurserCount)
         const reasons = []
@@ -91,7 +94,24 @@ export default function DashboardView({
       .sort((a, b) => b.score - a.score)
 
     return { kpis, rows, totGap, totUnits, candidates, econ }
-  }, [schools, rate, years, year, refSize, atRisk, target])
+  }, [schools, projFn, year, refSize, atRisk, target])
+
+  // Framskrivning aggregerad per mellanområde (befolkningsprognos × elevmönster)
+  const omr = useMemo(() => {
+    const m = new Map()
+    for (const s of schools) {
+      let o = m.get(s.mellanomrade)
+      if (!o) { o = { k: s.mellanomrade, stad: s.stadsomrade, n: 0, now: 0, proj: 0 }; m.set(s.mellanomrade, o) }
+      o.n++; o.now += s.elever; o.proj += pe(s)
+    }
+    return [...m.values()].sort((a, b) =>
+      a.stad.localeCompare(b.stad, 'sv') || a.k.localeCompare(b.k, 'sv'))
+  }, [schools, projFn, year])
+
+  // Vägd implicit förändringstakt för urvalet (kohortmodellen har ingen enskild takt)
+  const totNow = sum(schools, 'elever')
+  const implRate = years > 0 && totNow > 0
+    ? Math.pow(schools.reduce((t, s) => t + pe(s), 0) / totNow, 1 / years) - 1 : 0
 
   const action = (units) => {
     if (units >= 1) return <span className="gap-pos">Bygg ~{units} ny skola{units > 1 ? 'r' : ''}</span>
@@ -156,8 +176,9 @@ export default function DashboardView({
       <div className="card">
         <h2>Scenario — elevutveckling och kapacitet</h2>
         <p className="hint">
-          Välj demografiskt scenario och planeringshorisont. Dagens elevtal projiceras med vald
-          årlig förändring. <span className="mockflag">exempelscenario</span>
+          Välj demografiskt scenario och planeringshorisont. {isCohort
+            ? 'Befolkningsprognos skrivs fram per primärområde och åldersstadie (F–3 / 4–6 / 7–9) och fördelas på skolor via historiskt elevmönster.'
+            : 'Dagens elevtal projiceras med vald årlig förändring.'} <span className="mockflag">exempelscenario</span>
         </p>
 
         <div className="controls-inline">
@@ -175,7 +196,9 @@ export default function DashboardView({
             </label>
           )}
           <span className="inlabel" style={{ marginLeft: 'auto' }}>
-            {rate >= 0 ? '+' : ''}{(rate * 100).toFixed(1)} %/år
+            {isCohort
+              ? `≈ ${implRate >= 0 ? '+' : ''}${(implRate * 100).toFixed(1)} %/år (vägt)`
+              : `${rate >= 0 ? '+' : ''}${(rate * 100).toFixed(1)} %/år`}
           </span>
         </div>
 
@@ -226,6 +249,42 @@ export default function DashboardView({
                 <td>{action(r.units)}</td>
               </tr>
             ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="card">
+        <h2>Framskrivning per område — {year}</h2>
+        <p className="hint">
+          Befolkningsprognos per primärområde och åldersstadie × historiskt elevmönster (vilka
+          skolor områdets elever söker sig till), aggregerat per mellanområde. Visar var
+          elevunderlaget växer respektive krymper — inte bara en gemensam takt för hela staden.
+          <span className="mockflag">exempelprognos</span>
+        </p>
+        <table className="gaptable">
+          <thead>
+            <tr>
+              <th>Mellanområde</th><th>Stadsområde</th><th>Skolor</th>
+              <th>Elever idag</th><th>Elever {year}</th><th>Förändring</th>
+            </tr>
+          </thead>
+          <tbody>
+            {omr.map((o) => {
+              const diff = o.proj - o.now
+              const pct = o.now ? Math.round((diff / o.now) * 100) : 0
+              return (
+                <tr key={o.k}>
+                  <td><b>{o.k}</b></td>
+                  <td>{o.stad}</td>
+                  <td>{o.n}</td>
+                  <td>{o.now.toLocaleString('sv')}</td>
+                  <td>{o.proj.toLocaleString('sv')}</td>
+                  <td style={{ color: diff < 0 ? '#dc2626' : diff > 0 ? '#16a34a' : 'var(--muted)' }}>
+                    {diff >= 0 ? '+' : ''}{diff.toLocaleString('sv')} ({pct >= 0 ? '+' : ''}{pct}%)
+                  </td>
+                </tr>
+              )
+            })}
           </tbody>
         </table>
       </div>

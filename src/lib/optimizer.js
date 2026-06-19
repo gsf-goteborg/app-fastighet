@@ -22,18 +22,22 @@ function emptyPlan(komm, optimal) {
   return { closures: [], savedKr: 0, seatsRemoved: 0, avoidedDebt: 0, maxKm: 0, stranded: [], openCount: komm.length, optimal }
 }
 
-function context(schools, { rate, years, reservePct }) {
-  const proj = (e) => Math.round(e * Math.pow(1 + rate, years))
+function context(schools, { rate, years, reservePct, projFn, year }) {
+  // projFn (skola, år) → projicerat elevtal används om det finns (befolknings-
+  // baserad framskrivning); annars enkel uniform takt på dagens elevtal.
+  const projOf = projFn
+    ? (s) => projFn(s, year)
+    : (s) => Math.round(s.elever * Math.pow(1 + rate, years))
   const komm = schools.filter((s) => s.hyraPerM2 > 0)   // kommunens egna lokaler
   const fri = schools.filter((s) => s.hyraPerM2 === 0)  // fristående → resiliensbehov
   const friContingency = {}
   for (const f of fri) {
-    const v = proj(f.elever)
+    const v = projOf(f)
     if (v > (friContingency[f.stadsomrade] || 0)) friContingency[f.stadsomrade] = v
   }
   const areaDemand = {}, areaCap = {}
   for (const s of komm) {
-    areaDemand[s.stadsomrade] = (areaDemand[s.stadsomrade] || 0) + proj(s.elever)
+    areaDemand[s.stadsomrade] = (areaDemand[s.stadsomrade] || 0) + projOf(s)
     areaCap[s.stadsomrade] = (areaCap[s.stadsomrade] || 0) + s.pedKapacitet
   }
   const areaRequired = {}
@@ -42,7 +46,7 @@ function context(schools, { rate, years, reservePct }) {
     // kan aldrig kräva mer kapacitet än som finns (annars olösbart)
     areaRequired[a] = Math.min(areaDemand[a] + reserve, areaCap[a])
   }
-  return { proj, komm, areaRequired }
+  return { projOf, komm, areaRequired }
 }
 
 function finalize(closures, komm, loadOf, optimal) {
@@ -65,11 +69,11 @@ function finalize(closures, komm, loadOf, optimal) {
 // ---------- MILP ----------
 function milpPlan(schools, params) {
   const { maxDistKm } = params
-  const { proj, komm, areaRequired } = context(schools, params)
+  const { projOf, komm, areaRequired } = context(schools, params)
   if (komm.length === 0) return emptyPlan(komm, true)
 
   const d = {}
-  komm.forEach((s) => { d[s.id] = proj(s.elever) })
+  komm.forEach((s) => { d[s.id] = projOf(s) })
 
   const model = { optimize: 'cost', opType: 'min', constraints: {}, variables: {}, ints: {} }
 
@@ -125,8 +129,8 @@ function milpPlan(schools, params) {
 // ---------- Girig fallback ----------
 function greedyPlan(schools, params) {
   const { maxDistKm } = params
-  const { proj, komm, areaRequired } = context(schools, params)
-  let open = komm.map((s) => ({ s, cap: s.pedKapacitet, load: proj(s.elever) }))
+  const { projOf, komm, areaRequired } = context(schools, params)
+  let open = komm.map((s) => ({ s, cap: s.pedKapacitet, load: projOf(s) }))
   const closures = []
   const score = (o) =>
     (1 - o.load / o.cap) * 100 + (o.s.renovbehov >= 4 ? o.s.renovbehov * 10 : 0) + o.s.kostnadPerPlats / 1000

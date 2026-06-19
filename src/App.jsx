@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react'
 import { SCHOOLS, SCENARIOS, BASE_YEAR } from './data/schools'
 import { emptyFilters, applyFilters } from './lib/filters'
 import { planConsolidation } from './lib/optimizer'
+import { buildProjector } from './lib/framskrivning'
 import Sidebar from './components/Sidebar'
 import MapView from './components/MapView'
 import TableView from './components/TableView'
@@ -29,14 +30,26 @@ export default function App() {
 
   const rate = scenario === 'Egen' ? customRate / 100 : SCENARIOS[scenario]
   const years = year - BASE_YEAR
+
+  // Befolkningsbaserad framskrivning byggs en gång över hela skolbeståndet
+  // (demografin är oberoende av filtret). Scenariot "Befolkningsprognos"
+  // använder kohortmodellen; övriga scenarier en uniform takt.
+  const cohort = useMemo(() => buildProjector(SCHOOLS), [])
+  const projFn = useMemo(
+    () => scenario === 'Befolkningsprognos'
+      ? (s, y) => cohort.project(s, y)
+      : (s, y) => Math.round(s.elever * Math.pow(1 + rate, y - BASE_YEAR)),
+    [scenario, rate, cohort],
+  )
+
   const plan = useMemo(
-    () => planConsolidation(filtered, { rate, years, maxDistKm: maxDist, reservePct: reserve }),
-    [filtered, rate, years, maxDist, reserve],
+    () => planConsolidation(filtered, { rate, years, year, projFn, maxDistKm: maxDist, reservePct: reserve }),
+    [filtered, rate, years, year, projFn, maxDist, reserve],
   )
 
   const planState = {
     scenario, setScenario, customRate, setCustomRate, year, setYear,
-    maxDist, setMaxDist, reserve, setReserve, rate, years, plan,
+    maxDist, setMaxDist, reserve, setReserve, rate, years, projFn, plan,
   }
 
   return (
