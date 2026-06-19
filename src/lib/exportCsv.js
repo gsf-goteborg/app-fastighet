@@ -3,6 +3,8 @@
 const COLUMNS = [
   ['namn', 'Skola'],
   ['stadsomrade', 'Stadsområde'],
+  ['mellanomrade', 'Mellanområde'],
+  ['primaromrade', 'Primärområde'],
   ['huvudman', 'Huvudman'],
   ['arskurser', 'Årskurser'],
   ['adress', 'Adress'],

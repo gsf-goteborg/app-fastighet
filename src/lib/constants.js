@@ -14,8 +14,22 @@ export const RENOV = {
 }
 
 // Filter-fasetter (fältnamn → valbara värden, i visningsordning)
+// Geografin följer Göteborgs indelning: stadsområde ⊃ mellanområde ⊃ primärområde.
 export const FACETS = {
   stadsomrade: ['Centrum', 'Nordost', 'Hisingen', 'Sydväst'],
+  mellanomrade: [
+    'Centrum-Vasastaden', 'Haga-Linné', 'Guldheden-Johanneberg', 'Örgryte-Härlanda',
+    'Bergsjön', 'Kortedala', 'Angered',
+    'Backa', 'Biskopsgården', 'Lundby',
+    'Frölunda', 'Älvsborg-Önnered', 'Askim-Hovås',
+  ],
+  primaromrade: [
+    'Vasastaden', 'Gårda', 'Annedal', 'Masthugget', 'Johanneberg', 'Krokslätt',
+    'Södra Guldheden', 'Bö', 'Lunden',
+    'Östra Bergsjön', 'Kortedala', 'Gärdsås', 'Rannebergen', 'Lövgärdet',
+    'Tolered', 'Brunnsbo', 'Rya', 'Södra Biskopsgården',
+    'Järnbrott', 'Älvsborg', 'Önnered', 'Askim',
+  ],
   huvudman: ['Kommunal', 'Fristående'],
   aldersgrupp: ['–1959', '1960–79', '1980–2009', '2010–'],
   renovgrupp: ['OK', 'Acceptabelt', 'Eftersatt', 'Akut'],
@@ -24,6 +38,8 @@ export const FACETS = {
 
 export const FACET_LABELS = {
   stadsomrade: 'Stadsområde',
+  mellanomrade: 'Mellanområde',
+  primaromrade: 'Primärområde',
   huvudman: 'Huvudman',
   aldersgrupp: 'Byggnadsår',
   renovgrupp: 'Renoveringsbehov',

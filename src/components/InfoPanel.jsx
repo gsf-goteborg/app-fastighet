@@ -25,6 +25,8 @@ export default function InfoPanel({ school, onClose }) {
           </div>
           <div className="p-body">
             <Field label="Stadsområde" value={school.stadsomrade} />
+            <Field label="Mellanområde" value={school.mellanomrade} />
+            <Field label="Primärområde" value={school.primaromrade} />
             <Field label="Adress" value={school.adress} />
             <Field label="Närmaste skola" value={school.nearestNamn + ' · ' + school.nearestKm + ' km'} />
             <Field label="Årskurser" value={school.arskurser} />
