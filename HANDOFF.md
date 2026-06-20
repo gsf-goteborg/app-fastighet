@@ -86,12 +86,66 @@ annat behöver ändras. Är modellen en logit-/nyttomodell kan en skolnedläggni
 simuleras genom att ta bort skolan och normera om resten (IIA) — då kan
 omfördelningen vid stängning drivas av faktiskt skolval i stället för tilldelning.
 
+### C. Riktiga vägnätsavstånd via DuckDB (precompute, inte runtime-DB)
+
+Den stora adress×skola-tabellen (tiotals miljoner rader) ska **inte** in i
+frontend-bundeln — för stor och adressnivå är känslig. Använd DuckDB som
+ETL-steg: aggregera offline till en liten härledd tabell som appen läser, på
+samma sätt som `origins.js`.
+
+Appen behöver bara aggregat:
+- **Per skola**: genomsnittlig (och ev. P90) resväg → `meanKm` i `origins.js`.
+- **Per (primärområde → skola)**: representativt vägnätsavstånd → ny `distances.js`
+  som optimeraren (radie 2/4/6 km) och valmodellen läser i stället för `haversineKm`.
+
+Förslag på arbetsflöde:
+
+1. Spara er matris som **Parquet** (kolumnär, komprimerad; DuckDB läser den direkt
+   och det är även rätt lagring för önska-skola-processen i Python).
+2. Kör en DuckDB-SQL som joinar adress→primärområde (väg gärna med var eleverna
+   faktiskt bor), grupperar och skriver ut den lilla tabellen. Skiss:
+
+```sql
+-- indata: avstand(adress_id, skol_id, km), adress(adress_id, primaromrade),
+--         elev(adress_id) eller folkbokföring för viktning
+-- Per (primärområde, skola): elevviktat medelavstånd, beskuret till rimlig radie
+COPY (
+  SELECT a.primaromrade, d.skol_id,
+         round(avg(d.km), 2)                         AS medel_km,
+         round(quantile_cont(d.km, 0.9), 2)          AS p90_km,
+         count(*)                                    AS n
+  FROM avstand d
+  JOIN adress  a USING (adress_id)
+  -- JOIN elev e USING (adress_id)   -- valfritt: vikta på faktiska elever
+  WHERE d.km <= 6                                    -- max stadieradie
+  GROUP BY a.primaromrade, d.skol_id
+) TO 'distances.parquet' (FORMAT parquet);
+
+-- Per skola: genomsnittlig resväg för eleverna (driver origins.meanKm)
+COPY (
+  SELECT d.skol_id, round(avg(d.km), 2) AS mean_km
+  FROM avstand d JOIN placering p ON p.adress_id = d.adress_id AND p.skol_id = d.skol_id
+  GROUP BY d.skol_id
+) TO 'school_meankm.parquet' (FORMAT parquet);
+```
+
+3. Exportera den lilla tabellen till JSON/JS och lägg som `src/data/distances.js`.
+   Mappa `skol_id`/`primaromrade` mot appens `id`/`primaromrade`. Byt sedan
+   `haversineKm` i `optimizer.js` (och avståndsmodellen i `choice.js`) mot
+   uppslag i tabellen, och `meanKm` i `origins.js` mot de riktiga värdena.
+
+Vill ni ha live-uppslag per adress i verktyget (t.ex. "vilka skolor inom X km
+för denna adress") går det utan backend via **DuckDB-WASM** mot en hostad
+Parquet (range-requests), eller en liten **FastAPI + DuckDB**. Behövs inte för
+nuvarande områdesnivå.
+
 ## Därefter (kräver de riktiga vägnätsavstånden)
 
-- **Riktiga avstånd in i konsolideringsplanen.** Stadieindelningen och radierna
-  (2/4/6 km) finns redan i `optimizer.js` (`STAGE_RADIUS`), men avstånden mäts ännu
-  fågelvägen byggnad→byggnad. Byt `haversineKm` mot riktiga vägnätsavstånd
-  (helst hemområde→skola) så blir radievillkoret styrkbart per elev.
+- **Riktiga avstånd in i konsolideringsplanen** (se C ovan). Stadieindelningen och
+  radierna (2/4/6 km) finns redan i `optimizer.js` (`STAGE_RADIUS`), men avstånden
+  mäts ännu fågelvägen byggnad→byggnad. Byt `haversineKm` mot uppslag i den
+  DuckDB-härledda `distances.js` (hemområde→skola) så blir radievillkoret styrkbart
+  per elev.
 - **Likvärdighetslins** — andel elever med > X km resväg per stadie, och hur varje
   nedläggning ändrar den.
 - **Skolvalsdriven omfördelning vid stängning** — använd `CHOICE` (IIA) för att visa
