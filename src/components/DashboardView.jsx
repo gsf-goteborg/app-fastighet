@@ -2,6 +2,12 @@ import { useState, useMemo } from 'react'
 import { RENOV, occColor } from '../lib/constants'
 import { SCENARIOS, HORIZONS, MIN_VIABLE_PER_GRADE, LARARKOSTNAD, BASE_YEAR } from '../data/schools'
 import { getIntake, entryGrades } from '../lib/simulate'
+import { SCHOOL_ORIGINS } from '../data/origins'
+
+// Restidsklasser (km) för tillgänglighetsfördelning
+const TRAVEL_BINS = [[0, 1], [1, 2], [2, 4], [4, 6], [6, Infinity]]
+const TRAVEL_LABELS = ['< 1 km', '1–2 km', '2–4 km', '4–6 km', '> 6 km']
+const TRAVEL_COLORS = ['#16a34a', '#65a30d', '#ca8a04', '#ea580c', '#dc2626']
 
 const AREAS = ['Centrum', 'Nordost', 'Hisingen', 'Sydväst']
 const sum = (a, k) => a.reduce((t, s) => t + s[k], 0)
@@ -123,6 +129,32 @@ export default function DashboardView({
       .filter((x) => x.o && x.o.mean > 0)
       .sort((a, b) => b.o.mean - a.o.mean),
     [schools, intake])
+
+  // Tillgänglighet — elevviktad restidsfördelning ur elevhärkomsten
+  const access = useMemo(() => {
+    const counts = TRAVEL_BINS.map(() => 0)
+    let total = 0, weighted = 0
+    const perSchool = []
+    for (const s of schools) {
+      const o = SCHOOL_ORIGINS[s.id]
+      if (!o) continue
+      const cells = [...o.areas, ...(o.ovriga ? [{ medelKm: o.ovriga.medelKm, antal: o.ovriga.antal }] : [])]
+      let sn = 0, sw = 0
+      for (const c of cells) {
+        total += c.antal; weighted += c.antal * c.medelKm; sn += c.antal; sw += c.antal * c.medelKm
+        const bi = TRAVEL_BINS.findIndex(([lo, hi]) => c.medelKm >= lo && c.medelKm < hi)
+        counts[bi < 0 ? TRAVEL_BINS.length - 1 : bi] += c.antal
+      }
+      if (sn) perSchool.push({ s, mean: +(sw / sn).toFixed(1), n: sn })
+    }
+    const over2 = counts.slice(2).reduce((t, n) => t + n, 0)
+    return {
+      counts, total,
+      mean: total ? +(weighted / total).toFixed(1) : 0,
+      over2Pct: total ? Math.round((over2 / total) * 100) : 0,
+      worst: perSchool.sort((a, b) => b.mean - a.mean).slice(0, 5),
+    }
+  }, [schools])
 
   const action = (units) => {
     if (units >= 1) return <span className="gap-pos">Bygg ~{units} ny skola{units > 1 ? 'r' : ''}</span>
@@ -324,6 +356,51 @@ export default function DashboardView({
             ))}
           </tbody>
         </table>
+      </div>
+
+      <div className="card">
+        <h2>Tillgänglighet — elevernas resväg</h2>
+        <p className="hint">
+          Elevviktad restidsfördelning ur elevhärkomsten. Närhetsnorm per stadie: lågstadiet 2 km,
+          mellanstadiet 4 km, högstadiet 6 km — yngre barn ska ha nära till skolan. Avgörande för
+          likvärdighet: en nedläggning slår hårdare där eleverna redan reser långt.
+          <span className="mockflag">exempelavstånd</span>
+        </p>
+        <div className="kpis" style={{ marginBottom: 12 }}>
+          <div className="kpi"><div className="k">Genomsnittlig resväg</div><div className="v">{access.mean} <small>km</small></div></div>
+          <div className="kpi"><div className="k">Andel elever &gt; 2 km</div><div className="v">{access.over2Pct} <small>%</small></div></div>
+          <div className="kpi"><div className="k">Elever i urvalet</div><div className="v">{access.total.toLocaleString('sv')}</div></div>
+        </div>
+        <div className="distbar" style={{ marginBottom: 10 }}>
+          {access.counts.map((n, i) => n > 0 && (
+            <span key={i} title={TRAVEL_LABELS[i] + ': ' + n + ' elever'}
+              style={{ background: TRAVEL_COLORS[i], width: (n / (access.total || 1) * 100) + '%' }}>
+              {Math.round(n / (access.total || 1) * 100)}%
+            </span>
+          ))}
+        </div>
+        <div className="legend" style={{ display: 'flex', gap: 14, flexWrap: 'wrap', marginBottom: 6 }}>
+          {TRAVEL_LABELS.map((l, i) => (
+            <span key={l} className="row" style={{ fontSize: 12 }}>
+              <span className="dot" style={{ background: TRAVEL_COLORS[i] }} />{l}
+            </span>
+          ))}
+        </div>
+        {access.worst.length > 0 && (
+          <table className="gaptable">
+            <thead><tr><th>Längst resväg (minst tillgängliga)</th><th>Primärområde</th><th>Elever</th><th>Snittresväg</th></tr></thead>
+            <tbody>
+              {access.worst.map(({ s, mean, n }) => (
+                <tr key={s.id} onClick={() => onSelect(s.id)} style={{ cursor: 'pointer' }}>
+                  <td><b>{s.namn}</b></td>
+                  <td>{s.primaromrade}</td>
+                  <td>{n}</td>
+                  <td style={{ color: mean > 2 ? '#dc2626' : 'var(--muted)' }}>{mean} km</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
 
       <div className="card">
