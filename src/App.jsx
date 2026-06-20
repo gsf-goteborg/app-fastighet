@@ -48,9 +48,21 @@ export default function App() {
     [filtered, rate, years, year, projFn, radii, reserve],
   )
 
+  // Robusthet: kör planen under varje demografiskt scenario vid vald horisont
+  const robustness = useMemo(
+    () => Object.keys(SCENARIOS).map((sc) => {
+      const f = sc === 'Befolkningsprognos'
+        ? (s, y) => cohort.project(s, y)
+        : (s, y) => Math.round(s.elever * Math.pow(1 + SCENARIOS[sc], y - BASE_YEAR))
+      const pl = planConsolidation(filtered, { rate: SCENARIOS[sc], years, year, projFn: f, radii, reservePct: reserve })
+      return { scenario: sc, names: pl.closures.map((c) => c.school.namn), n: pl.closures.length, seats: pl.seatsRemoved, savedKr: pl.savedKr }
+    }),
+    [filtered, years, year, radii, reserve, cohort],
+  )
+
   const planState = {
     scenario, setScenario, customRate, setCustomRate, year, setYear,
-    radii, setRadii, reserve, setReserve, rate, years, projFn, plan,
+    radii, setRadii, reserve, setReserve, rate, years, projFn, plan, robustness,
   }
 
   return (

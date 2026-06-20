@@ -17,9 +17,20 @@ const teachers = (kr) => Math.round(kr / LARARKOSTNAD)
 export default function DashboardView({
   schools, onSelect,
   scenario, setScenario, customRate, setCustomRate, year, setYear,
-  radii, setRadii, reserve, setReserve, rate, years, projFn, plan,
+  radii, setRadii, reserve, setReserve, rate, years, projFn, plan, robustness,
 }) {
   const setRadius = (st, v) => setRadii({ ...radii, [st]: Math.max(0.5, +v || radii[st]) })
+
+  // Robusthet: vilka stängningar håller i ALLA scenarier vs bara vissa
+  const robust = useMemo(() => {
+    if (!robustness?.length) return { all: [], some: [] }
+    const sets = robustness.map((r) => new Set(r.names))
+    const union = [...new Set(robustness.flatMap((r) => r.names))]
+    return {
+      all: union.filter((n) => sets.every((s) => s.has(n))),
+      some: union.filter((n) => !sets.every((s) => s.has(n))),
+    }
+  }, [robustness])
   const [refSize, setRefSize] = useState(450)         // pedagogisk kapacitet per skola
   const [atRisk, setAtRisk] = useState(false)         // akut-skick = riskkapacitet
   const [target, setTarget] = useState(95)            // målbeläggning %
@@ -506,6 +517,40 @@ export default function DashboardView({
             Lågt nyttjade men kan ej konsolideras (avstånd/reserv): {plan.stranded.join(', ')}.
           </p>
         )}
+      </div>
+
+      <div className="card">
+        <h2>Robusthet — håller planen i alla scenarier? {year}</h2>
+        <p className="hint">
+          Samma konsolideringsregler körda under varje demografiskt scenario. En stängning som är
+          motiverad i alla scenarier är ett tryggt beslut; en som bara dyker upp vid kraftig
+          minskning är villkorad och bör avvaktas. <span className="mockflag">exempelscenario</span>
+        </p>
+        <table className="gaptable">
+          <thead><tr><th>Scenario</th><th>Stängningar</th><th>Platser bort</th><th>Frigör</th></tr></thead>
+          <tbody>
+            {(robustness || []).map((r) => (
+              <tr key={r.scenario}>
+                <td><b>{r.scenario}</b></td>
+                <td>{r.n}</td>
+                <td>{r.seats.toLocaleString('sv')}</td>
+                <td>{mkr(r.savedKr)} Mkr/år</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <div className="banner" style={{ marginTop: 12 }}>
+          {robust.all.length === 0 && robust.some.length === 0 ? (
+            <div>Ingen konsolidering föreslås i något scenario vid denna horisont/villkor.</div>
+          ) : (
+            <div>
+              <b style={{ color: '#16a34a' }}>Robusta stängningar</b> (alla scenarier): {robust.all.length ? robust.all.join(', ') : '–'}.
+              {robust.some.length > 0 && (
+                <> <b style={{ color: '#ea580c' }}>Villkorade</b> (endast vissa scenarier): {robust.some.join(', ')}.</>
+              )}
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="card">
