@@ -47,6 +47,13 @@ export function schoolStages(span) {
   return STAGE_KEYS.filter((k) => set.has(k))
 }
 
+// Antal årskurser per stadie i ett spann, t.ex. "F–6" → { lag:4, mellan:3, hog:0 }
+export function stageGrades(span) {
+  const out = { lag: 0, mellan: 0, hog: 0 }
+  for (const g of gradesOf(span)) out[STAGE_OF[g]]++
+  return out
+}
+
 // Deltagandegrad: andel av åldersgruppen som går i grundskola.
 export const PARTICIPATION = 0.965
 

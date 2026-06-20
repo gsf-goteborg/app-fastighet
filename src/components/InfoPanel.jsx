@@ -1,5 +1,6 @@
 import { RENOV, occColor } from '../lib/constants'
 import { SCHOOL_ORIGINS } from '../data/origins'
+import { getIntake } from '../lib/simulate'
 
 function Field({ label, value, mock }) {
   return (
@@ -41,6 +42,7 @@ function Origins({ school }) {
 export default function InfoPanel({ school, onClose }) {
   const komm = school && school.huvudman === 'Kommunal'
   const origin = school ? SCHOOL_ORIGINS[school.id] : null
+  const intake = school ? getIntake().get(school.id) : null
   return (
     <aside className={'panel' + (school ? ' open' : '')}>
       {school && (
@@ -59,6 +61,10 @@ export default function InfoPanel({ school, onClose }) {
             <Field label="Primärområde" value={school.primaromrade} />
             <Field label="Adress" value={school.adress} />
             {origin && <Field label="Genomsnittlig resväg (vägnät)" value={origin.meanKm + ' km'} mock />}
+            {intake && intake.mean > 0 && (
+              <Field label="Förväntad intagning nästa termin"
+                value={intake.mean + ' elever (' + intake.p10 + '–' + intake.p90 + ')'} mock />
+            )}
             <Origins school={school} />
             <Field label="Närmaste skola" value={school.nearestNamn + ' · ' + school.nearestKm + ' km'} />
             <Field label="Årskurser" value={school.arskurser} />

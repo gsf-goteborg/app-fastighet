@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react'
 import { RENOV, occColor } from '../lib/constants'
-import { SCENARIOS, HORIZONS, MIN_VIABLE_PER_GRADE, LARARKOSTNAD } from '../data/schools'
+import { SCENARIOS, HORIZONS, MIN_VIABLE_PER_GRADE, LARARKOSTNAD, BASE_YEAR } from '../data/schools'
+import { getIntake, entryGrades } from '../lib/simulate'
 
 const AREAS = ['Centrum', 'Nordost', 'Hisingen', 'Sydväst']
 const sum = (a, k) => a.reduce((t, s) => t + s[k], 0)
@@ -112,6 +113,15 @@ export default function DashboardView({
   const totNow = sum(schools, 'elever')
   const implRate = years > 0 && totNow > 0
     ? Math.pow(schools.reduce((t, s) => t + pe(s), 0) / totNow, 1 / years) - 1 : 0
+
+  // Önska skola — simulerad intagning nästa termin (Monte Carlo, globalt; filtrerat till urvalet)
+  const intake = getIntake()
+  const intakeRows = useMemo(() =>
+    schools
+      .map((s) => ({ s, o: intake.get(s.id), entry: entryGrades(s) }))
+      .filter((x) => x.o && x.o.mean > 0)
+      .sort((a, b) => b.o.mean - a.o.mean),
+    [schools, intake])
 
   const action = (units) => {
     if (units >= 1) return <span className="gap-pos">Bygg ~{units} ny skola{units > 1 ? 'r' : ''}</span>
@@ -285,6 +295,32 @@ export default function DashboardView({
                 </tr>
               )
             })}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="card">
+        <h2>Önska skola — simulerad intagning {BASE_YEAR + 1}</h2>
+        <p className="hint">
+          Skolvalsmodellen ger varje elev en sannolikhet per skola vid de tre övergångarna
+          (förskoleklass 6 år, mellanstadium 10 år, högstadium 13 år). Här simuleras valen och
+          visar förväntad intagning av nya elever per skola med osäkerhetsband (P10–P90).
+          <span className="mockflag">exempelmodell</span>
+        </p>
+        <table className="gaptable">
+          <thead>
+            <tr><th>Skola</th><th>Område</th><th>Inträde</th><th>Förväntad intagning</th><th>Osäkerhet (P10–P90)</th></tr>
+          </thead>
+          <tbody>
+            {intakeRows.map(({ s, o, entry }) => (
+              <tr key={s.id} onClick={() => onSelect(s.id)} style={{ cursor: 'pointer' }}>
+                <td><b>{s.namn}</b></td>
+                <td>{s.primaromrade}</td>
+                <td>{entry.join(', ')}</td>
+                <td><b>{o.mean}</b> elever</td>
+                <td style={{ color: 'var(--muted)' }}>{o.p10}–{o.p90}</td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>

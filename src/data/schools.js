@@ -49,6 +49,7 @@ export function gradeCount(span) {
 }
 
 import { haversineKm } from '../lib/geo'
+import { stageGrades } from './prognos'
 
 function ageGroup(yr) {
   return yr < 1960 ? '–1959' : yr < 1980 ? '1960–79' : yr < 2010 ? '1980–2009' : '2010–'
@@ -73,6 +74,14 @@ export const SCHOOLS = RAW.map((r, i) => {
   const tommaPlatser = Math.max(0, pedKapacitet - elever)
   const spilldHyra = Math.round(tommaPlatser * kostnadPerPlats) // hyra för tomma platser, kr/år
   const kostnadPerElev = elever ? Math.round(arshyra / elever) : 0
+  // Kapacitet och elever fördelade per åldersstadie (lag/mellan/hog)
+  const sg = stageGrades(r[3])
+  const stageKap = { lag: kapPerArskurs * sg.lag, mellan: kapPerArskurs * sg.mellan, hog: kapPerArskurs * sg.hog }
+  const stageElever = {
+    lag: Math.round(elever * sg.lag / arskurserCount),
+    mellan: Math.round(elever * sg.mellan / arskurserCount),
+    hog: Math.round(elever * sg.hog / arskurserCount),
+  }
   return {
     id: i,
     namn: r[0], huvudman: r[1], stadsomrade: r[2], arskurser: r[3], adress: r[4],
@@ -80,7 +89,7 @@ export const SCHOOLS = RAW.map((r, i) => {
     platser: r[10], elever, renovbehov: r[12], underhallsskuld: r[13],
     energiklass: r[14], fastighet: r[15],
     primaromrade: r[18], mellanomrade: r[19],
-    kapPerArskurs, arskurserCount, pedKapacitet,
+    kapPerArskurs, arskurserCount, pedKapacitet, stageKap, stageElever,
     eleverPerArskurs: Math.round(elever / arskurserCount),
     hyraPerM2, arshyra, kostnadPerPlats: Math.round(kostnadPerPlats),
     tommaPlatser, spilldHyra, kostnadPerElev,
