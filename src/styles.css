@@ -116,3 +116,7 @@ tbody tr:hover { background:#f8fafc; cursor:pointer; }
 .origin-row { display:flex; justify-content:space-between; gap:12px; font-size:12px; }
 .origin-row.muted { color:var(--muted); }
 .origin-meta { color:var(--muted); white-space:nowrap; }
+.errbox { margin:24px; padding:20px 22px; max-width:640px; background:#fff; border:1px solid #fecaca; border-left:3px solid #dc2626; border-radius:10px; }
+.errbox h2 { margin:0 0 8px; color:#b91c1c; font-size:16px; }
+.errbox p { color:var(--muted); font-size:13px; margin:0 0 12px; }
+.errbox pre { background:#f8fafc; border:1px solid var(--line); border-radius:8px; padding:10px; font-size:12px; overflow:auto; margin:0 0 12px; }

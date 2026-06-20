@@ -8,6 +8,7 @@ import MapView from './components/MapView'
 import TableView from './components/TableView'
 import DashboardView from './components/DashboardView'
 import InfoPanel from './components/InfoPanel'
+import ErrorBoundary from './components/ErrorBoundary'
 
 const TABS = [['map', 'Karta'], ['table', 'Tabell'], ['dash', 'Översikt']]
 
@@ -82,8 +83,8 @@ export default function App() {
             projFn={projFn} year={year}
           />
         </div>
-        {view === 'table' && <TableView schools={filtered} onSelect={setSelectedId} />}
-        {view === 'dash' && <DashboardView schools={filtered} onSelect={setSelectedId} {...planState} />}
+        {view === 'table' && <ErrorBoundary><TableView schools={filtered} onSelect={setSelectedId} /></ErrorBoundary>}
+        {view === 'dash' && <ErrorBoundary><DashboardView schools={filtered} onSelect={setSelectedId} {...planState} /></ErrorBoundary>}
 
         <InfoPanel school={selected} onClose={() => setSelectedId(null)} />
       </main>
