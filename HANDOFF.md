@@ -150,6 +150,10 @@ nuvarande områdesnivå.
   nedläggning ändrar den.
 - **Skolvalsdriven omfördelning vid stängning** — använd `CHOICE` (IIA) för att visa
   var eleverna faktiskt hamnar när en skola stängs, inte bara en tilldelning.
+- **Skarp optimeringsmotor (spopt)** — se `backend/` (referensscaffold). Python +
+  spopt/PuLP för det fullskaliga facility location-problemet (LSCP, kap. p-median,
+  p-center) med DuckDB-avstånd som kostnadsmatris. Körs i backend/batch; frontend
+  anropar `/api/plan` och behåller JS-lösaren som offline-fallback. Se `backend/README.md`.
 
 ---
 
