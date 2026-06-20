@@ -112,7 +112,7 @@ SCHOOLS.forEach((s) => {
 
 // Basår för projektion (dagens elevtal som utgångspunkt)
 export const BASE_YEAR = 2026
-export const HORIZONS = [2030, 2035, 2040]
+export const HORIZONS = [2030, 2035, 2040, 2045, 2050]
 
 // Scenarier = årlig demografisk förändring. Göteborg väntar minskande
 // elevkullar — därför är huvudscenariot negativt. (mock-värden)

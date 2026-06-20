@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react'
 import { SCHOOLS, SCENARIOS, BASE_YEAR } from './data/schools'
 import { emptyFilters, applyFilters } from './lib/filters'
-import { planConsolidation } from './lib/optimizer'
+import { planConsolidation, STAGE_RADIUS } from './lib/optimizer'
 import { buildProjector } from './lib/framskrivning'
 import Sidebar from './components/Sidebar'
 import MapView from './components/MapView'
@@ -22,7 +22,7 @@ export default function App() {
   const [scenario, setScenario] = useState('Befolkningsprognos')
   const [customRate, setCustomRate] = useState(-1.5)
   const [year, setYear] = useState(2035)
-  const [maxDist, setMaxDist] = useState(2.5)
+  const [radii, setRadii] = useState(STAGE_RADIUS) // maxavstånd per åldersstadie (km)
   const [reserve, setReserve] = useState(10)
 
   const filtered = useMemo(() => applyFilters(SCHOOLS, filters, search), [filters, search])
@@ -43,13 +43,13 @@ export default function App() {
   )
 
   const plan = useMemo(
-    () => planConsolidation(filtered, { rate, years, year, projFn, maxDistKm: maxDist, reservePct: reserve }),
-    [filtered, rate, years, year, projFn, maxDist, reserve],
+    () => planConsolidation(filtered, { rate, years, year, projFn, radii, reservePct: reserve }),
+    [filtered, rate, years, year, projFn, radii, reserve],
   )
 
   const planState = {
     scenario, setScenario, customRate, setCustomRate, year, setYear,
-    maxDist, setMaxDist, reserve, setReserve, rate, years, projFn, plan,
+    radii, setRadii, reserve, setReserve, rate, years, projFn, plan,
   }
 
   return (

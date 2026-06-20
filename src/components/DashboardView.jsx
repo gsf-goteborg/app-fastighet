@@ -11,8 +11,9 @@ const teachers = (kr) => Math.round(kr / LARARKOSTNAD)
 export default function DashboardView({
   schools, onSelect,
   scenario, setScenario, customRate, setCustomRate, year, setYear,
-  maxDist, setMaxDist, reserve, setReserve, rate, years, projFn, plan,
+  radii, setRadii, reserve, setReserve, rate, years, projFn, plan,
 }) {
+  const setRadius = (st, v) => setRadii({ ...radii, [st]: Math.max(0.5, +v || radii[st]) })
   const [refSize, setRefSize] = useState(450)         // pedagogisk kapacitet per skola
   const [atRisk, setAtRisk] = useState(false)         // akut-skick = riskkapacitet
   const [target, setTarget] = useState(95)            // målbeläggning %
@@ -362,15 +363,27 @@ export default function DashboardView({
           {plan.optimal
             ? 'MILP-optimering (bevisat optimal): minimerar lokalkostnad'
             : 'Girig heuristik (lösaren föll tillbaka): minskar lokalkostnad'}
-          {' '}— men <b>bara</b> om eleverna får plats på annan skola inom maxavståndet och området
-          behåller reservkapacitet (för t.ex. friskolenedläggning). <span className="mockflag">exempeldata</span>
+          {' '}— men <b>bara</b> om eleverna får plats på en skola med rätt stadie inom stadiets
+          maxavstånd, och området behåller reservkapacitet (för t.ex. friskolenedläggning).
+          Yngre barn kräver närmare skola. <span className="mockflag">exempeldata</span>
         </p>
 
         <div className="controls-inline">
+          <span className="inlabel">Max avstånd per stadie</span>
           <label className="inlabel">
-            Max avstånd till annan skola
-            <input type="number" min="0.5" max="10" step="0.5" value={maxDist}
-              onChange={(e) => setMaxDist(Math.max(0.5, +e.target.value || 2.5))} /> km
+            Lågstadiet
+            <input type="number" min="0.5" max="10" step="0.5" value={radii.lag}
+              onChange={(e) => setRadius('lag', e.target.value)} /> km
+          </label>
+          <label className="inlabel">
+            Mellan
+            <input type="number" min="0.5" max="10" step="0.5" value={radii.mellan}
+              onChange={(e) => setRadius('mellan', e.target.value)} /> km
+          </label>
+          <label className="inlabel">
+            Högstadiet
+            <input type="number" min="0.5" max="10" step="0.5" value={radii.hog}
+              onChange={(e) => setRadius('hog', e.target.value)} /> km
           </label>
           <label className="inlabel">
             Reservmarginal
@@ -381,7 +394,7 @@ export default function DashboardView({
 
         <div className="banner">
           {plan.closures.length === 0 ? (
-            <div>Inga skolor kan konsolideras inom villkoren ({maxDist} km, {reserve}% reserv) i detta urval/scenario.</div>
+            <div>Inga skolor kan konsolideras inom villkoren ({radii.lag}/{radii.mellan}/{radii.hog} km per stadie, {reserve}% reserv) i detta urval/scenario. Skolorna ligger nära full kapacitet — prova en längre horisont eller ett scenario med minskande elevtal för att frigöra platser, eller justera radie/reserv.</div>
           ) : (
             <div>
               Förslag: <b>{plan.closures.length}</b> skolor stängs/omvandlas → <b>−{plan.seatsRemoved.toLocaleString('sv')}</b> platser,
