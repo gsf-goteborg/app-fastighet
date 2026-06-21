@@ -7,6 +7,14 @@ skarpa register.
 
 > Snabbstart: `npm install` → `npm run dev`. Allt ligger på `main`.
 
+## Publicering (testgrupp)
+
+`npm run build` → servera `dist/` på valfri statisk host (verifierad: index +
+assets svarar 200 via `npm run preview`). Inget backend krävs. **Enda externa
+runtime-beroendet är bakgrundskartan** (vektor-tiles från `openfreemap.org`) —
+kontrollera att testgruppens nät/proxy når den, annars blir kartan tom. Vill man
+vara oberoende kan en egen tile-källa/MapTiler-nyckel pekas in i `MapView.jsx`.
+
 ---
 
 ## Vad som är byggt

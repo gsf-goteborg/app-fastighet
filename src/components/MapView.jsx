@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import maplibregl from 'maplibre-gl'
 import { THEME_EXPR, THEME_LABELS, LEGENDS } from '../lib/constants'
 
@@ -29,7 +29,16 @@ function planFeatures(plan) {
   return { lines: { type: 'FeatureCollection', features: lines }, closed: { type: 'FeatureCollection', features: closed } }
 }
 
-export default function MapView({ schools, theme, setTheme, onSelect, active, plan, projFn, year }) {
+export default function MapView({ schools, theme, setTheme, onSelect, active, plan, projFn, year, setYear }) {
+  const [playing, setPlaying] = useState(false)
+  // Spela upp tidslinjen: stega prognosåret 2026 → 2050 och se staden förändras
+  useEffect(() => {
+    if (!playing) return
+    if (year >= 2050) { setPlaying(false); return }
+    const t = setTimeout(() => setYear((y) => Math.min(2050, y + 1)), 650)
+    return () => clearTimeout(t)
+  }, [playing, year, setYear])
+
   const containerRef = useRef(null)
   const mapRef = useRef(null)
   const readyRef = useRef(false)
@@ -136,6 +145,17 @@ export default function MapView({ schools, theme, setTheme, onSelect, active, pl
         {theme === 'forandring' && (
           <div className="legend-note">Prognos till {year} · scenario väljs under Översikt</div>
         )}
+      </div>
+
+      <div className="timebar">
+        <button className="time-play" onClick={() => setPlaying((p) => !p)} title={playing ? 'Pausa' : 'Spela upp prognosen'}>
+          {playing ? '⏸' : '▶'}
+        </button>
+        <input
+          type="range" min="2026" max="2050" step="1" value={year}
+          onChange={(e) => { setPlaying(false); setYear(+e.target.value) }}
+        />
+        <div className="time-year">{year}<small>{year <= 2026 ? ' (idag)' : ' prognos'}</small></div>
       </div>
 
       {plan.closures.length > 0 && (
