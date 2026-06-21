@@ -9,6 +9,7 @@ import TableView from './components/TableView'
 import DashboardView from './components/DashboardView'
 import InfoPanel from './components/InfoPanel'
 import ErrorBoundary from './components/ErrorBoundary'
+import WelcomeOverlay from './components/WelcomeOverlay'
 
 const TABS = [['map', 'Karta'], ['table', 'Tabell'], ['dash', 'Översikt']]
 
@@ -16,13 +17,13 @@ export default function App() {
   const [view, setView] = useState('map')
   const [filters, setFilters] = useState(emptyFilters)
   const [search, setSearch] = useState('')
-  const [theme, setTheme] = useState('renovbehov')
+  const [theme, setTheme] = useState('forandring') // led med prognosen — stadens signaturvy
   const [selectedId, setSelectedId] = useState(null)
 
   // Planeringstillstånd lyfts hit så karta och översikt delar samma plan
   const [scenario, setScenario] = useState('Befolkningsprognos')
   const [customRate, setCustomRate] = useState(-1.5)
-  const [year, setYear] = useState(2035)
+  const [year, setYear] = useState(2040)
   const [radii, setRadii] = useState(STAGE_RADIUS) // maxavstånd per åldersstadie (km)
   const [reserve, setReserve] = useState(10)
 
@@ -67,6 +68,7 @@ export default function App() {
 
   return (
     <div id="app">
+      <WelcomeOverlay />
       <header>
         <div>
           <h1>Skolportfölj — Göteborg</h1>
