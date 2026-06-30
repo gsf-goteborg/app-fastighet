@@ -1,48 +1,46 @@
 /* ===========================================================================
-   ELEVMÖNSTER — observerad elevhärkomst per skola (var eleverna bor → skola).
+   ELEVMÖNSTER — elevhärkomst per skola (var eleverna bor → skola), per
+   MELLANOMRÅDE. Individuella adresser visas eller lagras ALDRIG. Små celler
+   (< MIN_CELL elever) slås ihop till "Övriga/spridda" så att enskilda elever
+   inte kan pekas ut.
 
-   VIKTIGT (sekretess): individuella adresser visas eller lagras ALDRIG. Denna
-   tabell är redan aggregerad till "antal elever på skola X från primärområde P"
-   plus genomsnittlig resväg. Små celler (< MIN_CELL elever) redovisas inte per
-   område utan slås ihop till "Övriga/spridda" — så att enskilda elever inte kan
-   pekas ut.
-
-   STATUS: EXEMPELDATA. Mönstret genereras här ur en avståndsbaserad
-   gravitationsmodell över skolornas läge, kalibrerat så att varje skolas
-   härkomst summerar till dess faktiska elevtal. På måndag ersätts hela denna
-   fil med Göteborgs Stads verkliga uttag (folkbokföring × placering), med
-   riktiga vägnätsavstånd. Konsumenterna — InfoPanel (visning) och
-   framskrivning.js (flödesmatris) — är oförändrade vid bytet.
-
-   Förväntad form på det riktiga uttaget, en rad per (skola, primärområde):
-       skola, primärområde, antal_elever, medelavstånd_km   (små celler maskade)
+   STATUS: EXEMPELMÖNSTER. En avståndsdämpad gravitationsmodell sprider varje
+   skolas elever över närliggande mellanområden, förankrad i skolans riktiga
+   hemområde (ur testdatan) med extra dragningskraft. Ersätts av Göteborgs
+   Stads verkliga uttag (folkbokföring × placering) med riktiga vägnätsavstånd —
+   konsumenterna (InfoPanel, framskrivning.js) är oförändrade vid bytet.
+   Resväg (medelKm) är fågelväg × omvägsfaktor tills vägnätsavstånd kopplas in.
 =========================================================================== */
 import { SCHOOLS } from './schools'
 import { BEFOLKNING } from './prognos'
 import { haversineKm } from '../lib/geo'
 
-// Mock-parametrar för att generera ett rimligt elevmönster (byts mot riktig data)
-const HOME_BOOST = 1.8     // närområdesskolans extra dragningskraft
-const DECAY_KM = 1.5       // avståndsdämpning
-const RADIUS_KM = 6        // elever söker sig sällan längre än så
-const DETOUR = 1.35        // vägnät vs fågelväg (mock — ersätts av riktiga vägnätsavstånd)
-const INTRA_AREA_KM = 0.6  // typisk spridning inom ett primärområde
+const HOME_BOOST = 1.8     // hemområdets extra dragningskraft
+const DECAY_KM = 2.0       // avståndsdämpning
+const RADIUS_KM = 5        // elever söker sig sällan längre än så
+const DETOUR = 1.35        // vägnät vs fågelväg (skattning tills riktiga avstånd kopplas in)
+const INTRA_AREA_KM = 0.6  // typisk spridning inom ett mellanområde
 export const MIN_CELL = 5  // sekretess: minsta redovisade cell per område
 
-// Primärområdescentroid ≈ läget för områdets skola(or)
-const AREAS = [...new Set(SCHOOLS.map((s) => s.primaromrade))]
+const byId = new Map(SCHOOLS.map((s) => [s.id, s]))
+
+// Mellanområdescentroid ≈ medelläget för områdets skolor (för resvägsskattning)
 const centroid = {}
-for (const a of AREAS) {
-  const inA = SCHOOLS.filter((s) => s.primaromrade === a)
-  centroid[a] = {
-    lng: inA.reduce((t, s) => t + s.lng, 0) / inA.length,
-    lat: inA.reduce((t, s) => t + s.lat, 0) / inA.length,
-  }
+for (const s of SCHOOLS) {
+  (centroid[s.mellanomrade] ||= { lng: 0, lat: 0, n: 0 })
+  centroid[s.mellanomrade].lng += s.lng
+  centroid[s.mellanomrade].lat += s.lat
+  centroid[s.mellanomrade].n += 1
+}
+for (const a of Object.keys(centroid)) {
+  centroid[a].lng /= centroid[a].n
+  centroid[a].lat /= centroid[a].n
 }
 
-// Ungefärligt vägnätsavstånd från ett områdes elever till en skola (mock)
 function netKm(area, school) {
-  const d = haversineKm(centroid[area].lat, centroid[area].lng, school.lat, school.lng)
+  const c = centroid[area]
+  if (!c) return 0
+  const d = haversineKm(c.lat, c.lng, school.lat, school.lng)
   return +((d + INTRA_AREA_KM) * DETOUR).toFixed(1)
 }
 
@@ -52,24 +50,26 @@ function roundToSum(cells, target) {
   let rem = Math.round(target) - f.reduce((t, c) => t + c.n, 0)
   f.sort((a, b) => b.r - a.r)
   for (let i = 0; i < f.length && rem > 0; i++) { f[i].n++; rem-- }
-  return f.map((c) => ({ area: c.area, antal: c.n, medelKm: c.medelKm }))
+  return f.map((c) => ({ omrade: c.omrade, antal: c.n, medelKm: c.medelKm }))
 }
 
-// SCHOOL_ORIGINS[skolId] = { meanKm, areas: [{primaromrade, antal, medelKm}], ovriga }
+// SCHOOL_ORIGINS[skolId] = { meanKm, areas: [{omrade, antal, medelKm}], ovriga }
+const AREAS = Object.keys(centroid)
 export const SCHOOL_ORIGINS = {}
 for (const s of SCHOOLS) {
+  // Gravitationsvikter: hemområdet boostas, närliggande områden dämpas med
+  // avståndet, områden bortom radien faller bort.
   const weights = AREAS.map((a) => {
     const km = haversineKm(centroid[a].lat, centroid[a].lng, s.lat, s.lng)
-    const w = km > RADIUS_KM ? 0 : (s.primaromrade === a ? HOME_BOOST : 1) * Math.exp(-km / DECAY_KM)
-    return { area: a, w }
-  })
-  const tot = weights.reduce((t, x) => t + x.w, 0)
+    const w = km > RADIUS_KM ? 0 : (a === s.mellanomrade ? HOME_BOOST : 1) * Math.exp(-km / DECAY_KM)
+    return { omrade: a, w }
+  }).filter((x) => x.w > 0)
+  const tot = weights.reduce((t, x) => t + x.w, 0) || 1
+  // Skala till skolans faktiska elevtal och fördela exakt
   const cells = roundToSum(
-    weights.filter((x) => x.w > 0).map((x) => ({ area: x.area, antal: (x.w / tot) * s.elever, medelKm: netKm(x.area, s) })),
+    weights.map((x) => ({ omrade: x.omrade, antal: (x.w / tot) * s.elever, medelKm: netKm(x.omrade, s) })),
     s.elever,
   )
-
-  // genomsnittlig resväg för skolan (innan sekretessmaskning, för korrekt vikt)
   const allN = cells.reduce((t, c) => t + c.antal, 0)
   const meanKm = allN ? +(cells.reduce((t, c) => t + c.antal * c.medelKm, 0) / allN).toFixed(1) : 0
 
@@ -79,28 +79,26 @@ for (const s of SCHOOLS) {
 
   SCHOOL_ORIGINS[s.id] = {
     meanKm,
-    areas: shown.map((c) => ({ primaromrade: c.area, antal: c.antal, medelKm: c.medelKm })),
+    areas: shown,
     ovriga: ovrigaN
       ? { antal: ovrigaN, medelKm: +(supp.reduce((t, c) => t + c.antal * c.medelKm, 0) / ovrigaN).toFixed(1) }
       : null,
   }
 }
 
-// Invers vy för modellen: AREA_INTAKE[primärområde] = { skolId: antal }
+// Invers vy för modellen: AREA_INTAKE[mellanområde] = { skolId: antal }
 // Bygger bara på redovisade (icke-maskade) celler.
 export const AREA_INTAKE = {}
 for (const s of SCHOOLS) {
-  for (const { primaromrade, antal } of SCHOOL_ORIGINS[s.id].areas) {
-    (AREA_INTAKE[primaromrade] ||= {})[s.id] = antal
+  for (const { omrade, antal } of SCHOOL_ORIGINS[s.id].areas) {
+    (AREA_INTAKE[omrade] ||= {})[s.id] = antal
   }
 }
 
 /* ---------------------------------------------------------------------------
-   Importkontroll — körs när det riktiga uttaget läggs in (måndag).
-   Fångar de vanliga felen vid databyte: skolor utan härkomst, okända skol-id,
-   summa som inte stämmer mot elevtalet, celler under sekretessgränsen, samt
-   primärområden som saknar befolkningsprognos (då ignoreras de av modellen).
-   Loggar en samlad varning i utvecklingsläge; stoppar inte appen.
+   Importkontroll — fångar vanliga fel vid databyte: skolor utan härkomst,
+   okända skol-id, summa som inte stämmer mot elevtalet, omaskade småceller,
+   samt mellanområden som saknar befolkningsprognos (ignoreras av modellen).
 --------------------------------------------------------------------------- */
 export function validateOrigins(schools = SCHOOLS, table = SCHOOL_ORIGINS, minCell = MIN_CELL) {
   const problems = []
@@ -117,17 +115,17 @@ export function validateOrigins(schools = SCHOOLS, table = SCHOOL_ORIGINS, minCe
       problems.push(`"${s.namn}": härkomst summerar ${tot}, elevtal ${s.elever} (stämmer inte)`)
     for (const a of o.areas) {
       if (a.antal < minCell)
-        problems.push(`"${s.namn}": cell ${a.primaromrade}=${a.antal} under sekretessgräns ${minCell}`)
+        problems.push(`"${s.namn}": cell ${a.omrade}=${a.antal} under sekretessgräns ${minCell}`)
       if (!(a.medelKm >= 0))
-        problems.push(`"${s.namn}": ogiltigt medelavstånd för ${a.primaromrade}`)
-      if (!prognosAreas.has(a.primaromrade)) utanPrognos.add(a.primaromrade)
+        problems.push(`"${s.namn}": ogiltigt medelavstånd för ${a.omrade}`)
+      if (!prognosAreas.has(a.omrade)) utanPrognos.add(a.omrade)
     }
   }
   for (const key of Object.keys(table)) {
     if (!ids.has(+key)) problems.push(`Elevhärkomst för okänd skola-id ${key}`)
   }
   if (utanPrognos.size)
-    problems.push(`${utanPrognos.size} primärområden saknar befolkningsprognos och ignoreras av framskrivningen: ${[...utanPrognos].join(', ')}`)
+    problems.push(`${utanPrognos.size} mellanområden saknar befolkningsprognos och ignoreras av framskrivningen: ${[...utanPrognos].join(', ')}`)
   return problems
 }
 

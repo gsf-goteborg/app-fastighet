@@ -2,8 +2,16 @@
 
 Internt planeringsverktyg för fastighetsavdelningen: visar Göteborgs grundskolor
 på karta, skriver fram elevtal demografiskt, simulerar skolval och föreslår
-konsolidering. **All icke-geografisk data är exempeldata** tills den kopplas mot
-skarpa register.
+konsolidering.
+
+**Datakälla (uppdaterat):** Appens datalager genereras numera ur
+`data/student_data.xlsx` (172 kommunala skolenheter — grundskola + anpassad
+grundskola) via `scripts/build_data.py`, som skriver `src/data/generated/*.json`.
+Geografin följer **stadsområde ⊃ mellanområde** (matchar `public/geo/`-filerna).
+Elevtal och förändringstakter kommer ur elevhistorik 2024–2026 (riktiga trender
+per mellanområde). Fastighets-/FM-fält (byggnadsår, skick, BTA, internhyra/m²,
+underhållsskuld, energiklass) syntetiseras deterministiskt tills de kopplas mot
+underhålls-/hyressystem. Bygg om data: `python scripts/build_data.py`.
 
 > Snabbstart: `npm install` → `npm run dev`. Allt ligger på `main`.
 
@@ -41,15 +49,49 @@ vara oberoende kan en egen tile-källa/MapTiler-nyckel pekas in i `MapView.jsx`.
 
 | Datakälla | Fil | Status |
 |---|---|---|
-| Skolor (läge, BTA, hyra, skick, elevtal, kapacitet/stadie …) | `src/data/schools.js` | exempel |
-| Befolkningsprognos per primärområde × stadie | `src/data/prognos.js` (`BEFOLKNING`) | exempel |
-| Elevmönster: härkomst + resväg per skola | `src/data/origins.js` (`SCHOOL_ORIGINS`) | exempel (mock) |
+| Generator (xlsx → JSON) | `scripts/build_data.py` | klar |
+| Skolor (172 kommunala, läge, kapacitet, hyra, elevtal, skolform) | `src/data/generated/schools.json` → `src/data/schools.js` | testdata + syntetiska FM-fält |
+| Befolkning i skolålder per **mellanområde** × stadie + trend | `src/data/generated/befolkning.json` → `prognos.js` (`BEFOLKNING`) | ur elevhistorik 2024–26 |
+| Elevmönster (intake per mellanområde → skola) | `src/data/generated/intake.json` → `origins.js` | ur bostadszoner |
 | Skolval: sannolikheter + övergångsårgångar | `src/data/choice.js` (`CHOICE`, `COHORT`) | exempel (mock) |
 | Framskrivningsmotor (befolkning × elevmönster) | `src/lib/framskrivning.js` | klar |
 | Skolvalssimulering (Monte Carlo) | `src/lib/simulate.js` | klar |
-| Konsolideringsoptimering (stadieindelad MILP) | `src/lib/optimizer.js` | klar |
+| Konsolideringsoptimering (stadieindelad MILP + girig) | `src/lib/optimizer.js` | klar — MILP > 40 skolor ⇒ girig heuristik |
+| Områdesgeometri (stads-/mellan-/primär-/basområde) | `public/geo/*.geojson` | klar (officiell indelning, EPSG:4326) |
 
 Motorerna och komponenterna är oförändrade vid databyte — bara datafilerna byts.
+
+---
+
+## Beslutsberedskap — vad som måste kopplas in INNAN skarpa fastighetsbeslut
+
+Verktyget duger nu för **testgruppens utvärdering** (arbetssätt, vyer, nytta). Det
+duger **inte** för att fatta nedläggnings-/fastighetsbeslut ännu — flera av de
+fält som *avgör* optimeringen är syntetiska eller svaga. I appen är dessa märkta
+med röd **"syntetiskt"**-flagga (infopanelen) och en varning i konsolideringskortet.
+
+Checklista, i fallande prioritet (störst påverkan på besluten först):
+
+- [ ] **Vägnätsavstånd** hemområde→skola (ersätt fågelvägen). *Enskilt viktigast* —
+      styr hela radievillkoret (2/4/6 km) och därmed vilka skolor som kan ta emot
+      varandra. Fågelväg är fel särskilt över Göta älv. Pipeline finns: DuckDB-precompute
+      (avsnitt C nedan) → `src/data/distances.js`, byt `haversineKm` i `optimizer.js`.
+- [ ] **Skarpa fastighets-/FM-data** (skick, underhållsskuld, BTA, internhyra) från
+      underhålls-/hyressystemet. Dessa är idag **syntetiska** men driver
+      `optimizer.js` (`savedKr`, `avoidedDebt`, stäng-rankning). Utan dem är
+      besparingssiffrorna meningslösa. Lägg in i `scripts/build_data.py`.
+- [ ] **Riktig befolkningsprognos** per mellanområde × stadie (stadens egen) i stället
+      för den dämpade 3-årstrenden ur elevhistoriken. Ersätt `befolkning.json`.
+- [ ] **Verkligt elevmönster/skolval** (folkbokföring × placering, resp. skarp
+      valmodell) → `origins.js` / `choice.js`. Idag gravitations-/avståndsmock.
+- [ ] **Bevisat optimal lösare** för beslutsstöd: spopt-backend (avsnitt nedan) över
+      riktig kostnadsmatris. Webbläsar-MILP:en stängs av > 40 skolor (girig heuristik).
+- [ ] **Samlokalisering**: 35 lägen delar hus (grundskola + anpassad grundskola) men
+      bär var sin (syntetisk) hyra → dubbelräknad byggnadskostnad. Modellera delad lokal.
+- [ ] **Likvärdighetslins**: visa resväg per stadie och hur varje nedläggning ändrar
+      andelen elever med lång resväg, bredvid besparingen.
+
+Tills ovan är klart: presentera resultat som *underlag för diskussion*, inte beslut.
 
 ---
 

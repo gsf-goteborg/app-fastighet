@@ -1,0 +1,362 @@
+[
+{
+"id": "12-gamlestaden-utby-candidate",
+"name": "Kandidatsite Gamlestaden-Utby",
+"mellanomrade": "Gamlestaden-Utby",
+"lat": 57.745383,
+"lng": 12.069287,
+"proposedCapacity": 140,
+"supportedStages": "7-9",
+"siteType": "expansion"
+},
+{
+"id": "71-backa-candidate",
+"name": "Kandidatsite Backa",
+"mellanomrade": "Backa",
+"lat": 57.749,
+"lng": 11.965436,
+"proposedCapacity": 160,
+"supportedStages": "F-3,4-6",
+"siteType": "expansion"
+},
+{
+"id": "35-kungsladugard-sanna-candidate",
+"name": "Kandidatsite Kungsladugård-Sanna",
+"mellanomrade": "Kungsladugård-Sanna",
+"lat": 57.688321,
+"lng": 11.905709,
+"proposedCapacity": 180,
+"supportedStages": "7-9",
+"siteType": "new"
+},
+{
+"id": "54-bratthammar-naset-onnered-candidate",
+"name": "Kandidatsite Bratthammar-Näset-Önnered",
+"mellanomrade": "Bratthammar-Näset-Önnered",
+"lat": 57.626529,
+"lng": 11.891798,
+"proposedCapacity": 220,
+"supportedStages": "7-9",
+"siteType": "expansion"
+},
+{
+"id": "16-norra-angered-candidate",
+"name": "Kandidatsite Norra Angered",
+"mellanomrade": "Norra Angered",
+"lat": 57.812175,
+"lng": 12.029879,
+"proposedCapacity": 240,
+"supportedStages": "F-3,4-6",
+"siteType": "new"
+},
+{
+"id": "30-kalltorp-torpa-bjorkekarr-candidate",
+"name": "Kandidatsite Kålltorp-Torpa-Björkekärr",
+"mellanomrade": "Kålltorp-Torpa-Björkekärr",
+"lat": 57.714246,
+"lng": 12.029732,
+"proposedCapacity": 140,
+"supportedStages": "F-3,4-6,7-9",
+"siteType": "expansion"
+},
+{
+"id": "50-stora-hogsbo-candidate",
+"name": "Kandidatsite Stora Högsbo",
+"mellanomrade": "Stora Högsbo",
+"lat": 57.673718,
+"lng": 11.933209,
+"proposedCapacity": 160,
+"supportedStages": "7-9",
+"siteType": "new"
+},
+{
+"id": "57-alvsborg-candidate",
+"name": "Kandidatsite Älvsborg",
+"mellanomrade": "Älvsborg",
+"lat": 57.678712,
+"lng": 11.881721,
+"proposedCapacity": 180,
+"supportedStages": "F-3,4-6",
+"siteType": "expansion"
+},
+{
+"id": "79-ostra-biskopsgarden-candidate",
+"name": "Kandidatsite Östra Biskopsgården",
+"mellanomrade": "Östra Biskopsgården",
+"lat": 57.7339,
+"lng": 11.899128,
+"proposedCapacity": 200,
+"supportedStages": "7-9",
+"siteType": "expansion"
+},
+{
+"id": "33-guldheden-landala-candidate",
+"name": "Kandidatsite Guldheden-Landala",
+"mellanomrade": "Guldheden-Landala",
+"lat": 57.696078,
+"lng": 11.965167,
+"proposedCapacity": 240,
+"supportedStages": "7-9",
+"siteType": "expansion"
+},
+{
+"id": "74-norra-alvstranden-candidate",
+"name": "Kandidatsite Norra Älvstranden",
+"mellanomrade": "Norra Älvstranden",
+"lat": 57.70158,
+"lng": 11.899756,
+"proposedCapacity": 120,
+"supportedStages": "F-3,4-6",
+"siteType": "expansion"
+},
+{
+"id": "31-kalleback-skar-karralund-candidate",
+"name": "Kandidatsite Kallebäck-Skår-Kärralund",
+"mellanomrade": "Kallebäck-Skår-Kärralund",
+"lat": 57.706023,
+"lng": 12.020609,
+"proposedCapacity": 220,
+"supportedStages": "7-9",
+"siteType": "expansion"
+},
+{
+"id": "76-bjorlanda-candidate",
+"name": "Kandidatsite Björlanda",
+"mellanomrade": "Björlanda",
+"lat": 57.765525,
+"lng": 11.833151,
+"proposedCapacity": 120,
+"supportedStages": "7-9",
+"siteType": "new"
+},
+{
+"id": "72-kvillebacken-candidate",
+"name": "Kandidatsite Kvillebäcken",
+"mellanomrade": "Kvillebäcken",
+"lat": 57.722463,
+"lng": 11.926194,
+"proposedCapacity": 160,
+"supportedStages": "7-9",
+"siteType": "expansion"
+},
+{
+"id": "55-centrala-tynnered-candidate",
+"name": "Kandidatsite Centrala Tynnered",
+"mellanomrade": "Centrala Tynnered",
+"lat": 57.643841,
+"lng": 11.902497,
+"proposedCapacity": 120,
+"supportedStages": "F-3,4-6,7-9",
+"siteType": "expansion"
+},
+{
+"id": "38-lunden-harlanda-overas-candidate",
+"name": "Kandidatsite Lunden-Härlanda-Överås",
+"mellanomrade": "Lunden-Härlanda-Överås",
+"lat": 57.703149,
+"lng": 12.006422,
+"proposedCapacity": 160,
+"supportedStages": "F-3,4-6",
+"siteType": "new"
+},
+{
+"id": "34-olivedal-haga-annedal-anggarden-candidate",
+"name": "Kandidatsite Olivedal-Haga-Annedal-Änggården",
+"mellanomrade": "Olivedal-Haga-Annedal-Änggården",
+"lat": 57.699957,
+"lng": 11.956298,
+"proposedCapacity": 240,
+"supportedStages": "F-3,4-6",
+"siteType": "expansion"
+},
+{
+"id": "77-tuve-save-candidate",
+"name": "Kandidatsite Tuve-Säve",
+"mellanomrade": "Tuve-Säve",
+"lat": 57.751706,
+"lng": 11.919404,
+"proposedCapacity": 120,
+"supportedStages": "7-9",
+"siteType": "expansion"
+},
+{
+"id": "53-sodra-skargarden-candidate",
+"name": "Kandidatsite Södra Skärgården",
+"mellanomrade": "Södra Skärgården",
+"lat": 57.651093,
+"lng": 11.797175,
+"proposedCapacity": 140,
+"supportedStages": "F-3,4-6,7-9",
+"siteType": "new"
+},
+{
+"id": "32-krokslatt-johanneberg-candidate",
+"name": "Kandidatsite Krokslätt-Johanneberg",
+"mellanomrade": "Krokslätt-Johanneberg",
+"lat": 57.692512,
+"lng": 11.982809,
+"proposedCapacity": 180,
+"supportedStages": "F-3,4-6",
+"siteType": "expansion"
+},
+{
+"id": "39-olskroken-redbergslid-bagaregarden-candidate",
+"name": "Kandidatsite Olskroken-Redbergslid-Bagaregården",
+"mellanomrade": "Olskroken-Redbergslid-Bagaregården",
+"lat": 57.720466,
+"lng": 12.008368,
+"proposedCapacity": 140,
+"supportedStages": "7-9",
+"siteType": "expansion"
+},
+{
+"id": "51-askim-hovas-candidate",
+"name": "Kandidatsite Askim-Hovås",
+"mellanomrade": "Askim-Hovås",
+"lat": 57.63581,
+"lng": 11.955044,
+"proposedCapacity": 160,
+"supportedStages": "F-3,4-6,7-9",
+"siteType": "expansion"
+},
+{
+"id": "11-bergsjon-candidate",
+"name": "Kandidatsite Bergsjön",
+"mellanomrade": "Bergsjön",
+"lat": 57.753505,
+"lng": 12.064844,
+"proposedCapacity": 180,
+"supportedStages": "7-9",
+"siteType": "new"
+},
+{
+"id": "73-kyrkbyn-rambergsstaden-candidate",
+"name": "Kandidatsite Kyrkbyn-Rambergsstaden",
+"mellanomrade": "Kyrkbyn-Rambergsstaden",
+"lat": 57.71881,
+"lng": 11.937601,
+"proposedCapacity": 120,
+"supportedStages": "7-9",
+"siteType": "expansion"
+},
+{
+"id": "15-centrala-angered-candidate",
+"name": "Kandidatsite Centrala Angered",
+"mellanomrade": "Centrala Angered",
+"lat": 57.801021,
+"lng": 12.055288,
+"proposedCapacity": 120,
+"supportedStages": "F-3,4-6,7-9",
+"siteType": "expansion"
+},
+{
+"id": "36-majorna-stigberget-masthugget-candidate",
+"name": "Kandidatsite Majorna-Stigberget-Masthugget",
+"mellanomrade": "Majorna-Stigberget-Masthugget",
+"lat": 57.698948,
+"lng": 11.944221,
+"proposedCapacity": 140,
+"supportedStages": "7-9",
+"siteType": "new"
+},
+{
+"id": "78-karrdalen-slattadamm-candidate",
+"name": "Kandidatsite Kärrdalen-Slättadamm",
+"mellanomrade": "Kärrdalen-Slättadamm",
+"lat": 57.746644,
+"lng": 11.916062,
+"proposedCapacity": 200,
+"supportedStages": "F-3,4-6,7-9",
+"siteType": "new"
+},
+{
+"id": "80-vastra-biskopsgarden-candidate",
+"name": "Kandidatsite Västra Biskopsgården",
+"mellanomrade": "Västra Biskopsgården",
+"lat": 57.734834,
+"lng": 11.883742,
+"proposedCapacity": 160,
+"supportedStages": "7-9",
+"siteType": "expansion"
+},
+{
+"id": "13-kortedala-candidate",
+"name": "Kandidatsite Kortedala",
+"mellanomrade": "Kortedala",
+"lat": 57.764597,
+"lng": 12.042634,
+"proposedCapacity": 160,
+"supportedStages": "F-3,4-6,7-9",
+"siteType": "new"
+},
+{
+"id": "14-sodra-angered-candidate",
+"name": "Kandidatsite Södra Angered",
+"mellanomrade": "Södra Angered",
+"lat": 57.770048,
+"lng": 12.025133,
+"proposedCapacity": 200,
+"supportedStages": "F-3,4-6",
+"siteType": "expansion"
+},
+{
+"id": "37-norra-centrum-candidate",
+"name": "Kandidatsite Norra Centrum",
+"mellanomrade": "Norra Centrum",
+"lat": 57.70466,
+"lng": 11.961054,
+"proposedCapacity": 120,
+"supportedStages": "7-9",
+"siteType": "expansion"
+},
+{
+"id": "10-ostra-angered-candidate",
+"name": "Kandidatsite Östra Angered",
+"mellanomrade": "Östra Angered",
+"lat": 57.807555,
+"lng": 12.167332,
+"proposedCapacity": 200,
+"supportedStages": "7-9",
+"siteType": "new"
+},
+{
+"id": "75-sodra-torslanda-candidate",
+"name": "Kandidatsite Södra Torslanda",
+"mellanomrade": "Södra Torslanda",
+"lat": 57.705024,
+"lng": 11.735771,
+"proposedCapacity": 160,
+"supportedStages": "7-9",
+"siteType": "new"
+},
+{
+"id": "70-karra-rodbo-candidate",
+"name": "Kandidatsite Kärra-Rödbo",
+"mellanomrade": "Kärra-Rödbo",
+"lat": 57.795056,
+"lng": 11.991801,
+"proposedCapacity": 180,
+"supportedStages": "F-3,4-6",
+"siteType": "expansion"
+},
+{
+"id": "56-frolunda-torg-tofta-candidate",
+"name": "Kandidatsite Frölunda Torg-Tofta",
+"mellanomrade": "Frölunda Torg-Tofta",
+"lat": 57.658882,
+"lng": 11.903234,
+"proposedCapacity": 160,
+"supportedStages": "7-9",
+"siteType": "expansion"
+},
+{
+"id": "52-billdal-candidate",
+"name": "Kandidatsite Billdal",
+"mellanomrade": "Billdal",
+"lat": 57.594119,
+"lng": 11.94385,
+"proposedCapacity": 180,
+"supportedStages": "F-3,4-6",
+"siteType": "expansion"
+}
+]

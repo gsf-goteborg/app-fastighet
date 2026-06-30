@@ -1,0 +1,218 @@
+{
+"Gamlestaden-Utby": {
+"lag": 1118,
+"mellan": 701,
+"hog": 510,
+"trend": 0.017
+},
+"Backa": {
+"lag": 687,
+"mellan": 683,
+"hog": 433,
+"trend": -0.0069
+},
+"Kungsladugård-Sanna": {
+"lag": 301,
+"mellan": 232,
+"hog": 120,
+"trend": -0.02
+},
+"Bratthammar-Näset-Önnered": {
+"lag": 768,
+"mellan": 390,
+"hog": 169,
+"trend": 0.02
+},
+"Norra Angered": {
+"lag": 784,
+"mellan": 183,
+"hog": 177,
+"trend": 0.02
+},
+"Kålltorp-Torpa-Björkekärr": {
+"lag": 775,
+"mellan": 602,
+"hog": 486,
+"trend": -0.0108
+},
+"Stora Högsbo": {
+"lag": 1066,
+"mellan": 683,
+"hog": 400,
+"trend": -0.0012
+},
+"Älvsborg": {
+"lag": 1178,
+"mellan": 891,
+"hog": 331,
+"trend": 0.0067
+},
+"Östra Biskopsgården": {
+"lag": 200,
+"mellan": 306,
+"hog": 298,
+"trend": -0.0031
+},
+"Guldheden-Landala": {
+"lag": 385,
+"mellan": 178,
+"hog": 122,
+"trend": 0.0157
+},
+"Norra Älvstranden": {
+"lag": 331,
+"mellan": 252,
+"hog": 102,
+"trend": -0.0036
+},
+"Kallebäck-Skår-Kärralund": {
+"lag": 406,
+"mellan": 305,
+"hog": 190,
+"trend": 0.02
+},
+"Björlanda": {
+"lag": 454,
+"mellan": 247,
+"hog": 160,
+"trend": 0.0088
+},
+"Kvillebäcken": {
+"lag": 283,
+"mellan": 216,
+"hog": 144,
+"trend": 0.0184
+},
+"Centrala Tynnered": {
+"lag": 713,
+"mellan": 566,
+"hog": 337,
+"trend": -0.02
+},
+"Lunden-Härlanda-Överås": {
+"lag": 254,
+"mellan": 195,
+"hog": 192,
+"trend": 0.02
+},
+"Olivedal-Haga-Annedal-Änggården": {
+"lag": 545,
+"mellan": 444,
+"hog": 204,
+"trend": 0.02
+},
+"Tuve-Säve": {
+"lag": 600,
+"mellan": 459,
+"hog": 175,
+"trend": 0.012
+},
+"Södra Skärgården": {
+"lag": 753,
+"mellan": 270,
+"hog": 129,
+"trend": -0.02
+},
+"Krokslätt-Johanneberg": {
+"lag": 337,
+"mellan": 208,
+"hog": 0,
+"trend": -0.02
+},
+"Olskroken-Redbergslid-Bagaregården": {
+"lag": 371,
+"mellan": 277,
+"hog": 0,
+"trend": -0.02
+},
+"Askim-Hovås": {
+"lag": 800,
+"mellan": 495,
+"hog": 185,
+"trend": -0.02
+},
+"Bergsjön": {
+"lag": 883,
+"mellan": 661,
+"hog": 302,
+"trend": 0.0071
+},
+"Kyrkbyn-Rambergsstaden": {
+"lag": 348,
+"mellan": 266,
+"hog": 0,
+"trend": -0.02
+},
+"Centrala Angered": {
+"lag": 383,
+"mellan": 293,
+"hog": 304,
+"trend": 0.02
+},
+"Majorna-Stigberget-Masthugget": {
+"lag": 373,
+"mellan": 281,
+"hog": 0,
+"trend": 0.0085
+},
+"Kärrdalen-Slättadamm": {
+"lag": 544,
+"mellan": 363,
+"hog": 114,
+"trend": -0.02
+},
+"Västra Biskopsgården": {
+"lag": 566,
+"mellan": 195,
+"hog": 0,
+"trend": -0.0198
+},
+"Kortedala": {
+"lag": 326,
+"mellan": 360,
+"hog": 357,
+"trend": -0.0005
+},
+"Södra Angered": {
+"lag": 1027,
+"mellan": 665,
+"hog": 438,
+"trend": 0.02
+},
+"Norra Centrum": {
+"lag": 207,
+"mellan": 182,
+"hog": 73,
+"trend": -0.02
+},
+"Östra Angered": {
+"lag": 410,
+"mellan": 205,
+"hog": 134,
+"trend": -0.0131
+},
+"Södra Torslanda": {
+"lag": 854,
+"mellan": 391,
+"hog": 321,
+"trend": -0.02
+},
+"Kärra-Rödbo": {
+"lag": 360,
+"mellan": 270,
+"hog": 277,
+"trend": 0.0
+},
+"Frölunda Torg-Tofta": {
+"lag": 140,
+"mellan": 105,
+"hog": 0,
+"trend": -0.0198
+},
+"Billdal": {
+"lag": 476,
+"mellan": 367,
+"hog": 213,
+"trend": 0.0175
+}
+}

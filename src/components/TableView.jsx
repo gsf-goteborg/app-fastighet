@@ -5,7 +5,8 @@ import { exportCsv } from '../lib/exportCsv'
 const COLS = [
   ['namn', 'Skola'],
   ['stadsomrade', 'Område'],
-  ['primaromrade', 'Primärområde'],
+  ['mellanomrade', 'Mellanområde'],
+  ['skolform', 'Skolform'],
   ['byggnadsar', 'Byggår'],
   ['renovbehov', 'Renov.behov'],
   ['pedKapacitet', 'Ped. kap.'],
@@ -53,7 +54,8 @@ export default function TableView({ schools, onSelect }) {
             <tr key={s.id} onClick={() => onSelect(s.id)}>
               <td>{s.namn}</td>
               <td>{s.stadsomrade}</td>
-              <td>{s.primaromrade}</td>
+              <td>{s.mellanomrade}</td>
+              <td>{s.skolform === 'Anpassad grundskola' ? 'Anpassad' : 'Grundskola'}</td>
               <td className="num">{s.byggnadsar}</td>
               <td><span className="pill" style={{ background: RENOV[s.renovbehov][1] }}>{RENOV[s.renovbehov][0]}</span></td>
               <td className="num">{s.pedKapacitet}</td>

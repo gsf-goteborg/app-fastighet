@@ -44,21 +44,26 @@ export default function App() {
     [scenario, rate, cohort],
   )
 
+  // Planering (optimering) behövs bara i Översikt — beräkna inte i kartvyn,
+  // där den annars skulle blockera huvudtråden vid varje filter/horisont.
+  const needsPlan = view === 'dash'
   const plan = useMemo(
-    () => planConsolidation(filtered, { rate, years, year, projFn, radii, reservePct: reserve }),
-    [filtered, rate, years, year, projFn, radii, reserve],
+    () => needsPlan
+      ? planConsolidation(filtered, { rate, years, year, projFn, radii, reservePct: reserve })
+      : { closures: [], savedKr: 0, seatsRemoved: 0, avoidedDebt: 0, maxKm: 0, stranded: [], openCount: filtered.length, optimal: false },
+    [needsPlan, filtered, rate, years, year, projFn, radii, reserve],
   )
 
   // Robusthet: kör planen under varje demografiskt scenario vid vald horisont
   const robustness = useMemo(
-    () => Object.keys(SCENARIOS).map((sc) => {
+    () => !needsPlan ? [] : Object.keys(SCENARIOS).map((sc) => {
       const f = sc === 'Befolkningsprognos'
         ? (s, y) => cohort.project(s, y)
         : (s, y) => Math.round(s.elever * Math.pow(1 + SCENARIOS[sc], y - BASE_YEAR))
       const pl = planConsolidation(filtered, { rate: SCENARIOS[sc], years, year, projFn: f, radii, reservePct: reserve })
       return { scenario: sc, names: pl.closures.map((c) => c.school.namn), n: pl.closures.length, seats: pl.seatsRemoved, savedKr: pl.savedKr }
     }),
-    [filtered, years, year, radii, reserve, cohort],
+    [needsPlan, filtered, years, year, radii, reserve, cohort],
   )
 
   const planState = {
@@ -70,13 +75,16 @@ export default function App() {
     <div id="app">
       <WelcomeOverlay />
       <header>
-        <div>
-          <h1>Skolportfölj — Göteborg</h1>
-          <div className="sub">Fastighetsavdelningen · planeringsverktyg</div>
+        <div className="brand">
+          <span className="mark" aria-hidden>G</span>
+          <div>
+            <h1>Skolportfölj — Göteborg</h1>
+            <div className="sub">Fastighetsavdelningen · planeringsverktyg</div>
+          </div>
         </div>
         <div className="tabs">
           {TABS.map(([v, label]) => (
-            <button key={v} className={view === v ? 'active' : ''} onClick={() => setView(v)}>{label}</button>
+            <button key={v} className={view === v ? 'active' : ''} onClick={() => { setView(v); setSelectedId(null) }}>{label}</button>
           ))}
         </div>
         <span className="badge">⚠︎ Showcase · exempeldata</span>
@@ -93,8 +101,8 @@ export default function App() {
         <div style={{ position: 'absolute', inset: 0, display: view === 'map' ? 'block' : 'none' }}>
           <MapView
             schools={filtered} theme={theme} setTheme={setTheme}
-            onSelect={setSelectedId} active={view === 'map'} plan={plan}
-            projFn={projFn} year={year} setYear={setYear}
+            onSelect={setSelectedId} active={view === 'map'}
+            projFn={projFn} year={year} scenario={scenario} rate={rate}
           />
         </div>
         {view === 'table' && <ErrorBoundary><TableView schools={filtered} onSelect={setSelectedId} /></ErrorBoundary>}

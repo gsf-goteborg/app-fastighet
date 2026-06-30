@@ -231,7 +231,7 @@ export default function DashboardView({
         <h2>Scenario — elevutveckling och kapacitet</h2>
         <p className="hint">
           Välj demografiskt scenario och planeringshorisont. {isCohort
-            ? 'Befolkningsprognos skrivs fram per primärområde och åldersstadie (F–3 / 4–6 / 7–9) och fördelas på skolor via historiskt elevmönster.'
+            ? 'Befolkningsprognos skrivs fram per mellanområde och åldersstadie (F–3 / 4–6 / 7–9) och fördelas på skolor via historiskt elevmönster.'
             : 'Dagens elevtal projiceras med vald årlig förändring.'} <span className="mockflag">exempelscenario</span>
         </p>
 
@@ -310,8 +310,8 @@ export default function DashboardView({
       <div className="card">
         <h2>Framskrivning per område — {year}</h2>
         <p className="hint">
-          Befolkningsprognos per primärområde och åldersstadie × historiskt elevmönster (vilka
-          skolor områdets elever söker sig till), aggregerat per mellanområde. Visar var
+          Befolkningsprognos per mellanområde och åldersstadie × historiskt elevmönster (vilka
+          skolor områdets elever söker sig till). Visar var
           elevunderlaget växer respektive krymper — inte bara en gemensam takt för hela staden.
           <span className="mockflag">exempelprognos</span>
         </p>
@@ -359,7 +359,7 @@ export default function DashboardView({
             {intakeRows.map(({ s, o, entry }) => (
               <tr key={s.id} onClick={() => onSelect(s.id)} style={{ cursor: 'pointer' }}>
                 <td><b>{s.namn}</b></td>
-                <td>{s.primaromrade}</td>
+                <td>{s.mellanomrade}</td>
                 <td>{entry.join(', ')}</td>
                 <td><b>{o.mean}</b> elever</td>
                 <td style={{ color: 'var(--muted)' }}>{o.p10}–{o.p90}</td>
@@ -399,12 +399,12 @@ export default function DashboardView({
         </div>
         {access.worst.length > 0 && (
           <table className="gaptable">
-            <thead><tr><th>Längst resväg (minst tillgängliga)</th><th>Primärområde</th><th>Elever</th><th>Snittresväg</th></tr></thead>
+            <thead><tr><th>Längst resväg (minst tillgängliga)</th><th>Mellanområde</th><th>Elever</th><th>Snittresväg</th></tr></thead>
             <tbody>
               {access.worst.map(({ s, mean, n }) => (
                 <tr key={s.id} onClick={() => onSelect(s.id)} style={{ cursor: 'pointer' }}>
                   <td><b>{s.namn}</b></td>
-                  <td>{s.primaromrade}</td>
+                  <td>{s.mellanomrade}</td>
                   <td>{n}</td>
                   <td style={{ color: mean > 2 ? '#dc2626' : 'var(--muted)' }}>{mean} km</td>
                 </tr>
@@ -450,10 +450,17 @@ export default function DashboardView({
         <p className="hint">
           {plan.optimal
             ? 'MILP-optimering (bevisat optimal): minimerar lokalkostnad'
-            : 'Girig heuristik (lösaren föll tillbaka): minskar lokalkostnad'}
+            : 'Girig heuristik (ej bevisat optimal): minskar lokalkostnad'}
           {' '}— men <b>bara</b> om eleverna får plats på en skola med rätt stadie inom stadiets
           maxavstånd, och området behåller reservkapacitet (för t.ex. friskolenedläggning).
-          Yngre barn kräver närmare skola. <span className="mockflag">exempeldata</span>
+          Yngre barn kräver närmare skola.
+        </p>
+        <p className="hint" style={{ background: '#fee2e2', color: '#b91c1c', border: '1px solid #fecaca', borderRadius: 8, padding: '8px 10px' }}>
+          ⚠︎ <b>Ej beslutsunderlag.</b> Rangordningen drivs av <b>syntetiska</b> fält
+          (skick, underhållsskuld, BTA/hyra-per-m²) och avstånden mäts <b>fågelväg</b>
+          (ej vägnät — kan vara fel över Göta älv). Vid {'>'}40 skolor körs en heuristik,
+          inte den bevisat optimala lösaren. Koppla in skarpa fastighetsdata och
+          vägnätsavstånd innan beslut (se HANDOFF).
         </p>
 
         <div className="controls-inline">
@@ -487,7 +494,7 @@ export default function DashboardView({
             <div>
               Förslag: <b>{plan.closures.length}</b> skolor stängs/omvandlas → <b>−{plan.seatsRemoved.toLocaleString('sv')}</b> platser,
               frigör <b>{mkr(plan.savedKr)} Mkr/år</b> ≈ <b>{teachers(plan.savedKr)} lärartjänster</b>,
-              undviker <b>{plan.avoidedDebt} Mkr</b> underhållsskuld. Alla berörda elever får plats inom <b>{plan.maxKm.toFixed(1)} km</b>.
+              undviker <b>{Math.round(plan.avoidedDebt)} Mkr</b> underhållsskuld. Alla berörda elever får plats inom <b>{plan.maxKm.toFixed(1)} km</b>.
             </div>
           )}
         </div>

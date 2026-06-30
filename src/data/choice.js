@@ -33,10 +33,10 @@ export const TRANSITIONS = [
 
 const CHOICE_DECAY_KM = 2.0 // avståndsdämpning i mock-valmodellen
 
-const AREAS = [...new Set(SCHOOLS.map((s) => s.primaromrade))]
+const AREAS = [...new Set(SCHOOLS.map((s) => s.mellanomrade))]
 const centroid = {}
 for (const a of AREAS) {
-  const inA = SCHOOLS.filter((s) => s.primaromrade === a)
+  const inA = SCHOOLS.filter((s) => s.mellanomrade === a)
   centroid[a] = {
     lng: inA.reduce((t, s) => t + s.lng, 0) / inA.length,
     lat: inA.reduce((t, s) => t + s.lat, 0) / inA.length,

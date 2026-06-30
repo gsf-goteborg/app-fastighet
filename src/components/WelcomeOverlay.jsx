@@ -4,9 +4,9 @@ const SEEN_KEY = 'skolportfolj_welcome_seen'
 
 const TIPS = [
   ['🗺️', 'Kartan färglägger skolor efter prognostiserad elevförändring',
-    'Grönt växer, rött krymper. Byt färgläggning och horisont uppe till höger.'],
+    'Grönt växer, rött krymper. Byt färgläggning uppe till vänster; horisont och scenario väljs under Översikt. Slå på områdesprognos för mellanområdesvy.'],
   ['🏫', 'Klicka en skola',
-    'Fastighet, kapacitet, beläggning, elevernas härkomst per primärområde och genomsnittlig resväg.'],
+    'Fastighet, kapacitet, beläggning, elevernas härkomst per mellanområde och genomsnittlig resväg.'],
   ['📊', 'Fliken Översikt',
     'Elevframskrivning per område, önska skola-simulering, tillgänglighet, konsolideringsförslag och robusthet.'],
   ['🔧', 'Driv analysen',

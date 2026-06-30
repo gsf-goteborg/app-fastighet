@@ -2,11 +2,16 @@ import { RENOV, occColor } from '../lib/constants'
 import { SCHOOL_ORIGINS } from '../data/origins'
 import { getIntake } from '../lib/simulate'
 
-function Field({ label, value, mock }) {
+// mock = testdata/modell (gul "exempel"); synth = helt påhittat fält som inte
+// bör styra beslut (röd "syntetiskt").
+function Field({ label, value, mock, synth }) {
   return (
     <div className="field">
       <div className="k">{label}</div>
-      <div className="v">{value}{mock && <span className="mockflag">exempel</span>}</div>
+      <div className="v">
+        {value}
+        {synth ? <span className="mockflag synth">syntetiskt</span> : mock && <span className="mockflag">exempel</span>}
+      </div>
     </div>
   )
 }
@@ -22,8 +27,8 @@ function Origins({ school }) {
       <div className="v">
         <div className="origins">
           {o.areas.map((a) => (
-            <div className="origin-row" key={a.primaromrade}>
-              <span>{a.primaromrade}</span>
+            <div className="origin-row" key={a.omrade}>
+              <span>{a.omrade}</span>
               <span className="origin-meta">{a.antal} st · {Math.round((a.antal / total) * 100)}% · {a.medelKm} km</span>
             </div>
           ))}
@@ -58,9 +63,9 @@ export default function InfoPanel({ school, onClose }) {
           <div className="p-body">
             <Field label="Stadsområde" value={school.stadsomrade} />
             <Field label="Mellanområde" value={school.mellanomrade} />
-            <Field label="Primärområde" value={school.primaromrade} />
-            <Field label="Adress" value={school.adress} />
-            {origin && <Field label="Genomsnittlig resväg (vägnät)" value={origin.meanKm + ' km'} mock />}
+            <Field label="Skolform" value={school.skolform} />
+            <Field label="Skolhus" value={school.skolhus} />
+            {origin && <Field label="Genomsnittlig resväg (fågelväg)" value={origin.meanKm + ' km'} mock />}
             {intake && intake.mean > 0 && (
               <Field label="Förväntad intagning nästa termin"
                 value={intake.mean + ' elever (' + intake.p10 + '–' + intake.p90 + ')'} mock />
@@ -68,32 +73,25 @@ export default function InfoPanel({ school, onClose }) {
             <Origins school={school} />
             <Field label="Närmaste skola" value={school.nearestNamn + ' · ' + school.nearestKm + ' km'} />
             <Field label="Årskurser" value={school.arskurser} />
-            <Field label="Fastighetsbeteckning" value={'GÖTEBORG ' + school.fastighet} mock />
-            <Field label="Byggnadsår" value={school.byggnadsar} mock />
-            <Field label="Senaste renovering" value={school.senasteRenov} mock />
-            <Field label="BTA" value={school.bta.toLocaleString('sv') + ' m²'} mock />
+            <Field label="Skolhus" value={school.fastighet} mock />
+            <Field label="Byggnadsår" value={school.byggnadsar} synth />
+            <Field label="Senaste renovering" value={school.senasteRenov} synth />
+            <Field label="BTA" value={school.bta.toLocaleString('sv') + ' m²'} synth />
             <Field label="Pedagogisk kapacitet"
               value={school.kapPerArskurs + '/årskurs · ' + school.pedKapacitet + ' totalt'} mock />
-            <Field label="Elever (idag / per åk)" value={school.elever + ' / ' + school.eleverPerArskurs} />
-            <Field label="Byggnadens platser (BTA)" value={school.platser} mock />
+            <Field label="Elever (idag / per åk)" value={school.elever + ' / ' + school.eleverPerArskurs} mock />
             <Field label="Beläggningsgrad"
-              value={<span style={{ color: occColor(school.belaggPct) }}>{school.belaggPct}%</span>} />
-            {school.hyraPerM2 > 0 ? (
-              <>
-                <Field label="Internhyra" value={school.hyraPerM2.toLocaleString('sv') + ' kr/m² · ' + (school.arshyra / 1e6).toFixed(1) + ' Mkr/år'} mock />
-                <Field label="Lokalkostnad/elev" value={school.kostnadPerElev.toLocaleString('sv') + ' kr/år'} mock />
-                <Field label="Tomma platser"
-                  value={<span style={{ color: school.tommaPlatser ? '#dc2626' : 'var(--muted)' }}>
-                    {school.tommaPlatser} st {school.spilldHyra ? '· ' + (school.spilldHyra / 1e6).toFixed(2) + ' Mkr/år outnyttjat' : ''}
-                  </span>} mock />
-              </>
-            ) : (
-              <Field label="Internhyra" value="– (fristående, ej kommunal lokal)" />
-            )}
-            <Field label="Renoveringsbehov" mock
+              value={<span style={{ color: occColor(school.belaggPct) }}>{school.belaggPct}%</span>} mock />
+            <Field label="Internhyra" value={(school.arshyra / 1e6).toFixed(1) + ' Mkr/år'} mock />
+            <Field label="Lokalkostnad/elev" value={school.kostnadPerElev.toLocaleString('sv') + ' kr/år'} mock />
+            <Field label="Tomma platser"
+              value={<span style={{ color: school.tommaPlatser ? '#dc2626' : 'var(--muted)' }}>
+                {school.tommaPlatser} st {school.spilldHyra ? '· ' + (school.spilldHyra / 1e6).toFixed(2) + ' Mkr/år outnyttjat' : ''}
+              </span>} mock />
+            <Field label="Renoveringsbehov" synth
               value={<span className="pill" style={{ background: RENOV[school.renovbehov][1] }}>{RENOV[school.renovbehov][0]}</span>} />
-            <Field label="Underhållsskuld" value={school.underhallsskuld ? school.underhallsskuld + ' Mkr' : '–'} mock />
-            <Field label="Energiklass" value={school.energiklass} mock />
+            <Field label="Underhållsskuld" value={school.underhallsskuld ? school.underhallsskuld + ' Mkr' : '–'} synth />
+            <Field label="Energiklass" value={school.energiklass} synth />
           </div>
         </>
       )}

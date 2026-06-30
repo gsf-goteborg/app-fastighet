@@ -35,9 +35,11 @@ describe('skolvalssimulering (önska skola)', () => {
     }
   })
 
-  it('grade4-övergången är tom (inga F–3-skolor i datasetet)', () => {
+  it('grade4-övergångar uppstår (F–3-skolor finns i datasetet)', () => {
+    // Datasetet innehåller F–3-skolor vars elever måste välja mellanstadium —
+    // grade4-övergångsårgången ska därför vara > 0.
     const tot = Object.values(COHORT.grade4).reduce((a, b) => a + b, 0)
-    expect(tot).toBe(0)
+    expect(tot).toBeGreaterThan(0)
   })
 
   it('sannolikheter summerar till 1 per övergång och område (eller 0 om tomt)', () => {

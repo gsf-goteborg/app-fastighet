@@ -14,23 +14,22 @@ export const RENOV = {
 }
 
 // Filter-fasetter (fältnamn → valbara värden, i visningsordning)
-// Geografin följer Göteborgs indelning: stadsområde ⊃ mellanområde ⊃ primärområde.
+// Geografin följer Göteborgs indelning: stadsområde ⊃ mellanområde.
+import { SCHOOLS } from '../data/schools'
+
+const STADS_ORDER = ['Centrum', 'Nordost', 'Hisingen', 'Sydväst']
+// Mellanområden härleds ur skolbeståndet (typsäkert mot data) — grupperade per
+// stadsområde, alfabetiskt inom varje.
+const MELLAN = [...new Set(SCHOOLS.map((s) => s.mellanomrade))].sort((a, b) => {
+  const sa = SCHOOLS.find((s) => s.mellanomrade === a).stadsomrade
+  const sb = SCHOOLS.find((s) => s.mellanomrade === b).stadsomrade
+  return STADS_ORDER.indexOf(sa) - STADS_ORDER.indexOf(sb) || a.localeCompare(b, 'sv')
+})
+
 export const FACETS = {
-  stadsomrade: ['Centrum', 'Nordost', 'Hisingen', 'Sydväst'],
-  mellanomrade: [
-    'Centrum-Vasastaden', 'Haga-Linné', 'Guldheden-Johanneberg', 'Örgryte-Härlanda',
-    'Bergsjön', 'Kortedala', 'Angered',
-    'Backa', 'Biskopsgården', 'Lundby',
-    'Frölunda', 'Älvsborg-Önnered', 'Askim-Hovås',
-  ],
-  primaromrade: [
-    'Vasastaden', 'Gårda', 'Annedal', 'Masthugget', 'Johanneberg', 'Krokslätt',
-    'Södra Guldheden', 'Bö', 'Lunden',
-    'Östra Bergsjön', 'Kortedala', 'Gärdsås', 'Rannebergen', 'Lövgärdet',
-    'Tolered', 'Brunnsbo', 'Rya', 'Södra Biskopsgården',
-    'Järnbrott', 'Älvsborg', 'Önnered', 'Askim',
-  ],
-  huvudman: ['Kommunal', 'Fristående'],
+  stadsomrade: STADS_ORDER,
+  skolform: ['Grundskola', 'Anpassad grundskola'],
+  mellanomrade: MELLAN,
   aldersgrupp: ['–1959', '1960–79', '1980–2009', '2010–'],
   renovgrupp: ['OK', 'Acceptabelt', 'Eftersatt', 'Akut'],
   belaggrupp: ['Underbelagd', 'Balanserad', 'Överbelagd'],
@@ -38,9 +37,8 @@ export const FACETS = {
 
 export const FACET_LABELS = {
   stadsomrade: 'Stadsområde',
+  skolform: 'Skolform',
   mellanomrade: 'Mellanområde',
-  primaromrade: 'Primärområde',
-  huvudman: 'Huvudman',
   aldersgrupp: 'Byggnadsår',
   renovgrupp: 'Renoveringsbehov',
   belaggrupp: 'Beläggning',

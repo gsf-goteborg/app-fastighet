@@ -216,6 +216,13 @@ function greedyPlan(schools, params) {
   return finalize(closures, komm, (j) => loadById[j.id] ?? 0, false)
 }
 
+// Över denna storlek blir MILP:en (binär per skola + flödesvariabler per par×stadie)
+// för tung för webbläsarlösaren — använd den polynomiska giriga heuristiken direkt.
+// Den fullskaliga, bevisat optimala lösningen körs i backend (spopt), se HANDOFF.
+export const MILP_MAX_SCHOOLS = 40
+
 export function planConsolidation(schools, params) {
+  const kommCount = schools.reduce((n, s) => n + (s.hyraPerM2 > 0 ? 1 : 0), 0)
+  if (kommCount > MILP_MAX_SCHOOLS) return greedyPlan(schools, params)
   return milpPlan(schools, params) || greedyPlan(schools, params)
 }
