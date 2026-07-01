@@ -3,20 +3,20 @@
 
    Modellen skriver fram elevtal per skola i två steg:
 
-     1. BEFOLKNINGSPROGNOS  — antal barn i skolåldern per primärområde och
+     1. BEFOLKNINGSPROGNOS  — antal barn i skolåldern per MELLANOMRÅDE och
         åldersstadie (lågstadiet F–3, mellanstadiet 4–6, högstadiet 7–9),
         med en områdesspecifik årlig förändringstakt. Det är HÄR den
         rumsliga variationen finns: nybyggnadsområden växer, etablerade
         områden krymper — till skillnad från en enda procentsats för hela
-        staden.
+        staden. (Datat är nycklat på mellanområde, matchar public/geo/.)
 
      2. ELEVMÖNSTER (flödesmatris) — historiskt mönster för vilka skolor ett
         områdes elever faktiskt söker sig till. Hämtas från data/origins.js
-        (observerad härkomst: antal elever per skola och primärområde) och
+        (observerad härkomst: antal elever per skola och mellanområde) och
         omvandlas i framskrivning.js till andelar per område och stadie.
 
    ALLT ÄR EXEMPELDATA. Skarp användning kräver Göteborgs Stads verkliga
-   befolkningsprognos per primärområde/åldersklass (denna fil) samt det
+   befolkningsprognos per mellanområde/åldersklass (denna fil) samt det
    verkliga elevmönstret (data/origins.js). Båda byts in på var sitt ställe.
 =========================================================================== */
 

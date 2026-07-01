@@ -17,11 +17,16 @@ import { STAGE_KEYS } from '../data/prognos'
      • Stadie     — en elev kan bara tas emot av skola som har det stadiet
                     (en 7–9-skola tar inte emot lågstadieelever) och bara upp
                     till skolans kapacitet i det stadiet.
-     • Resiliens  — varje stadsområde behåller kapacitet ≥ efterfrågan + reserv
-                    (minst största fristående skolan, n-1-kontingens).
+     • Resiliens  — varje stadsområde behåller PER STADIE kapacitet ≥
+                    efterfrågan + reservmarginal.
+
+   OMFATTNING: bara GRUNDSKOLA i kommunal lokal deltar. Anpassad grundskola
+   exkluderas helt (egen skolform, ej utbytbar). Samlokaliserade grundskolor
+   (delad byggnad) kan tas emot men föreslås inte för stängning per enhet —
+   se `konsoliderbar` i data/schools.js.
 
    Elever från en stängd skola kan delas på FLERA närliggande skolor.
-   Löses som MILP (bevisat optimal); faller tillbaka på girig heuristik.
+   Löses som MILP (optimal för valt urval) för små urval; annars girig heuristik.
 =========================================================================== */
 
 // Radie per åldersstadie (km). Byts mot riktiga vägnätsavstånd när de finns.
@@ -44,28 +49,34 @@ function context(schools, { rate, years, projFn, year, reservePct, radii }) {
   const projOf = projFn
     ? (s) => projFn(s, year)
     : (s) => Math.round(s.elever * Math.pow(1 + rate, years))
-  const komm = schools.filter((s) => s.hyraPerM2 > 0)   // kommunens egna lokaler
-  const fri = schools.filter((s) => s.hyraPerM2 === 0)  // fristående → resiliensbehov
+  // Bara ordinarie grundskola deltar (anpassad grundskola + specialverksamhet
+  // exkluderas helt — se ordinarieGrundskola i data/schools.js).
+  const komm = schools.filter((s) => s.ordinarieGrundskola)
+  // Stängningskandidater: grundskola i solo-byggnad (se konsoliderbar i schools.js).
+  const closable = new Set(komm.filter((s) => s.konsoliderbar).map((s) => s.id))
 
   const dem = {}                                        // dem[id][stadie] = efterfrågan
   for (const s of komm) dem[s.id] = stageDemand(s, projOf(s))
 
-  const friContingency = {}
-  for (const f of fri) {
-    const v = projOf(f)
-    if (v > (friContingency[f.stadsomrade] || 0)) friContingency[f.stadsomrade] = v
-  }
-  const areaDemand = {}, areaCap = {}
+  // Resiliens PER STADIE: varje stadsområde ska behålla kapacitet ≥ efterfrågan +
+  // reservmarginal i varje åldersstadie (ett stadie kan strandas även om totalen räcker).
+  const areaCapSt = {}, areaDemSt = {}
   for (const s of komm) {
-    areaDemand[s.stadsomrade] = (areaDemand[s.stadsomrade] || 0) + projOf(s)
-    areaCap[s.stadsomrade] = (areaCap[s.stadsomrade] || 0) + s.pedKapacitet
+    const a = s.stadsomrade
+    if (!areaCapSt[a]) { areaCapSt[a] = { lag: 0, mellan: 0, hog: 0 }; areaDemSt[a] = { lag: 0, mellan: 0, hog: 0 } }
+    for (const st of STAGE_KEYS) {
+      areaCapSt[a][st] += s.stageKap[st]
+      areaDemSt[a][st] += dem[s.id][st]
+    }
   }
-  const areaRequired = {}
-  for (const a in areaDemand) {
-    const reserve = Math.max((areaDemand[a] * reservePct) / 100, friContingency[a] || 0)
-    areaRequired[a] = Math.min(areaDemand[a] + reserve, areaCap[a])
+  const areaReqSt = {}
+  for (const a in areaDemSt) {
+    areaReqSt[a] = {}
+    for (const st of STAGE_KEYS) {
+      areaReqSt[a][st] = Math.min(areaDemSt[a][st] * (1 + reservePct / 100), areaCapSt[a][st])
+    }
   }
-  return { projOf, komm, dem, areaRequired, R }
+  return { projOf, komm, closable, dem, areaReqSt, R }
 }
 
 function finalize(closures, komm, loadOf, optimal) {
@@ -87,26 +98,51 @@ function finalize(closures, komm, loadOf, optimal) {
 
 // ---------- MILP (stadieindelad) ----------
 function milpPlan(schools, params) {
-  const { komm, dem, areaRequired, R } = context(schools, params)
+  const { komm, closable, dem, areaReqSt, R } = context(schools, params)
   if (komm.length === 0) return emptyPlan(komm, true)
 
   const model = { optimize: 'cost', opType: 'min', constraints: {}, variables: {}, ints: {} }
 
+  // Fast (alltid öppen) kapacitet per stadsområde×stadie från icke-konsoliderbara skolor
+  const fixedCap = {}
   komm.forEach((j) => {
-    const openCost = j.arshyra + (j.underhallsskuld * 1e6) / 10 // hyra + annualiserad skuld
-    const ak = 'area_' + j.stadsomrade
-    const v = { cost: openCost, ['ybnd_' + j.id]: 1, [ak]: j.pedKapacitet }
-    for (const st of STAGE_KEYS) {
-      if (j.stageKap[st] > 0) v['cap_' + j.id + '_' + st] = -j.stageKap[st] // Σx − cap·y ≤ 0
-    }
-    model.variables['y_' + j.id] = v
-    model.constraints['ybnd_' + j.id] = { max: 1 }
-    model.ints['y_' + j.id] = 1
-    for (const st of STAGE_KEYS) {
-      if (j.stageKap[st] > 0) model.constraints['cap_' + j.id + '_' + st] = { max: 0 }
-    }
-    if (!(ak in model.constraints)) model.constraints[ak] = { min: areaRequired[j.stadsomrade] }
+    if (closable.has(j.id)) return
+    const a = j.stadsomrade
+    if (!fixedCap[a]) fixedCap[a] = { lag: 0, mellan: 0, hog: 0 }
+    for (const st of STAGE_KEYS) fixedCap[a][st] += j.stageKap[st]
   })
+
+  komm.forEach((j) => {
+    if (closable.has(j.id)) {
+      const openCost = j.arshyra + (j.underhallsskuld * 1e6) / 10 // hyra + annualiserad skuld
+      const v = { cost: openCost, ['ybnd_' + j.id]: 1 }
+      for (const st of STAGE_KEYS) {
+        if (j.stageKap[st] > 0) {
+          v['cap_' + j.id + '_' + st] = -j.stageKap[st]            // Σx − cap·y ≤ 0
+          v['area_' + j.stadsomrade + '_' + st] = j.stageKap[st]   // bidrar till områdeskravet när öppen
+        }
+      }
+      model.variables['y_' + j.id] = v
+      model.constraints['ybnd_' + j.id] = { max: 1 }
+      model.ints['y_' + j.id] = 1
+      for (const st of STAGE_KEYS) {
+        if (j.stageKap[st] > 0) model.constraints['cap_' + j.id + '_' + st] = { max: 0 }
+      }
+    } else {
+      // Alltid öppen (icke-konsoliderbar): fast kapacitetstak, ingen y, ingen kostnad.
+      for (const st of STAGE_KEYS) {
+        if (j.stageKap[st] > 0) model.constraints['cap_' + j.id + '_' + st] = { max: j.stageKap[st] }
+      }
+    }
+  })
+
+  // Områdesreserv per stadie: Σ konsoliderbar stageKap·y ≥ krav − fast kapacitet
+  for (const a in areaReqSt) {
+    for (const st of STAGE_KEYS) {
+      const rhs = areaReqSt[a][st] - (fixedCap[a] ? fixedCap[a][st] : 0)
+      model.constraints['area_' + a + '_' + st] = { min: Math.max(0, rhs) }
+    }
+  }
 
   komm.forEach((i) => {
     for (const st of STAGE_KEYS) {
@@ -136,6 +172,7 @@ function milpPlan(schools, params) {
   const flow = (i, j) => STAGE_KEYS.reduce((t, st) => t + (sol['x_' + i.id + '_' + j.id + '_' + st] || 0), 0)
   const closures = []
   komm.forEach((j) => {
+    if (!closable.has(j.id)) return          // icke-konsoliderbar → alltid öppen
     if ((sol['y_' + j.id] || 0) >= 0.5) return // öppen
     const reassign = komm
       .filter((k) => k.id !== j.id && flow(j, k) > 0.5)
@@ -155,7 +192,7 @@ function milpPlan(schools, params) {
 
 // ---------- Girig fallback (stadieindelad) ----------
 function greedyPlan(schools, params) {
-  const { komm, dem, areaRequired, R } = context(schools, params)
+  const { komm, closable, dem, areaReqSt, R } = context(schools, params)
   let open = komm.map((s) => ({ s, capStage: { ...s.stageKap }, loadStage: { ...dem[s.id] } }))
   const closures = []
   const totLoad = (o) => STAGE_KEYS.reduce((t, st) => t + o.loadStage[st], 0)
@@ -165,11 +202,16 @@ function greedyPlan(schools, params) {
   let changed = true
   while (changed) {
     changed = false
-    for (const cand of [...open].sort((a, b) => score(b) - score(a))) {
-      const areaCapAfter = open
-        .filter((o) => o !== cand && o.s.stadsomrade === cand.s.stadsomrade)
-        .reduce((t, o) => t + o.s.pedKapacitet, 0)
-      if (areaCapAfter < (areaRequired[cand.s.stadsomrade] || 0)) continue
+    const cands = open.filter((o) => closable.has(o.s.id)).sort((a, b) => score(b) - score(a))
+    for (const cand of cands) {
+      // Områdesreserv per stadie måste hålla efter stängning
+      const req = areaReqSt[cand.s.stadsomrade] || { lag: 0, mellan: 0, hog: 0 }
+      const capAfter = { lag: 0, mellan: 0, hog: 0 }
+      for (const o of open) {
+        if (o === cand || o.s.stadsomrade !== cand.s.stadsomrade) continue
+        for (const st of STAGE_KEYS) capAfter[st] += o.s.stageKap[st]
+      }
+      if (STAGE_KEYS.some((st) => capAfter[st] < req[st])) continue
 
       const others = open
         .filter((o) => o !== cand)
@@ -222,7 +264,7 @@ function greedyPlan(schools, params) {
 export const MILP_MAX_SCHOOLS = 40
 
 export function planConsolidation(schools, params) {
-  const kommCount = schools.reduce((n, s) => n + (s.hyraPerM2 > 0 ? 1 : 0), 0)
+  const kommCount = schools.reduce((n, s) => n + (s.ordinarieGrundskola ? 1 : 0), 0)
   if (kommCount > MILP_MAX_SCHOOLS) return greedyPlan(schools, params)
   return milpPlan(schools, params) || greedyPlan(schools, params)
 }

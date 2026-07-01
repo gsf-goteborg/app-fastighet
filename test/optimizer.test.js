@@ -50,4 +50,30 @@ describe('konsolideringsoptimering (stadieindelad)', () => {
     expect(plan.savedKr).toBeGreaterThanOrEqual(0)
     expect(plan.closures.length).toBeLessThanOrEqual(komm)
   })
+
+  it('föreslår ALDRIG anpassad grundskola eller specialverksamhet för stängning', () => {
+    const plan = planConsolidation(SCHOOLS, { year: 2050, projFn: decline, radii: { lag: 10, mellan: 10, hog: 10 }, reservePct: 0 })
+    expect(plan.closures.length).toBeGreaterThan(0)
+    for (const c of plan.closures) {
+      expect(c.school.skolform).toBe('Grundskola')
+      expect(c.school.ordinarieGrundskola).toBe(true)
+      expect(/anpassad|resursskola|döv|hörsel/i.test(c.school.namn)).toBe(false)
+    }
+  })
+
+  it('föreslår bara konsoliderbara enheter (ej samlokaliserade delade hus)', () => {
+    const plan = planConsolidation(SCHOOLS, { year: 2050, projFn: decline, radii: { lag: 10, mellan: 10, hog: 10 }, reservePct: 0 })
+    for (const c of plan.closures) expect(c.school.konsoliderbar).toBe(true)
+  })
+
+  it('MILP körs för litet urval och ger giltig struktur (endast grundskola)', () => {
+    const subset = SCHOOLS.filter((s) => s.stadsomrade === 'Centrum').slice(0, 30)
+    const plan = planConsolidation(subset, { year: 2050, projFn: decline, radii: { lag: 4, mellan: 6, hog: 8 }, reservePct: 0 })
+    expect(plan).toHaveProperty('closures')
+    expect(plan.openCount).toBeGreaterThanOrEqual(0)
+    for (const c of plan.closures) {
+      expect(c.school.skolform).toBe('Grundskola')
+      expect(c.school.konsoliderbar).toBe(true)
+    }
+  })
 })

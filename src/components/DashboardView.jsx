@@ -95,8 +95,10 @@ export default function DashboardView({
     const totGap = rows.reduce((t, r) => t + r.gap, 0)
     const totUnits = rows.reduce((t, r) => t + r.units, 0)
 
-    // Konsolideringskandidater: skolor som blir små/under-belagda eller är i dåligt skick
+    // Konsolideringskandidater: bara konsoliderbara grundskolor (ej anpassad grundskola,
+    // ej samlokaliserade enheter) som blir små/under-belagda eller är i dåligt skick
     const candidates = schools
+      .filter((s) => s.konsoliderbar)
       .map((s) => {
         const proj = pe(s)
         const belProj = proj / s.pedKapacitet
@@ -449,11 +451,11 @@ export default function DashboardView({
         <h2>Föreslagen konsolideringsplan — {year}</h2>
         <p className="hint">
           {plan.optimal
-            ? 'MILP-optimering (bevisat optimal): minimerar lokalkostnad'
+            ? 'MILP-optimering (optimal för valt urval): minimerar lokalkostnad'
             : 'Girig heuristik (ej bevisat optimal): minskar lokalkostnad'}
           {' '}— men <b>bara</b> om eleverna får plats på en skola med rätt stadie inom stadiets
-          maxavstånd, och området behåller reservkapacitet (för t.ex. friskolenedläggning).
-          Yngre barn kräver närmare skola.
+          maxavstånd, och området behåller reservkapacitet per stadie.
+          Yngre barn kräver närmare skola. Endast grundskola; anpassad grundskola ingår ej.
         </p>
         <p className="hint" style={{ background: '#fee2e2', color: '#b91c1c', border: '1px solid #fecaca', borderRadius: 8, padding: '8px 10px' }}>
           ⚠︎ <b>Ej beslutsunderlag.</b> Rangordningen drivs av <b>syntetiska</b> fält

@@ -78,14 +78,43 @@ SCHOOLS.forEach((s) => {
   s.nearestNamn = bestNamn
 })
 
+// ORDINARIE GRUNDSKOLA — deltar i konsolideringsmodellen (mottagare + efterfrågan).
+// Exkluderar (platserna är INTE utbytbara mot vanliga grundskoleplatser):
+//   • Anpassad grundskola (egen skolform, skollagen 7 kap.).
+//   • Specialverksamhet felmärkt som grundskola i datan — resursskola, döv/hörsel,
+//     enheter med "anpassad grundskola" i namnet. Kräver särskild kompetens/lokaler.
+const SPECIAL_VERKSAMHET = /anpassad|resursskola|döv|hörsel/i
+SCHOOLS.forEach((s) => {
+  s.ordinarieGrundskola = s.skolform === 'Grundskola' && s.hyraPerM2 > 0 && !SPECIAL_VERKSAMHET.test(s.namn)
+})
+
+// Konsoliderbarhet — vilka enheter som får vara STÄNGNINGSKANDIDATER. Utöver att
+// vara ordinarie grundskola måste enheten ligga i en solo-byggnad: att stänga en
+// enhet i ett delat hus frigör ingen byggnadshyra (kräver helbyggnadsanalys, inte
+// en per-enhet-stängning) — vilket också löser dubbelräknad hyra för delade hus.
+const buildingKey = (s) => s.lat.toFixed(4) + ',' + s.lng.toFixed(4)
+const grundPerBuilding = {}
+for (const s of SCHOOLS) {
+  if (s.ordinarieGrundskola) {
+    const k = buildingKey(s)
+    grundPerBuilding[k] = (grundPerBuilding[k] || 0) + 1
+  }
+}
+SCHOOLS.forEach((s) => {
+  s.konsoliderbar = s.ordinarieGrundskola && grundPerBuilding[buildingKey(s)] === 1
+})
+
 // Basår för projektion (dagens elevtal som utgångspunkt)
 export const BASE_YEAR = 2026
 export const HORIZONS = [2030, 2035, 2040, 2045, 2050]
 
-// Scenarier = årlig demografisk förändring utöver befolkningsprognosen.
+// Scenarier för framskrivningen. "Befolkningsprognos" drivs av den områdesvisa
+// kohortmodellen (framskrivning.js) — dess värde här används INTE för projektionen,
+// bara som platshållare i listan. Övriga scenarier är en enhetlig årlig takt för
+// hela staden (ingen områdesupplösning); "Egen" sätts av användaren.
 export const SCENARIOS = {
   Stabilt: 0.000,
-  Befolkningsprognos: -0.010,
+  Befolkningsprognos: null, // kohortmodell, ej uniform takt
   'Snabb minskning': -0.022,
   'Svag ökning': 0.006,
 }
