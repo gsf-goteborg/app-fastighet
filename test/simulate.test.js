@@ -2,10 +2,30 @@ import { describe, it, expect } from 'vitest'
 import { SCHOOLS } from '../src/data/schools'
 import { COHORT, TRANSITIONS, CHOICE } from '../src/data/choice'
 import { simulateIntake, entryGrades } from '../src/lib/simulate'
+import { friAttrition } from '../src/data/fristaende'
 import { gradesOf } from '../src/data/prognos'
 
 describe('skolvalssimulering (önska skola)', () => {
   const intake = simulateIntake(300)
+
+  it('intagning per inträdesårskurs summerar (nära) till skolans totala intagning', () => {
+    for (const s of SCHOOLS) {
+      const o = intake.get(s.id)
+      if (!o || !o.byEntry) continue
+      const sum = o.byEntry.fklass + o.byEntry.grade4 + o.byEntry.grade7
+      expect(Math.abs(sum - o.mean)).toBeLessThanOrEqual(3)
+    }
+  })
+
+  it('fristående-avhopp ligger i ett rimligt band (2–25 %)', () => {
+    for (const s of SCHOOLS) {
+      for (const st of ['lag', 'mellan', 'hog']) {
+        const a = friAttrition(s.mellanomrade, st)
+        expect(a).toBeGreaterThanOrEqual(0.02)
+        expect(a).toBeLessThanOrEqual(0.25)
+      }
+    }
+  })
 
   const totalCohort = ['fklass', 'grade4', 'grade7']
     .reduce((t, k) => t + Object.values(COHORT[k]).reduce((a, b) => a + b, 0), 0)

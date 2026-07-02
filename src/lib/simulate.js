@@ -22,6 +22,8 @@ export function simulateIntake(nSims = 300) {
   const areas = Object.keys(COHORT.fklass)
   // sims[k] = Map skolId → antal nya elever i simulering k
   const sims = Array.from({ length: nSims }, () => new Map(ids.map((id) => [id, 0])))
+  // Ackumulerad intagning per skola OCH övergång (för klass-/inträdesbeslut)
+  const byEntry = new Map(ids.map((id) => [id, { fklass: 0, grade4: 0, grade7: 0 }]))
 
   for (const t of TRANSITIONS) {
     for (const a of areas) {
@@ -32,7 +34,7 @@ export function simulateIntake(nSims = 300) {
         const acc = sims[k]
         for (let i = 0; i < n; i++) {
           const id = pick(probs, Math.random())
-          if (id != null) acc.set(id, acc.get(id) + 1)
+          if (id != null) { acc.set(id, acc.get(id) + 1); byEntry.get(id)[t.key] += 1 }
         }
       }
     }
@@ -43,7 +45,15 @@ export function simulateIntake(nSims = 300) {
     const arr = sims.map((m) => m.get(id)).sort((x, y) => x - y)
     const mean = arr.reduce((t, v) => t + v, 0) / nSims
     const q = (p) => arr[Math.min(nSims - 1, Math.floor(p * nSims))]
-    out.set(id, { mean: Math.round(mean), p10: q(0.10), p90: q(0.90), min: arr[0], max: arr[nSims - 1] })
+    const be = byEntry.get(id)
+    out.set(id, {
+      mean: Math.round(mean), p10: q(0.10), p90: q(0.90), min: arr[0], max: arr[nSims - 1],
+      byEntry: {
+        fklass: Math.round(be.fklass / nSims),
+        grade4: Math.round(be.grade4 / nSims),
+        grade7: Math.round(be.grade7 / nSims),
+      },
+    })
   }
   return out
 }

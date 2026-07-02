@@ -2,7 +2,12 @@
 
 Internt planeringsverktyg för fastighetsavdelningen: visar Göteborgs grundskolor
 på karta, skriver fram elevtal demografiskt, simulerar skolval och föreslår
-konsolidering.
+konsolidering. Produktvisionen finns i [`vision.md`](vision.md).
+
+**Två planeringsprocesser.** Översikt-fliken är uppdelad i **Kortsiktig** (placera
+nästa års elever — skolval, fristående-avhopp/överplacering, klass-beslut) och
+**Långsiktig** (befolkningsprognos, trender, lokalbestånd/skick, konsolidering). Se
+`vision.md` för varför uppdelningen.
 
 **Datakälla (uppdaterat):** Appens datalager genereras numera ur
 `data/student_data.xlsx` (172 kommunala skolenheter — grundskola + anpassad
@@ -27,22 +32,26 @@ vara oberoende kan en egen tile-källa/MapTiler-nyckel pekas in i `MapView.jsx`.
 
 ## Vad som är byggt
 
-1. **Geografisk hierarki** — `stadsområde ⊃ mellanområde ⊃ primärområde` (Göteborgs
-   statistiska indelning). Fält på varje skola, filterfasetter, infopanel, tabell, CSV.
+1. **Geografisk hierarki** — `stadsområde ⊃ mellanområde` (Göteborgs statistiska
+   indelning; primär-/basområde finns som geofiler). Fält på varje skola,
+   filterfasetter, infopanel, tabell, CSV. Koroplet på mellanområde.
 2. **Befolkningsbaserad elevframskrivning** (kohortmodell) — skriver fram per
-   primärområde och åldersstadie (F–3/4–6/7–9) och fördelar på skolor via observerat
+   mellanområde och åldersstadie (F–3/4–6/7–9) och fördelar på skolor via observerat
    elevmönster. Basårskalibrerad.
-3. **Elevhärkomst + resväg** — per skola: antal elever per primärområde och
+3. **Elevhärkomst + resväg** — per skola: antal elever per mellanområde och
    genomsnittlig resväg. Aggregerat och sekretessmaskat (inga individadresser).
    Driver visning (infopanel) och framskrivningens flödesmatris.
 4. **Kartvy av prognosen** — tema "Elevförändring (prognos)" färglägger skolor efter
-   projicerad förändring till vald horisont.
-5. **Önska skola — skolvalssimulering** — sannolikhetsmodell för var elever väljer
-   skola vid de tre övergångarna (förskoleklass 6 år, mellanstadium 10 år, högstadium
-   13 år). Monte Carlo ger förväntad intagning per skola med osäkerhetsband (P10–P90).
-6. **Stadieindelad konsolideringsoptimering** — stänger skolor till minsta lokalkostnad,
-   men eleverna omfördelas per åldersstadie till skolor som har rätt stadie inom
-   stadiets maxavstånd (2/4/6 km), med kapacitetstak per stadie.
+   projicerad förändring till vald horisont. Kandidatsit-lager (expansion/nybyggnad).
+5. **Kortsiktig placering** (Översikt → Kortsiktig) — inför nästa läsår: simulerad
+   intagning per inträdesårskurs (F/åk 4/åk 7), minus **fristående-avhopp** →
+   **överplacering** (överbokning för att fylla kapaciteten) och **klass-signal**
+   (öppna/stäng klass). Bygger på önska-skola-simuleringen (Monte Carlo, P10–P90).
+6. **Stadieindelad konsolideringsoptimering** (Långsiktig) — stänger skolor till minsta
+   lokalkostnad; eleverna omfördelas per åldersstadie till skola med rätt stadie inom
+   maxavstånd (2/4/6 km), kapacitetstak + reservmarginal **per stadie**. Endast
+   ordinarie grundskola — anpassad grundskola och specialverksamhet exkluderas helt
+   (`ordinarieGrundskola`/`konsoliderbar` i `schools.js`).
 7. **Importkontroll** — `validateOrigins()` granskar skarpt elevhärkomstuttag vid byte.
 
 ## Arkitektur — var datan kommer in
@@ -54,8 +63,9 @@ vara oberoende kan en egen tile-källa/MapTiler-nyckel pekas in i `MapView.jsx`.
 | Befolkning i skolålder per **mellanområde** × stadie + trend | `src/data/generated/befolkning.json` → `prognos.js` (`BEFOLKNING`) | ur elevhistorik 2024–26 |
 | Elevmönster (intake per mellanområde → skola) | `src/data/generated/intake.json` → `origins.js` | ur bostadszoner |
 | Skolval: sannolikheter + övergångsårgångar | `src/data/choice.js` (`CHOICE`, `COHORT`) | exempel (mock) |
+| Fristående-avhopp (för överplacering) per mellanområde × stadie | `src/data/fristaende.js` (`friAttrition`) | exempel (mock) |
 | Framskrivningsmotor (befolkning × elevmönster) | `src/lib/framskrivning.js` | klar |
-| Skolvalssimulering (Monte Carlo) | `src/lib/simulate.js` | klar |
+| Skolvalssimulering (Monte Carlo, intagning per inträdesårskurs) | `src/lib/simulate.js` | klar |
 | Konsolideringsoptimering (stadieindelad MILP + girig) | `src/lib/optimizer.js` | klar — MILP > 40 skolor ⇒ girig heuristik |
 | Områdesgeometri (stads-/mellan-/primär-/basområde) | `public/geo/*.geojson` | klar (officiell indelning, EPSG:4326) |
 
@@ -70,12 +80,19 @@ duger **inte** för att fatta nedläggnings-/fastighetsbeslut ännu — flera av
 fält som *avgör* optimeringen är syntetiska eller svaga. I appen är dessa märkta
 med röd **"syntetiskt"**-flagga (infopanelen) och en varning i konsolideringskortet.
 
+**Fas 0 gjort** (korrekthet & ärlighet, ingen ny data): anpassad grundskola +
+specialverksamhet exkluderade ur konsolidering, samlokaliseringens dubbelräkning
+löst (delade hus ej individuellt stängningsbara), reserv per stadie, ärliga
+etiketter ("optimal för valt urval" i st. f. "bevisat optimal"), doc-fix
+mellanområde. Se commit "Fas 0".
+
 Checklista, i fallande prioritet (störst påverkan på besluten först):
 
 - [ ] **Vägnätsavstånd** hemområde→skola (ersätt fågelvägen). *Enskilt viktigast* —
       styr hela radievillkoret (2/4/6 km) och därmed vilka skolor som kan ta emot
-      varandra. Fågelväg är fel särskilt över Göta älv. Pipeline finns: DuckDB-precompute
-      (avsnitt C nedan) → `src/data/distances.js`, byt `haversineKm` i `optimizer.js`.
+      varandra. Fågelväg är fel särskilt över Göta älv. **PAUSAT medvetet** — matrisen
+      finns i SQL Server (adress×skola, vägnät); två SQL-exporter (aggregat
+      mellanområde×skola + skoldimension) → `src/data/distances.js`, byt `haversineKm`.
 - [ ] **Skarpa fastighets-/FM-data** (skick, underhållsskuld, BTA, internhyra) från
       underhålls-/hyressystemet. Dessa är idag **syntetiska** men driver
       `optimizer.js` (`savedKr`, `avoidedDebt`, stäng-rankning). Utan dem är
@@ -84,10 +101,11 @@ Checklista, i fallande prioritet (störst påverkan på besluten först):
       för den dämpade 3-årstrenden ur elevhistoriken. Ersätt `befolkning.json`.
 - [ ] **Verkligt elevmönster/skolval** (folkbokföring × placering, resp. skarp
       valmodell) → `origins.js` / `choice.js`. Idag gravitations-/avståndsmock.
+      Gäller även **fristående-avhopp** (`fristaende.js`) i den kortsiktiga överplaceringen.
 - [ ] **Bevisat optimal lösare** för beslutsstöd: spopt-backend (avsnitt nedan) över
       riktig kostnadsmatris. Webbläsar-MILP:en stängs av > 40 skolor (girig heuristik).
-- [ ] **Samlokalisering**: 35 lägen delar hus (grundskola + anpassad grundskola) men
-      bär var sin (syntetisk) hyra → dubbelräknad byggnadskostnad. Modellera delad lokal.
+- [x] ~~**Samlokalisering** dubbelräknad hyra~~ — löst i Fas 0 (delade hus ej
+      individuellt stängningsbara). Full helbyggnads-MILP kvarstår som förfining.
 - [ ] **Likvärdighetslins**: visa resväg per stadie och hur varje nedläggning ändrar
       andelen elever med lång resväg, bredvid besparingen.
 

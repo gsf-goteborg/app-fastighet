@@ -2,12 +2,18 @@ import { useState, useMemo } from 'react'
 import { RENOV, occColor } from '../lib/constants'
 import { SCENARIOS, HORIZONS, MIN_VIABLE_PER_GRADE, LARARKOSTNAD, BASE_YEAR } from '../data/schools'
 import { getIntake, entryGrades } from '../lib/simulate'
+import { friAttrition } from '../data/fristaende'
 import { SCHOOL_ORIGINS } from '../data/origins'
 
 // Restidsklasser (km) för tillgänglighetsfördelning
 const TRAVEL_BINS = [[0, 1], [1, 2], [2, 4], [4, 6], [6, Infinity]]
 const TRAVEL_LABELS = ['< 1 km', '1–2 km', '2–4 km', '4–6 km', '> 6 km']
 const TRAVEL_COLORS = ['#16a34a', '#65a30d', '#ca8a04', '#ea580c', '#dc2626']
+
+// Kortsiktig placering: klasstorlek + mappning inträdesårskurs → stadie/etikett
+const KLASS_STORLEK = 28
+const ENTRY_STAGE = { F: 'lag', 4: 'mellan', 7: 'hog' }
+const ENTRY_LABEL = { F: 'Förskoleklass', 4: 'Mellanstadiet (åk 4)', 7: 'Högstadiet (åk 7)' }
 
 const AREAS = ['Centrum', 'Nordost', 'Hisingen', 'Sydväst']
 const sum = (a, k) => a.reduce((t, s) => t + s[k], 0)
@@ -20,6 +26,7 @@ export default function DashboardView({
   radii, setRadii, reserve, setReserve, rate, years, projFn, plan, robustness,
 }) {
   const setRadius = (st, v) => setRadii({ ...radii, [st]: Math.max(0.5, +v || radii[st]) })
+  const [horizon, setHorizon] = useState('kort')      // kort = nästa läsår, lang = 5–25 år
 
   // Robusthet: vilka stängningar håller i ALLA scenarier vs bara vissa
   const robust = useMemo(() => {
@@ -143,6 +150,46 @@ export default function DashboardView({
       .sort((a, b) => b.o.mean - a.o.mean),
     [schools, intake])
 
+  // KORTSIKTIG placering inför nästa läsår: intagning per inträdesårskurs minus
+  // fristående-avhopp → netto som börjar; överplacering (överbokning) för att fylla
+  // kapaciteten; klass-signal (öppna/stäng klass). Klass ≈ KLASS_STORLEK elever.
+  const short = useMemo(() => {
+    const rows = []
+    let totE = 0, totNet = 0, totCap = 0, closeCls = 0, openCls = 0, overfull = 0
+    for (const s of schools) {
+      const o = intake.get(s.id)
+      if (!o || !o.byEntry) continue
+      for (const eg of entryGrades(s)) {
+        const key = eg === 'F' ? 'fklass' : eg === '4' ? 'grade4' : 'grade7'
+        const E = o.byEntry[key] || 0
+        if (!E) continue
+        const a = friAttrition(s.mellanomrade, ENTRY_STAGE[eg])
+        const net = Math.round(E * (1 - a))
+        const capPerGrade = s.kapPerArskurs
+        const currentClasses = Math.max(1, Math.round(capPerGrade / KLASS_STORLEK))
+        const neededClasses = Math.max(0, Math.ceil(net / KLASS_STORLEK))
+        const classDelta = neededClasses - currentClasses          // <0 stäng, >0 öppna
+        const overPlace = Math.round((capPerGrade * a) / (1 - a))   // överbokning för att netto fylla kap
+        rows.push({ s, eg, E, aPct: Math.round(a * 100), net, capPerGrade, classDelta, overPlace, overfull: net > capPerGrade })
+        totE += E; totNet += net; totCap += capPerGrade
+        if (classDelta < 0) closeCls += -classDelta
+        if (classDelta > 0) openCls += classDelta
+        if (net > capPerGrade) overfull++
+      }
+    }
+    rows.sort((a, b) => b.E - a.E)
+    return { rows, totE, totNet, totCap, closeCls, openCls, overfull }
+  }, [schools, intake])
+
+  const shortKpis = [
+    [`Nya elever ${BASE_YEAR + 1}`, short.totE.toLocaleString('sv')],
+    ['Netto efter fri-avhopp', short.totNet.toLocaleString('sv')],
+    ['Kapacitet inträdesår', short.totCap.toLocaleString('sv')],
+    ['Klasser att stänga', short.closeCls],
+    ['Klasser att öppna', short.openCls],
+    ['Översökta inträden', short.overfull],
+  ]
+
   // Tillgänglighet — elevviktad restidsfördelning ur elevhärkomsten
   const access = useMemo(() => {
     const counts = TRAVEL_BINS.map(() => 0)
@@ -183,6 +230,100 @@ export default function DashboardView({
 
   return (
     <div className="dash">
+      <div className="controls-inline" style={{ marginBottom: 6 }}>
+        <span className="inlabel">Planeringshorisont</span>
+        <div className="seg">
+          <button className={horizon === 'kort' ? 'on' : ''} onClick={() => setHorizon('kort')}>Kortsiktig — nästa läsår</button>
+          <button className={horizon === 'lang' ? 'on' : ''} onClick={() => setHorizon('lang')}>Långsiktig — 5–25 år</button>
+        </div>
+        <span className="inlabel" style={{ marginLeft: 'auto', color: 'var(--muted)' }}>
+          {horizon === 'kort' ? `Placera nästa års elever · läsår ${BASE_YEAR + 1}` : `Befolkningsprognos & lokalbestånd · till ${year}`}
+        </span>
+      </div>
+
+      {horizon === 'kort' && (
+        <>
+          <div className="kpis">
+            {shortKpis.map(([k, v]) => (
+              <div className="kpi" key={k}>
+                <div className="k">{k}</div>
+                <div className="v" dangerouslySetInnerHTML={{ __html: String(v).replace(/ (\D+)$/, ' <small>$1</small>') }} />
+              </div>
+            ))}
+          </div>
+
+          <div className="card">
+            <h2>Placering & överplacering — läsår {BASE_YEAR + 1}</h2>
+            <p className="hint">
+              Kan vi placera alla nya elever? Simulerad intagning per inträdesårskurs (F / åk 4 / åk 7)
+              minus förväntat <b>fristående-avhopp</b> ger nettot som faktiskt börjar. Eftersom en andel
+              tackar ja men väljer fristående vid terminsstart kan man <b>överplacera</b> (som överbokning)
+              så att nettot fyller kapaciteten. Klass ≈ {KLASS_STORLEK} elever.
+              <span className="mockflag">exempeldata</span>
+            </p>
+            <div className="banner">
+              <div>
+                <b>{short.totE.toLocaleString('sv')}</b> nya elever söks in, netto <b>{short.totNet.toLocaleString('sv')}</b> efter
+                fristående-avhopp mot <b>{short.totCap.toLocaleString('sv')}</b> platser i inträdesåren.
+                {short.closeCls > 0 && <> Kan stänga <b>{short.closeCls}</b> klass{short.closeCls > 1 ? 'er' : ''}.</>}
+                {short.overfull > 0 && <> <b style={{ color: '#dc2626' }}>{short.overfull}</b> inträden är översökta (netto &gt; kapacitet) — elever måste placeras om.</>}
+              </div>
+            </div>
+            <table className="gaptable">
+              <thead>
+                <tr><th>Skola</th><th>Inträde</th><th>Söker in</th><th>Fri-avhopp</th><th>Netto börjar</th><th>Kap/åk</th><th>Överplacera</th><th>Klass-signal</th></tr>
+              </thead>
+              <tbody>
+                {short.rows.map((r) => (
+                  <tr key={r.s.id + '-' + r.eg} onClick={() => onSelect(r.s.id)} style={{ cursor: 'pointer' }}>
+                    <td><b>{r.s.namn}</b></td>
+                    <td>{ENTRY_LABEL[r.eg]}</td>
+                    <td>{r.E}</td>
+                    <td style={{ color: 'var(--muted)' }}>{r.aPct}%</td>
+                    <td className={r.overfull ? 'gap-pos' : ''}><b>{r.net}</b></td>
+                    <td>{r.capPerGrade}</td>
+                    <td style={{ color: 'var(--komm)' }}>+{r.overPlace}</td>
+                    <td>{r.classDelta < 0
+                      ? <span className="gap-neg">stäng {-r.classDelta} klass</span>
+                      : r.classDelta > 0
+                        ? <span className="gap-pos">öppna {r.classDelta} klass</span>
+                        : <span style={{ color: 'var(--muted)' }}>balans</span>}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="card">
+            <h2>Önska skola — simulerad intagning {BASE_YEAR + 1}</h2>
+            <p className="hint">
+              Skolvalsmodellen ger varje elev en sannolikhet per skola vid de tre övergångarna
+              (förskoleklass 6 år, mellanstadium 10 år, högstadium 13 år). Här simuleras valen och
+              visar förväntad intagning av nya elever per skola med osäkerhetsband (P10–P90).
+              <span className="mockflag">exempelmodell</span>
+            </p>
+            <table className="gaptable">
+              <thead>
+                <tr><th>Skola</th><th>Område</th><th>Inträde</th><th>Förväntad intagning</th><th>Osäkerhet (P10–P90)</th></tr>
+              </thead>
+              <tbody>
+                {intakeRows.map(({ s, o, entry }) => (
+                  <tr key={s.id} onClick={() => onSelect(s.id)} style={{ cursor: 'pointer' }}>
+                    <td><b>{s.namn}</b></td>
+                    <td>{s.mellanomrade}</td>
+                    <td>{entry.join(', ')}</td>
+                    <td><b>{o.mean}</b> elever</td>
+                    <td style={{ color: 'var(--muted)' }}>{o.p10}–{o.p90}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
+
+      {horizon === 'lang' && (
+      <>
       <div className="kpis">
         {kpis.map(([k, v]) => (
           <div className="kpi" key={k}>
@@ -341,32 +482,6 @@ export default function DashboardView({
                 </tr>
               )
             })}
-          </tbody>
-        </table>
-      </div>
-
-      <div className="card">
-        <h2>Önska skola — simulerad intagning {BASE_YEAR + 1}</h2>
-        <p className="hint">
-          Skolvalsmodellen ger varje elev en sannolikhet per skola vid de tre övergångarna
-          (förskoleklass 6 år, mellanstadium 10 år, högstadium 13 år). Här simuleras valen och
-          visar förväntad intagning av nya elever per skola med osäkerhetsband (P10–P90).
-          <span className="mockflag">exempelmodell</span>
-        </p>
-        <table className="gaptable">
-          <thead>
-            <tr><th>Skola</th><th>Område</th><th>Inträde</th><th>Förväntad intagning</th><th>Osäkerhet (P10–P90)</th></tr>
-          </thead>
-          <tbody>
-            {intakeRows.map(({ s, o, entry }) => (
-              <tr key={s.id} onClick={() => onSelect(s.id)} style={{ cursor: 'pointer' }}>
-                <td><b>{s.namn}</b></td>
-                <td>{s.mellanomrade}</td>
-                <td>{entry.join(', ')}</td>
-                <td><b>{o.mean}</b> elever</td>
-                <td style={{ color: 'var(--muted)' }}>{o.p10}–{o.p90}</td>
-              </tr>
-            ))}
           </tbody>
         </table>
       </div>
@@ -572,6 +687,8 @@ export default function DashboardView({
           ))}
         </div>
       </div>
+      </>
+      )}
     </div>
   )
 }
