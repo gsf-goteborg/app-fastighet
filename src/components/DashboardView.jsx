@@ -2,8 +2,11 @@ import { useState, useMemo } from 'react'
 import { RENOV, occColor } from '../lib/constants'
 import { SCENARIOS, HORIZONS, MIN_VIABLE_PER_GRADE, LARARKOSTNAD, BASE_YEAR } from '../data/schools'
 import { getIntake, entryGrades } from '../lib/simulate'
+import { equityOfPlan } from '../lib/likvardighet'
+import { choiceRedistribution } from '../lib/skolval'
 import { friAttrition } from '../data/fristaende'
 import { SCHOOL_ORIGINS } from '../data/origins'
+import ReportView from './ReportView'
 
 // Restidsklasser (km) för tillgänglighetsfördelning
 const TRAVEL_BINS = [[0, 1], [1, 2], [2, 4], [4, 6], [6, Infinity]]
@@ -41,6 +44,18 @@ export default function DashboardView({
   const [refSize, setRefSize] = useState(450)         // pedagogisk kapacitet per skola
   const [atRisk, setAtRisk] = useState(false)         // akut-skick = riskkapacitet
   const [target, setTarget] = useState(95)            // målbeläggning %
+  const [showReport, setShowReport] = useState(false) // utskriftsvänligt underlag
+
+  // Likvärdighetslins: planens resvägseffekt per stadie + per stängning
+  const equity = useMemo(
+    () => plan.closures.length ? equityOfPlan(schools, plan, radii) : null,
+    [schools, plan, radii],
+  )
+  // Skolvalsdriven omfördelning (IIA): var eleverna själva skulle välja
+  const skolval = useMemo(
+    () => plan.closures.length ? choiceRedistribution(plan.closures.map((c) => c.school.id)) : null,
+    [plan],
+  )
 
   const isCohort = scenario === 'Befolkningsprognos'
   // Projicerat elevtal för en skola vid vald horisont (kohort- eller uniform takt)
@@ -239,7 +254,17 @@ export default function DashboardView({
         <span className="inlabel" style={{ marginLeft: 'auto', color: 'var(--muted)' }}>
           {horizon === 'kort' ? `Placera nästa års elever · läsår ${BASE_YEAR + 1}` : `Befolkningsprognos & lokalbestånd · till ${year}`}
         </span>
+        {horizon === 'lang' && (
+          <button className="btn" onClick={() => setShowReport(true)}>
+            Exportera underlag för diskussion
+          </button>
+        )}
       </div>
+
+      {showReport && (
+        <ReportView onClose={() => setShowReport(false)}
+          ctx={{ scenario, year, radii, reserve, schools, plan, robustness, equity, skolval }} />
+      )}
 
       {horizon === 'kort' && (
         <>
@@ -619,22 +644,42 @@ export default function DashboardView({
         {plan.closures.length > 0 && (
           <table className="gaptable">
             <thead>
-              <tr><th>Stäng/omvandla</th><th>Område</th><th>Elever att flytta</th><th>Tas emot av</th><th>Längsta avstånd</th><th>Frigjord hyra</th><th>Skick</th></tr>
+              <tr><th>Stäng/omvandla</th><th>Område</th><th>Elever att flytta</th><th>Tilldelas (optimering)</th><th>Dit väljer eleverna (skolval)</th><th>Resväg snitt</th><th>Frigjord hyra</th><th>Skick</th></tr>
             </thead>
             <tbody>
-              {plan.closures.map((c) => (
-                <tr key={c.school.id} onClick={() => onSelect(c.school.id)} style={{ cursor: 'pointer' }}>
-                  <td><b>{c.school.namn}</b></td>
-                  <td>{c.school.stadsomrade}</td>
-                  <td>{c.students}</td>
-                  <td style={{ fontSize: 12, color: 'var(--muted)' }}>{c.reassign.map((r) => `${r.namn} (${r.n})`).join(', ')}</td>
-                  <td>{c.maxKm.toFixed(1)} km</td>
-                  <td>{mkr(c.savedKr)} Mkr/år</td>
-                  <td><span className="pill" style={{ background: RENOV[c.school.renovbehov][1] }}>{RENOV[c.school.renovbehov][0]}</span></td>
-                </tr>
-              ))}
+              {plan.closures.map((c) => {
+                const eq = equity?.perClosure.get(c.school.id)
+                const val = skolval?.get(c.school.id)
+                return (
+                  <tr key={c.school.id} onClick={() => onSelect(c.school.id)} style={{ cursor: 'pointer' }}>
+                    <td><b>{c.school.namn}</b></td>
+                    <td>{c.school.stadsomrade}</td>
+                    <td>{c.students}</td>
+                    <td style={{ fontSize: 12, color: 'var(--muted)' }}>{c.reassign.map((r) => `${r.namn} (${r.n})`).join(', ')}</td>
+                    <td style={{ fontSize: 12, color: 'var(--fri)' }}>
+                      {val && val.flows.length
+                        ? val.flows.slice(0, 3).map((f) => `${f.namn} (${Math.round(f.n)}/år)`).join(', ')
+                        : '–'}
+                    </td>
+                    <td style={{ whiteSpace: 'nowrap' }}>
+                      {eq ? <>{eq.kmBefore} → <b style={{ color: eq.kmAfter > eq.kmBefore ? '#dc2626' : '#16a34a' }}>{eq.kmAfter}</b> km</> : '–'}
+                    </td>
+                    <td>{mkr(c.savedKr)} Mkr/år</td>
+                    <td><span className="pill" style={{ background: RENOV[c.school.renovbehov][1] }}>{RENOV[c.school.renovbehov][0]}</span></td>
+                  </tr>
+                )
+              })}
             </tbody>
           </table>
+        )}
+        {plan.closures.length > 0 && (
+          <p className="hint" style={{ marginTop: 10 }}>
+            <b>Tilldelas</b> = optimeringens placering (elever i berörda årskurser vid horisonten).
+            <b> Dit väljer eleverna</b> = skolvalsmodellens omval när skolan tas bort (IIA) — nya elever
+            per övergångsårgång (F/åk 4/åk 7) och år. Olika mått, men avvikelser i mottagare visar var
+            planen går emot faktiska sökmönster. Flödena kan ritas på kartan
+            (Karta → "Omfördelning vid stängning"). <span className="mockflag">exempelmodell</span>
+          </p>
         )}
         {plan.stranded.length > 0 && (
           <p className="hint" style={{ marginTop: 10 }}>
@@ -642,6 +687,50 @@ export default function DashboardView({
           </p>
         )}
       </div>
+
+      {equity && plan.closures.length > 0 && (
+        <div className="card">
+          <h2>Likvärdighet — vad planen gör med resvägarna</h2>
+          <p className="hint">
+            Andel elever med resväg över stadiets närhetsnorm ({radii.lag}/{radii.mellan}/{radii.hog} km),
+            före och efter planen. Eleverna på stängda skolor flyttas enligt tilldelningen och deras nya
+            resväg skattas från hemområdet till mottagarskolan. En besparing som ökar andelen med lång
+            resväg — särskilt för de yngsta — är ett sämre förslag än siffran antyder.
+            <span className="mockflag">fågelväg × schablon</span>
+          </p>
+          <div className="banner">
+            <div>
+              Andel elever över närhetsnormen: <b>{equity.totalBeforePct.toFixed(1)} %</b> idag →{' '}
+              <b style={{ color: equity.totalAfterPct > equity.totalBeforePct + 0.05 ? '#dc2626' : '#16a34a' }}>
+                {equity.totalAfterPct.toFixed(1)} %
+              </b> efter planen
+              {equity.totalAfterPct > equity.totalBeforePct + 0.05
+                ? <> — planen <b style={{ color: '#dc2626' }}>försämrar</b> likvärdigheten; väg det mot besparingen på {mkr(plan.savedKr)} Mkr/år.</>
+                : <> — planen håller resvägarna inom normen.</>}
+            </div>
+          </div>
+          <table className="gaptable">
+            <thead>
+              <tr><th>Stadie</th><th>Norm</th><th>Elever</th><th>Över normen idag</th><th>Efter planen</th><th>Förändring</th></tr>
+            </thead>
+            <tbody>
+              {equity.byStage.map((st) => {
+                const d = st.afterPct - st.beforePct
+                return (
+                  <tr key={st.key}>
+                    <td><b>{st.label}</b></td>
+                    <td>{st.norm} km</td>
+                    <td>{st.n.toLocaleString('sv')}</td>
+                    <td>{st.beforePct.toFixed(1)} %</td>
+                    <td>{st.afterPct.toFixed(1)} %</td>
+                    <td className={d > 0.05 ? 'gap-pos' : 'gap-neg'}>{d >= 0 ? '+' : ''}{d.toFixed(1)} p.e.</td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       <div className="card">
         <h2>Robusthet — håller planen i alla scenarier? {year}</h2>

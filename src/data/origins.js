@@ -37,11 +37,17 @@ for (const a of Object.keys(centroid)) {
   centroid[a].lat /= centroid[a].n
 }
 
-function netKm(area, school) {
+// Skattad resväg (km) från ett mellanområde till en godtycklig punkt — samma
+// schablon (fågelväg × omvägsfaktor) som härkomsttabellen, så att t.ex.
+// likvärdighetsberäkningen mäter före/efter med samma måttstock.
+export function areaPointKm(area, lat, lng) {
   const c = centroid[area]
-  if (!c) return 0
-  const d = haversineKm(c.lat, c.lng, school.lat, school.lng)
-  return +((d + INTRA_AREA_KM) * DETOUR).toFixed(1)
+  if (!c) return null
+  return +((haversineKm(c.lat, c.lng, lat, lng) + INTRA_AREA_KM) * DETOUR).toFixed(1)
+}
+
+function netKm(area, school) {
+  return areaPointKm(area, school.lat, school.lng) ?? 0
 }
 
 // Fördela heltal så att summan blir exakt target (största-rest-metoden)

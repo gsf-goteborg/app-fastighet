@@ -163,3 +163,66 @@ tbody tr:hover { background:#f8fafc; cursor:pointer; }
 .welcome-body { color:var(--muted); font-size:13px; line-height:1.45; margin-top:2px; }
 .welcome-note { background:#fef9c3; border:1px solid #fde68a; border-radius:8px; padding:10px 12px; font-size:12px; color:#854d0e; margin:0 0 18px; line-height:1.45; }
 .welcome .btn { width:100%; padding:11px; font-size:15px; }
+
+/* Byggnad 3D */
+.bygg { position:absolute; inset:0; overflow:hidden; }
+.bygg-canvas { position:absolute; inset:0; }
+.bygg-canvas canvas { display:block; }
+.bygg-ctl { max-width:250px; max-height:calc(100% - 120px); overflow-y:auto; }
+.bygg-ctl select { width:100%; margin-bottom:10px; }
+.bygg-mode { margin-bottom:10px; width:100%; }
+.bygg-mode button { flex:1; padding:6px 8px; }
+.bygg-slider { display:flex; align-items:center; gap:8px; font-size:11px; font-weight:600; color:var(--muted); margin-bottom:10px; }
+.bygg-slider input { flex:1; accent-color:var(--primary); }
+.bygg-warn { position:absolute; top:14px; right:14px; z-index:3; max-width:300px; background:#fff; border:1px solid #fecaca; border-left:3px solid #dc2626; border-radius:10px; padding:10px 12px; box-shadow:0 2px 8px rgba(0,0,0,.08); font-size:11.5px; line-height:1.45; color:var(--muted); }
+.bygg-warn b { color:#dc2626; }
+.bygg-warn code { font-size:10.5px; background:var(--bg); padding:1px 4px; border-radius:4px; }
+.bygg-room { position:absolute; top:120px; right:14px; z-index:4; width:260px; background:#fff; border:1px solid var(--line); border-radius:12px; padding:14px 16px; box-shadow:0 8px 24px rgba(0,0,0,.14); }
+.bygg-room .p-close { position:absolute; top:8px; right:10px; }
+.bygg-room-head { display:flex; align-items:center; gap:8px; }
+.bygg-room-head .dot { width:11px; height:11px; border-radius:50%; flex-shrink:0; }
+.bygg-room-head h3 { font-size:14px; margin:0; }
+.bygg-room-sub { font-size:11.5px; color:var(--muted); margin:3px 0 10px; }
+.bygg-room-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px 14px; font-size:13px; }
+.bygg-room-grid span { display:block; font-size:10px; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); font-weight:600; margin-bottom:2px; }
+.bygg-room-note { margin-top:12px; padding-top:9px; border-top:1px solid var(--line); font-size:10.5px; color:#dc2626; font-weight:600; }
+.bygg-kpis { position:absolute; left:14px; right:14px; bottom:14px; z-index:3; display:flex; gap:10px; overflow-x:auto; }
+.bygg-kpi { flex:1; min-width:140px; background:rgba(255,255,255,.94); backdrop-filter:blur(4px); border:1px solid var(--line); border-radius:11px; padding:10px 13px; }
+.bygg-kpi > span { display:block; font-size:10px; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); font-weight:600; }
+.bygg-kpi > b { display:block; font-size:19px; font-weight:700; margin-top:3px; letter-spacing:-.02em; }
+.bygg-kpi small { display:block; font-size:10.5px; color:var(--muted); margin-top:2px; }
+.bygg-funk { min-width:200px; }
+.bygg-funkbar { display:flex; height:14px; border-radius:5px; overflow:hidden; margin-top:6px; }
+.bygg-funkbar span { display:block; height:100%; }
+.bygg-empty { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; text-align:center; color:var(--muted); }
+.p-bygg { width:100%; margin-bottom:14px; }
+.mockflag.synth { font-style:normal; }
+
+/* Flödeslegend (kartan) */
+.flowline { display:inline-block; width:18px; height:3px; border-radius:2px; flex-shrink:0; }
+.flowline.dashed { background:repeating-linear-gradient(90deg,#f47815 0 4px,transparent 4px 7px); }
+
+/* Rapport — underlag för diskussion */
+.report-overlay { position:fixed; inset:0; z-index:100; background:rgba(15,23,42,.5); overflow-y:auto; padding:28px 16px; }
+.report { max-width:860px; margin:0 auto; background:#fff; border-radius:12px; padding:34px 40px; box-shadow:0 20px 60px rgba(0,0,0,.3); }
+.report-actions { display:flex; gap:10px; justify-content:flex-end; margin-bottom:18px; }
+.report-head { display:flex; justify-content:space-between; align-items:flex-start; gap:16px; border-bottom:3px solid var(--primary); padding-bottom:14px; margin-bottom:8px; }
+.report-head h1 { font-size:20px; margin:0; letter-spacing:-.01em; }
+.report-sub { font-size:12px; color:var(--muted); margin-top:3px; }
+.report-stamp { text-align:center; font-size:12px; font-weight:800; color:#b91c1c; border:2px solid #dc2626; border-radius:8px; padding:7px 12px; line-height:1.3; white-space:nowrap; }
+.report-stamp small { font-weight:600; color:#dc2626; text-transform:none; }
+.report section { margin-top:22px; }
+.report h2 { font-size:14px; margin:0 0 8px; border-bottom:1px solid var(--line); padding-bottom:5px; }
+.report .gaptable td, .report .gaptable th { padding:7px 9px; }
+.report .gaptable td { white-space:normal; }
+.report-fine { font-size:11px; color:var(--muted); margin:8px 0 0; line-height:1.45; }
+.report-fine-cell { font-size:11px; color:var(--muted); }
+.report-synth { color:#b91c1c; font-weight:600; }
+
+@media print {
+  #root { display:none !important; }
+  .report-overlay { position:static; background:#fff; padding:0; overflow:visible; }
+  .report { max-width:none; box-shadow:none; border-radius:0; padding:0; }
+  .report-actions { display:none; }
+  .report section { break-inside:avoid; }
+}

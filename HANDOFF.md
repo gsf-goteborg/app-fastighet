@@ -53,6 +53,26 @@ vara oberoende kan en egen tile-källa/MapTiler-nyckel pekas in i `MapView.jsx`.
    ordinarie grundskola — anpassad grundskola och specialverksamhet exkluderas helt
    (`ordinarieGrundskola`/`konsoliderbar` i `schools.js`).
 7. **Importkontroll** — `validateOrigins()` granskar skarpt elevhärkomstuttag vid byte.
+8. **3D-byggnadsanalys** (flik "Byggnad 3D", three.js, lazy-laddad) — rumsnivåmodell av
+   ett skolhus: färglägen funktion/skick/nyttjande, sprängskiss per plan, klickbara rum,
+   nyckeltal (yta/elev, undervisningsyta, eftersatt yta, outnyttjad yta, modell-BTA vs
+   register-BTA). Idag EN syntetisk exempelmodell (Lärjeskolan); dataschemat i
+   `src/data/byggnad.js` är förberett för lasermätningarna (rum = polygon + funktion +
+   skick + nyttjande per hus/plan). Nås även via "Analysera byggnaden i 3D" i infopanelen.
+9. **Likvärdighetslins** (`src/lib/likvardighet.js`) — konsolideringsplanens resvägseffekt:
+   andel elever över närhetsnormen per stadie före/efter planen (eget kort i Långsiktig)
+   och snittresväg före→efter per stängning i plantabellen. Mäter med härkomstschablonen
+   (fågelväg × omvägsfaktor) på båda sidor tills vägnätsavstånden kopplas in.
+10. **Skolvalsdriven omfördelning vid stängning** (`src/lib/skolval.js`) — IIA-omval i
+    valmodellen: när en skola stängs normeras områdets valsannolikheter om över kvarvarande
+    ordinarie grundskolor. Kolumnen "Dit väljer eleverna" i plantabellen jämför mot
+    optimeringens tilldelning; kartlagret "Omfördelning vid stängning" ritar båda flödena
+    (heldragen = tilldelning, streckad = skolval, ring = föreslagen stängning).
+11. **Rapportexport "Underlag för diskussion"** (`src/components/ReportView.jsx`, knapp i
+    Långsiktig) — utskriftsvänlig planeringsomgång med tidsstämpel, antaganden (scenario,
+    horisont, radier, reserv, lösare), plan + likvärdighet + robusthet samt en
+    datastatus-/spårbarhetstabell (uppdatera `DATA_STATUS` när källor byts in).
+    Skrivs ut/sparas som PDF via webbläsaren.
 
 ## Arkitektur — var datan kommer in
 
@@ -68,6 +88,7 @@ vara oberoende kan en egen tile-källa/MapTiler-nyckel pekas in i `MapView.jsx`.
 | Skolvalssimulering (Monte Carlo, intagning per inträdesårskurs) | `src/lib/simulate.js` | klar |
 | Konsolideringsoptimering (stadieindelad MILP + girig) | `src/lib/optimizer.js` | klar — MILP > 40 skolor ⇒ girig heuristik |
 | Områdesgeometri (stads-/mellan-/primär-/basområde) | `public/geo/*.geojson` | klar (officiell indelning, EPSG:4326) |
+| Byggnadsmodeller rumsnivå (3D-vyn) | `src/data/byggnad.js` (`BUILDING_MODELS`) | syntetisk exempelmodell — fylls av lasermätning |
 
 Motorerna och komponenterna är oförändrade vid databyte — bara datafilerna byts.
 
@@ -106,8 +127,12 @@ Checklista, i fallande prioritet (störst påverkan på besluten först):
       riktig kostnadsmatris. Webbläsar-MILP:en stängs av > 40 skolor (girig heuristik).
 - [x] ~~**Samlokalisering** dubbelräknad hyra~~ — löst i Fas 0 (delade hus ej
       individuellt stängningsbara). Full helbyggnads-MILP kvarstår som förfining.
-- [ ] **Likvärdighetslins**: visa resväg per stadie och hur varje nedläggning ändrar
-      andelen elever med lång resväg, bredvid besparingen.
+- [x] ~~**Likvärdighetslins**~~ — byggd (kort i Långsiktig + kolumn i plantabellen).
+      Kvarstår: byta schablonavstånden mot vägnätsavstånd när de kopplas in (spår C).
+- [ ] **Uppmätta byggnadsmodeller** (lasermätning → rumspolygoner + funktion + skick +
+      nyttjande) → `src/data/byggnad.js`. Idag en syntetisk exempelskola i 3D-vyn;
+      modellytan förväntas avvika från register-BTA tills mätningen är gjord (visas
+      medvetet i vyn).
 
 Tills ovan är klart: presentera resultat som *underlag för diskussion*, inte beslut.
 
@@ -214,10 +239,10 @@ nuvarande områdesnivå.
   mäts ännu fågelvägen byggnad→byggnad. Byt `haversineKm` mot uppslag i den
   DuckDB-härledda `distances.js` (hemområde→skola) så blir radievillkoret styrkbart
   per elev.
-- **Likvärdighetslins** — andel elever med > X km resväg per stadie, och hur varje
-  nedläggning ändrar den.
-- **Skolvalsdriven omfördelning vid stängning** — använd `CHOICE` (IIA) för att visa
-  var eleverna faktiskt hamnar när en skola stängs, inte bara en tilldelning.
+- ~~**Likvärdighetslins**~~ — byggd (`lib/likvardighet.js`); byt schablon mot vägnät.
+- ~~**Skolvalsdriven omfördelning vid stängning**~~ — byggd (`lib/skolval.js`, IIA över
+  ordinarie grundskolor; plantabellen + kartlager). Blir skarp när `CHOICE` byts mot er
+  riktiga valmodell.
 - **Skarp optimeringsmotor (spopt)** — se `backend/` (referensscaffold). Python +
   spopt/PuLP för det fullskaliga facility location-problemet (LSCP, kap. p-median,
   p-center) med DuckDB-avstånd som kostnadsmatris. Körs i backend/batch; frontend

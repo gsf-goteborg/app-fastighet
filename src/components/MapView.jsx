@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import maplibregl from 'maplibre-gl'
 import { THEME_EXPR, THEME_LABELS, LEGENDS } from '../lib/constants'
 import { BEFOLKNING } from '../data/prognos'
 import { BASE_YEAR } from '../data/schools'
+import { planFlowsGeoJSON, planClosedGeoJSON } from '../lib/skolval'
 import CANDIDATES from '../data/generated/candidates.json'
 
 const CAND_FC = {
@@ -80,7 +81,12 @@ function bakeAreas(fc, year, scenario, rate) {
 // Fyllnadsfärg: samma skala som temat "Elevförändring", grå när data saknas
 const AREA_FILL = ['case', ['has', 'forandPct'], THEME_EXPR.forandring, '#e5e7eb']
 
-export default function MapView({ schools, theme, setTheme, onSelect, active, projFn, year, scenario, rate }) {
+const FLOW_WIDTH = ['interpolate', ['linear'], ['get', 'n'], 1, 1, 40, 3.5, 150, 7]
+
+export default function MapView({
+  schools, theme, setTheme, onSelect, active, projFn, year, scenario, rate,
+  plan, showFlows, setShowFlows,
+}) {
   const [showAreas, setShowAreas] = useState(false)
   const [showCand, setShowCand] = useState(false)
 
@@ -117,6 +123,39 @@ export default function MapView({ schools, theme, setTheme, onSelect, active, pr
         layout: { visibility: 'none' },
         paint: { 'line-color': '#fff', 'line-width': 1, 'line-opacity': 0.8 },
       })
+
+      // Omfördelningsflöden (under skolpunkterna): tilldelning + skolval
+      map.addSource('flows', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } })
+      map.addLayer({
+        id: 'flows-assign', type: 'line', source: 'flows',
+        filter: ['==', ['get', 'typ'], 'tilldelning'],
+        layout: { visibility: 'none', 'line-cap': 'round' },
+        paint: { 'line-color': '#005293', 'line-width': FLOW_WIDTH, 'line-opacity': 0.75 },
+      })
+      map.addLayer({
+        id: 'flows-choice', type: 'line', source: 'flows',
+        filter: ['==', ['get', 'typ'], 'skolval'],
+        layout: { visibility: 'none' },
+        paint: { 'line-color': '#f47815', 'line-width': FLOW_WIDTH, 'line-opacity': 0.85, 'line-dasharray': [1.5, 1.5] },
+      })
+      map.addSource('closed', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } })
+      map.addLayer({
+        id: 'closed', type: 'circle', source: 'closed',
+        layout: { visibility: 'none' },
+        paint: {
+          'circle-radius': ['interpolate', ['linear'], ['zoom'], 10, 9, 14, 15],
+          'circle-color': '#fff', 'circle-opacity': 0.9,
+          'circle-stroke-width': 3, 'circle-stroke-color': '#dc2626',
+        },
+      })
+      const closedPopup = new maplibregl.Popup({ closeButton: false, offset: 12 })
+      map.on('mouseenter', 'closed', (e) => {
+        const p = e.features[0].properties
+        closedPopup.setLngLat(e.lngLat)
+          .setHTML(`<b>${p.namn}</b><br>Föreslås stängas · ${p.students} elever flyttas`)
+          .addTo(map)
+      })
+      map.on('mouseleave', 'closed', () => closedPopup.remove())
 
       map.addSource('schools', { type: 'geojson', data: toGeoJSON(schools, projRef.current.projFn, projRef.current.year) })
       map.addLayer({
@@ -204,6 +243,24 @@ export default function MapView({ schools, theme, setTheme, onSelect, active, pr
       mapRef.current.setLayoutProperty('cand', 'visibility', showCand ? 'visible' : 'none')
   }, [showCand])
 
+  // Omfördelningslagret: data + synlighet (skolvalsomvalet räknas bara när lagret är på)
+  const flowData = useMemo(
+    () => (showFlows ? planFlowsGeoJSON(plan) : null),
+    [showFlows, plan],
+  )
+  useEffect(() => {
+    if (!readyRef.current) return
+    const map = mapRef.current
+    if (flowData && map.getSource('flows')) {
+      map.getSource('flows').setData(flowData)
+      map.getSource('closed').setData(planClosedGeoJSON(plan))
+    }
+    const vis = showFlows ? 'visible' : 'none'
+    for (const id of ['flows-assign', 'flows-choice', 'closed']) {
+      map.getLayer(id) && map.setLayoutProperty(id, 'visibility', vis)
+    }
+  }, [flowData, showFlows, plan])
+
   // Byt tematisk färgläggning (skolpunkter)
   useEffect(() => {
     if (readyRef.current && mapRef.current.getLayer('pt')) {
@@ -247,6 +304,24 @@ export default function MapView({ schools, theme, setTheme, onSelect, active, pr
         </label>
         {showAreas && (
           <div className="legend-note">Befolkning i skolålder per mellanområde, förändring till {year} ({scenario.toLowerCase()}). Grå = ingen prognosdata.</div>
+        )}
+
+        <label className="mapctl-check">
+          <input type="checkbox" checked={showFlows} onChange={(e) => setShowFlows(e.target.checked)} />
+          Omfördelning vid stängning
+        </label>
+        {showFlows && (
+          <div className="legend">
+            <div className="row"><span className="flowline" style={{ background: '#005293' }} />Tilldelning (optimering)</div>
+            <div className="row"><span className="flowline dashed" />Skolval (elevernas omval)</div>
+            <div className="row"><span className="dot" style={{ background: '#fff', boxShadow: '0 0 0 2px #dc2626' }} />Föreslås stängas</div>
+            <div className="legend-note">
+              {plan?.closures?.length
+                ? `Konsolideringsplanens ${plan.closures.length} stängning${plan.closures.length > 1 ? 'ar' : ''} till ${year} (${scenario.toLowerCase()}). Heldragen = var eleverna tilldelas plats; streckad = var de själva skulle välja (IIA-omval). Linjebredd = antal elever.`
+                : 'Inga stängningar i planen vid vald horisont/scenario — justera under Översikt (t.ex. längre horisont eller minskande elevtal).'}
+              {' '}<span className="mockflag">exempelmodell</span>
+            </div>
+          </div>
         )}
 
         <label className="mapctl-check">
