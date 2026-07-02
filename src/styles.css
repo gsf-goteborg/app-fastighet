@@ -226,3 +226,11 @@ tbody tr:hover { background:#f8fafc; cursor:pointer; }
   .report-actions { display:none; }
   .report section { break-inside:avoid; }
 }
+
+/* Sökförslag (Sök skola) */
+.search-wrap { position:relative; margin-bottom:18px; }
+.search-wrap input[type=search] { margin-bottom:0; }
+.search-pop { position:absolute; top:calc(100% + 5px); left:0; right:0; z-index:30; background:#fff; border:1px solid var(--line); border-radius:10px; box-shadow:0 8px 24px rgba(0,0,0,.14); padding:6px; max-height:300px; overflow-y:auto; }
+.search-opt { padding:7px 9px; border-radius:7px; cursor:pointer; font-size:13px; }
+.search-opt.hi { background:var(--bg); }
+.search-opt .sub { font-size:11px; color:var(--muted); margin-top:1px; }

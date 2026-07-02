@@ -105,6 +105,7 @@ export default function App() {
         filters={filters} setFilters={setFilters}
         search={search} setSearch={setSearch}
         shown={filtered.length} total={SCHOOLS.length}
+        onSelect={setSelectedId}
       />
 
       <main>
