@@ -28,9 +28,9 @@ export default function DashboardView({
   schools, onSelect,
   scenario, setScenario, customRate, setCustomRate, year, setYear,
   radii, setRadii, reserve, setReserve, rate, years, projFn, plan, robustness,
+  horizon, setHorizon, // kort = nästa läsår, lang = 5–25 år (lyft till App så flikbyte inte nollställer)
 }) {
   const setRadius = (st, v) => setRadii({ ...radii, [st]: Math.max(0.5, +v || radii[st]) })
-  const [horizon, setHorizon] = useState('kort')      // kort = nästa läsår, lang = 5–25 år
 
   // Robusthet: vilka stängningar håller i ALLA scenarier vs bara vissa
   const robust = useMemo(() => {

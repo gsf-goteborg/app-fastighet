@@ -27,6 +27,7 @@ export default function App() {
 
   // Planeringstillstånd lyfts hit så karta och översikt delar samma plan
   const [scenario, setScenario] = useState('Befolkningsprognos')
+  const [horizon, setHorizon] = useState('kort') // kort/långsiktig — bevaras vid flikbyte
   const [customRate, setCustomRate] = useState(-1.5)
   const [year, setYear] = useState(2040)
   const [radii, setRadii] = useState(STAGE_RADIUS) // maxavstånd per åldersstadie (km)
@@ -80,6 +81,7 @@ export default function App() {
   const planState = {
     scenario, setScenario, customRate, setCustomRate, year, setYear,
     radii, setRadii, reserve, setReserve, rate, years, projFn, plan, robustness,
+    horizon, setHorizon,
   }
 
   return (
