@@ -115,7 +115,9 @@ export default function MapView({
 
   const containerRef = useRef(null)
   const mapRef = useRef(null)
-  const readyRef = useRef(false)
+  // state (inte ref): lagereffekterna nedan måste köras OM när kartan blir
+  // klar, annars gör ett kryss som hinner före kartans load-event ingenting
+  const [ready, setReady] = useState(false)
   const selectRef = useRef(onSelect)
   selectRef.current = onSelect
   const projRef = useRef({ projFn, year, scenario, rate })
@@ -171,19 +173,24 @@ export default function MapView({
           'circle-stroke-width': 3, 'circle-stroke-color': '#dc2626',
         },
       })
-      // Framtida skolnät (spopt): behåll / nytt läge / utanför nätet
+      // Framtida skolnät (spopt): behåll / nytt läge / utanför nätet.
+      // Medveten hög kontrast: "utanför" krymps och tonas ner, "nytt läge"
+      // får gul halo — annars ser lagret ut som standardtemat.
       map.addSource('natplan', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } })
       map.addLayer({
         id: 'natplan', type: 'circle', source: 'natplan',
         layout: { visibility: 'none' },
         paint: {
-          'circle-radius': ['match', ['get', 'roll'],
-            'nytt', ['interpolate', ['linear'], ['zoom'], 10, 8, 14, 14],
-            ['interpolate', ['linear'], ['zoom'], 10, 6, 14, 11]],
+          // OBS: zoom-interpolering måste ligga YTTERST (MapLibre tillåter bara
+          // en zoombaserad subexpression) — match per roll ligger i stoppen.
+          'circle-radius': ['interpolate', ['linear'], ['zoom'],
+            10, ['match', ['get', 'roll'], 'nytt', 9, 'utanfor', 4, 6],
+            14, ['match', ['get', 'roll'], 'nytt', 15, 'utanfor', 7, 11]],
           'circle-color': ['match', ['get', 'roll'],
-            'behall', '#16a34a', 'nytt', '#4f6f18', '#cbd5e1'],
-          'circle-stroke-width': 2.5,
-          'circle-stroke-color': '#fff',
+            'behall', '#16a34a', 'nytt', '#4f6f18', '#64748b'],
+          'circle-opacity': ['match', ['get', 'roll'], 'utanfor', 0.55, 1],
+          'circle-stroke-width': ['match', ['get', 'roll'], 'nytt', 3.5, 'utanfor', 1, 2.5],
+          'circle-stroke-color': ['match', ['get', 'roll'], 'nytt', '#fbc46d', '#fff'],
         },
       })
       const natPopup = new maplibregl.Popup({ closeButton: false, offset: 12 })
@@ -244,7 +251,7 @@ export default function MapView({
         ).addTo(map)
       })
       map.on('mouseleave', 'cand', () => { map.getCanvas().style.cursor = ''; popup.remove() })
-      readyRef.current = true
+      setReady(true)
       map.getSource('schools').setData(toGeoJSON(schools, projRef.current.projFn, projRef.current.year))
 
       // Ladda områdespolygoner (primärområde) en gång
@@ -264,42 +271,42 @@ export default function MapView({
 
   // Uppdatera punkter när filter, scenario eller horisont ändras
   useEffect(() => {
-    if (readyRef.current && mapRef.current.getSource('schools')) {
+    if (ready && mapRef.current.getSource('schools')) {
       mapRef.current.getSource('schools').setData(toGeoJSON(schools, projFn, year))
     }
-  }, [schools, projFn, year])
+  }, [ready, schools, projFn, year])
 
   // Bak om områdesfärgen när horisont eller scenario ändras
   useEffect(() => {
-    if (readyRef.current && areasRaw.current && mapRef.current.getSource('areas')) {
+    if (ready && areasRaw.current && mapRef.current.getSource('areas')) {
       mapRef.current.getSource('areas').setData(bakeAreas(areasRaw.current, year, scenario, rate))
     }
-  }, [year, scenario, rate])
+  }, [ready, year, scenario, rate])
 
   // Slå på/av områdeslagret
   useEffect(() => {
-    if (!readyRef.current) return
+    if (!ready) return
     const vis = showAreas ? 'visible' : 'none'
     mapRef.current.getLayer('areas-fill') && mapRef.current.setLayoutProperty('areas-fill', 'visibility', vis)
     mapRef.current.getLayer('areas-line') && mapRef.current.setLayoutProperty('areas-line', 'visibility', vis)
-  }, [showAreas])
+  }, [ready, showAreas])
 
   // Slå på/av kandidatlagret
   useEffect(() => {
-    if (!readyRef.current) return
+    if (!ready) return
     mapRef.current.getLayer('cand') &&
       mapRef.current.setLayoutProperty('cand', 'visibility', showCand ? 'visible' : 'none')
-  }, [showCand])
+  }, [ready, showCand])
 
   // Framtida nät-lagret: ersätter skolpunkterna medan det är på (annars dubbla prickar)
   useEffect(() => {
-    if (!readyRef.current) return
+    if (!ready) return
     const map = mapRef.current
     if (!map.getLayer('natplan')) return
     if (showNat) map.getSource('natplan').setData(natplanGeoJSON(year))
     map.setLayoutProperty('natplan', 'visibility', showNat ? 'visible' : 'none')
     map.getLayer('pt') && map.setLayoutProperty('pt', 'visibility', showNat ? 'none' : 'visible')
-  }, [showNat, year])
+  }, [ready, showNat, year])
 
   // Omfördelningslagret: data + synlighet (skolvalsomvalet räknas bara när lagret är på)
   const flowData = useMemo(
@@ -307,7 +314,7 @@ export default function MapView({
     [showFlows, plan],
   )
   useEffect(() => {
-    if (!readyRef.current) return
+    if (!ready) return
     const map = mapRef.current
     if (flowData && map.getSource('flows')) {
       map.getSource('flows').setData(flowData)
@@ -317,14 +324,14 @@ export default function MapView({
     for (const id of ['flows-assign', 'flows-choice', 'closed']) {
       map.getLayer(id) && map.setLayoutProperty(id, 'visibility', vis)
     }
-  }, [flowData, showFlows, plan])
+  }, [ready, flowData, showFlows, plan])
 
   // Byt tematisk färgläggning (skolpunkter)
   useEffect(() => {
-    if (readyRef.current && mapRef.current.getLayer('pt')) {
+    if (ready && mapRef.current.getLayer('pt')) {
       mapRef.current.setPaintProperty('pt', 'circle-color', THEME_EXPR[theme])
     }
-  }, [theme])
+  }, [ready, theme])
 
   // Justera storlek när kartvyn åter blir synlig
   useEffect(() => {
@@ -368,18 +375,23 @@ export default function MapView({
           <input type="checkbox" checked={showNat} onChange={(e) => setShowNat(e.target.checked)} />
           Framtida nät (optimerat)
         </label>
-        {showNat && (
-          <div className="legend">
-            <div className="row"><span className="dot" style={{ background: '#16a34a' }} />I optimala nätet {natHorizon(year)}</div>
-            <div className="row"><span className="dot" style={{ background: '#4f6f18' }} />Föreslaget nytt läge</div>
-            <div className="row"><span className="dot" style={{ background: '#cbd5e1' }} />Behövs ej i nätet</div>
-            <div className="legend-note">
-              Minsta nät som ger alla plats inom närhetsnormen, resvägsoptimerad placering
-              (spopt, batch — se Översikt → Framtida skolnät). Ersätter skolpunkterna medan lagret är på.
-              {' '}<span className="mockflag">metodprototyp</span>
+        {showNat && (() => {
+          const h = NATPLAN.horisonter[String(natHorizon(year))]
+          const nya = h.natverk.filter((n) => n.typ === 'kandidat').length
+          return (
+            <div className="legend">
+              <div className="row"><span className="dot" style={{ background: '#16a34a' }} />I optimala nätet {natHorizon(year)} ({h.natverk.length - nya})</div>
+              <div className="row"><span className="dot" style={{ background: '#4f6f18', boxShadow: '0 0 0 2px #fbc46d' }} />Föreslaget nytt läge ({nya})</div>
+              <div className="row"><span className="dot" style={{ background: '#64748b', opacity: 0.6 }} />Behövs ej i nätet ({h.utanfor.length})</div>
+              <div className="legend-note">
+                Minsta nät som ger alla plats inom närhetsnormen, resvägsoptimerad placering
+                (spopt, batch — se Översikt → Framtida skolnät). Ersätter skolpunkterna medan
+                lagret är på; anpassad grundskola/special ingår ej i nätmodellen.
+                {' '}<span className="mockflag">metodprototyp</span>
+              </div>
             </div>
-          </div>
-        )}
+          )
+        })()}
 
         <label className="mapctl-check">
           <input type="checkbox" checked={showFlows} onChange={(e) => setShowFlows(e.target.checked)} />
