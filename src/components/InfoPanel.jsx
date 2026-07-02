@@ -1,5 +1,6 @@
 import { RENOV, occColor } from '../lib/constants'
 import { SCHOOL_ORIGINS } from '../data/origins'
+import { BUILDING_MODELS } from '../data/byggnad'
 import { getIntake } from '../lib/simulate'
 
 // mock = testdata/modell (gul "exempel"); synth = helt påhittat fält som inte
@@ -44,7 +45,7 @@ function Origins({ school }) {
   )
 }
 
-export default function InfoPanel({ school, onClose }) {
+export default function InfoPanel({ school, onClose, onOpenBuilding }) {
   const komm = school && school.huvudman === 'Kommunal'
   const origin = school ? SCHOOL_ORIGINS[school.id] : null
   const intake = school ? getIntake().get(school.id) : null
@@ -61,6 +62,11 @@ export default function InfoPanel({ school, onClose }) {
             <h2>{school.namn}</h2>
           </div>
           <div className="p-body">
+            {onOpenBuilding && BUILDING_MODELS[school.id] && (
+              <button className="btn primary p-bygg" onClick={() => onOpenBuilding(school.id)}>
+                Analysera byggnaden i 3D →
+              </button>
+            )}
             <Field label="Stadsområde" value={school.stadsomrade} />
             <Field label="Mellanområde" value={school.mellanomrade} />
             <Field label="Skolform" value={school.skolform} />
