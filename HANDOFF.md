@@ -73,6 +73,17 @@ vara oberoende kan en egen tile-källa/MapTiler-nyckel pekas in i `MapView.jsx`.
     horisont, radier, reserv, lösare), plan + likvärdighet + robusthet samt en
     datastatus-/spårbarhetstabell (uppdatera `DATA_STATUS` när källor byts in).
     Skrivs ut/sparas som PDF via webbläsaren.
+12. **Framtida skolnät — normativ nätdesign med spopt (Fas 1)** — svarar på "var BORDE
+    skolorna ligga?" i stället för konsolideringens "vilka kan stängas?". Batch:
+    `python scripts/build_natplan.py` (kräver `pip install -r backend/requirements.txt`)
+    kör per horisont (2030/2040/2050) × stadie: LSCP-golv (spopt), minsta genomförbara
+    nät med kapacitet + BRIST inom normen (PuLP, delbar tilldelning — spopts kapaciterade
+    modeller kräver odelbar), resvägsoptimerad placering (kapaciterad p-median) över
+    befintliga skolor + kandidatsiter → `src/data/generated/natplan.json`. Frontend:
+    kort i Långsiktig + kartlager "Framtida nät (optimerat)". Ingen backend i drift —
+    statisk hosting oförändrad. Fas 1-proxyer: fågelväg, skolvisa elevkluster som
+    efterfrågansnoder, exempelprognos/-kandidater. Fas 2 = vägnätsmatris + basområdesnivå;
+    Fas 3 = p-center (likvärdighet) + upptagningsområden ur tilldelningen.
 
 ## Arkitektur — var datan kommer in
 
@@ -89,6 +100,7 @@ vara oberoende kan en egen tile-källa/MapTiler-nyckel pekas in i `MapView.jsx`.
 | Konsolideringsoptimering (stadieindelad MILP + girig) | `src/lib/optimizer.js` | klar — MILP > 40 skolor ⇒ girig heuristik |
 | Områdesgeometri (stads-/mellan-/primär-/basområde) | `public/geo/*.geojson` | klar (officiell indelning, EPSG:4326) |
 | Byggnadsmodeller rumsnivå (3D-vyn) | `src/data/byggnad.js` (`BUILDING_MODELS`) | syntetisk exempelmodell — fylls av lasermätning |
+| Framtida skolnät (spopt-batch) | `scripts/build_natplan.py` → `src/data/generated/natplan.json` | Fas 1-prototyp — schablonavstånd, byts mot vägnät |
 
 Motorerna och komponenterna är oförändrade vid databyte — bara datafilerna byts.
 
@@ -243,10 +255,11 @@ nuvarande områdesnivå.
 - ~~**Skolvalsdriven omfördelning vid stängning**~~ — byggd (`lib/skolval.js`, IIA över
   ordinarie grundskolor; plantabellen + kartlager). Blir skarp när `CHOICE` byts mot er
   riktiga valmodell.
-- **Skarp optimeringsmotor (spopt)** — se `backend/` (referensscaffold). Python +
-  spopt/PuLP för det fullskaliga facility location-problemet (LSCP, kap. p-median,
-  p-center) med DuckDB-avstånd som kostnadsmatris. Körs i backend/batch; frontend
-  anropar `/api/plan` och behåller JS-lösaren som offline-fallback. Se `backend/README.md`.
+- **Skarp optimeringsmotor (spopt)** — Fas 1 byggd som batch (`scripts/build_natplan.py`,
+  se "Vad som är byggt" p. 12). Fas 2 (kräver vägnätsdata): byt kostnadsmatrisen mot
+  DuckDB-avstånden och efterfrågansnoderna mot basområdesbefolkning; då blir även den
+  kapaciterade p-medianen skarp konsolideringsmotor. Fas 3: p-center (likvärdighet),
+  upptagningsområden ur tilldelningen, ev. interaktivt `/api/plan` (scaffold i `backend/`).
 
 ---
 

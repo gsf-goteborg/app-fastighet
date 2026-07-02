@@ -7,6 +7,7 @@ import { choiceRedistribution } from '../lib/skolval'
 import { friAttrition } from '../data/fristaende'
 import { SCHOOL_ORIGINS } from '../data/origins'
 import ReportView from './ReportView'
+import NatplanCard from './NatplanCard'
 
 // Restidsklasser (km) för tillgänglighetsfördelning
 const TRAVEL_BINS = [[0, 1], [1, 2], [2, 4], [4, 6], [6, Infinity]]
@@ -765,6 +766,8 @@ export default function DashboardView({
           )}
         </div>
       </div>
+
+      <NatplanCard year={year} />
 
       <div className="card">
         <h2>Renoveringsbehov i portföljen</h2>

@@ -5,6 +5,28 @@ import { BEFOLKNING } from '../data/prognos'
 import { BASE_YEAR } from '../data/schools'
 import { planFlowsGeoJSON, planClosedGeoJSON } from '../lib/skolval'
 import CANDIDATES from '../data/generated/candidates.json'
+import NATPLAN from '../data/generated/natplan.json'
+
+// Framtida skolnät (spopt-batch): närmaste beräknade horisont + geojson
+const NAT_HOR = Object.keys(NATPLAN.horisonter).map(Number)
+const natHorizon = (year) => NAT_HOR.reduce((b, h) => (Math.abs(h - year) < Math.abs(b - year) ? h : b))
+const STADIE_SHORT = { lag: 'F–3', mellan: '4–6', hog: '7–9' }
+
+function natplanGeoJSON(year) {
+  const h = NATPLAN.horisonter[String(natHorizon(year))]
+  const feat = (p, roll, stadier) => ({
+    type: 'Feature',
+    geometry: { type: 'Point', coordinates: [p.lng, p.lat] },
+    properties: { namn: p.namn, roll, stadier: stadier.map((s) => STADIE_SHORT[s]).join(', ') },
+  })
+  return {
+    type: 'FeatureCollection',
+    features: [
+      ...h.natverk.map((n) => feat(n, n.typ === 'kandidat' ? 'nytt' : 'behall', n.stadier)),
+      ...h.utanfor.map((s) => feat(s, 'utanfor', [])),
+    ],
+  }
+}
 
 const CAND_FC = {
   type: 'FeatureCollection',
@@ -89,6 +111,7 @@ export default function MapView({
 }) {
   const [showAreas, setShowAreas] = useState(false)
   const [showCand, setShowCand] = useState(false)
+  const [showNat, setShowNat] = useState(false)
 
   const containerRef = useRef(null)
   const mapRef = useRef(null)
@@ -148,6 +171,31 @@ export default function MapView({
           'circle-stroke-width': 3, 'circle-stroke-color': '#dc2626',
         },
       })
+      // Framtida skolnät (spopt): behåll / nytt läge / utanför nätet
+      map.addSource('natplan', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } })
+      map.addLayer({
+        id: 'natplan', type: 'circle', source: 'natplan',
+        layout: { visibility: 'none' },
+        paint: {
+          'circle-radius': ['match', ['get', 'roll'],
+            'nytt', ['interpolate', ['linear'], ['zoom'], 10, 8, 14, 14],
+            ['interpolate', ['linear'], ['zoom'], 10, 6, 14, 11]],
+          'circle-color': ['match', ['get', 'roll'],
+            'behall', '#16a34a', 'nytt', '#4f6f18', '#cbd5e1'],
+          'circle-stroke-width': 2.5,
+          'circle-stroke-color': '#fff',
+        },
+      })
+      const natPopup = new maplibregl.Popup({ closeButton: false, offset: 12 })
+      map.on('mouseenter', 'natplan', (e) => {
+        const p = e.features[0].properties
+        const roll = p.roll === 'behall' ? 'I optimala nätet' : p.roll === 'nytt' ? 'Föreslaget nytt läge' : 'Behövs ej i nätet'
+        natPopup.setLngLat(e.lngLat)
+          .setHTML(`<b>${p.namn}</b><br>${roll}${p.stadier ? '<br>Stadier: ' + p.stadier : ''}`)
+          .addTo(map)
+      })
+      map.on('mouseleave', 'natplan', () => natPopup.remove())
+
       const closedPopup = new maplibregl.Popup({ closeButton: false, offset: 12 })
       map.on('mouseenter', 'closed', (e) => {
         const p = e.features[0].properties
@@ -243,6 +291,16 @@ export default function MapView({
       mapRef.current.setLayoutProperty('cand', 'visibility', showCand ? 'visible' : 'none')
   }, [showCand])
 
+  // Framtida nät-lagret: ersätter skolpunkterna medan det är på (annars dubbla prickar)
+  useEffect(() => {
+    if (!readyRef.current) return
+    const map = mapRef.current
+    if (!map.getLayer('natplan')) return
+    if (showNat) map.getSource('natplan').setData(natplanGeoJSON(year))
+    map.setLayoutProperty('natplan', 'visibility', showNat ? 'visible' : 'none')
+    map.getLayer('pt') && map.setLayoutProperty('pt', 'visibility', showNat ? 'none' : 'visible')
+  }, [showNat, year])
+
   // Omfördelningslagret: data + synlighet (skolvalsomvalet räknas bara när lagret är på)
   const flowData = useMemo(
     () => (showFlows ? planFlowsGeoJSON(plan) : null),
@@ -304,6 +362,23 @@ export default function MapView({
         </label>
         {showAreas && (
           <div className="legend-note">Befolkning i skolålder per mellanområde, förändring till {year} ({scenario.toLowerCase()}). Grå = ingen prognosdata.</div>
+        )}
+
+        <label className="mapctl-check">
+          <input type="checkbox" checked={showNat} onChange={(e) => setShowNat(e.target.checked)} />
+          Framtida nät (optimerat)
+        </label>
+        {showNat && (
+          <div className="legend">
+            <div className="row"><span className="dot" style={{ background: '#16a34a' }} />I optimala nätet {natHorizon(year)}</div>
+            <div className="row"><span className="dot" style={{ background: '#4f6f18' }} />Föreslaget nytt läge</div>
+            <div className="row"><span className="dot" style={{ background: '#cbd5e1' }} />Behövs ej i nätet</div>
+            <div className="legend-note">
+              Minsta nät som ger alla plats inom närhetsnormen, resvägsoptimerad placering
+              (spopt, batch — se Översikt → Framtida skolnät). Ersätter skolpunkterna medan lagret är på.
+              {' '}<span className="mockflag">metodprototyp</span>
+            </div>
+          </div>
         )}
 
         <label className="mapctl-check">

@@ -1,0 +1,4240 @@
+{
+ "scenario": "Befolkningsprognos",
+ "metod": "spopt 0.7: LSCP (golv) + kapaciterad LSCP (minsta nät) + kapaciterad p-median (placering), CBC",
+ "radier": {
+  "lag": 2.0,
+  "mellan": 4.0,
+  "hog": 6.0
+ },
+ "antagande": "Fågelvägsavstånd (schablon, byts mot vägnät i Fas 2). Efterfrågansnoder = dagens skollägen med elever framskrivna per områdestrend (exempelprognos). Kandidatsiter är exempeldata.",
+ "horisonter": {
+  "2030": {
+   "stadier": {
+    "lag": {
+     "idag": 108,
+     "golv": 26,
+     "minsta": 87,
+     "brist": 0,
+     "meanKm": 0.25,
+     "maxKm": 2.0,
+     "otackbara": [],
+     "elever": 17867
+    },
+    "mellan": {
+     "idag": 95,
+     "golv": 10,
+     "minsta": 72,
+     "brist": 0,
+     "meanKm": 0.28,
+     "maxKm": 4.0,
+     "otackbara": [],
+     "elever": 11671
+    },
+    "hog": {
+     "idag": 45,
+     "golv": 6,
+     "minsta": 33,
+     "brist": 0,
+     "meanKm": 0.72,
+     "maxKm": 6.0,
+     "otackbara": [],
+     "elever": 6003
+    }
+   },
+   "natverk": [
+    {
+     "typ": "skola",
+     "id": 0,
+     "namn": "EfUS 1 Utby",
+     "lat": 57.742883,
+     "lng": 12.071287,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 1,
+     "namn": "Ellen Keyskolan F-6",
+     "lat": 57.7465,
+     "lng": 11.967436,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 2,
+     "namn": "Sandarnaskolan F-6",
+     "lat": 57.685821,
+     "lng": 11.907709,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 7,
+     "namn": "Parkskolan F-6",
+     "lat": 57.711746,
+     "lng": 12.031732,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 13,
+     "namn": "Taubeskolan F-6",
+     "lat": 57.69908,
+     "lng": 11.901756,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 15,
+     "namn": "Guldhedsskolan F-9",
+     "lat": 57.68695,
+     "lng": 11.970373,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 16,
+     "namn": "Rävebergsskolan F-3",
+     "lat": 57.817627,
+     "lng": 12.032027,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 18,
+     "namn": "Kärralundsskolan F-9",
+     "lat": 57.703523,
+     "lng": 12.022609,
+     "stadier": [
+      "lag",
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 20,
+     "namn": "Björlandaskolan F-6",
+     "lat": 57.763025,
+     "lng": 11.835151,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 26,
+     "namn": "Högenskolan F-3",
+     "lat": 57.6454,
+     "lng": 11.875225,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 28,
+     "namn": "Nya Varvetskolan F-6",
+     "lat": 57.679451,
+     "lng": 11.891449,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 30,
+     "namn": "Frölundaskolan F-9",
+     "lat": 57.657039,
+     "lng": 11.914983,
+     "stadier": [
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 32,
+     "namn": "Mossebergsskolan F-2",
+     "lat": 57.681868,
+     "lng": 11.972769,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 34,
+     "namn": "Gunnestorpsskolan F-6",
+     "lat": 57.749206,
+     "lng": 11.921404,
+     "stadier": [
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 35,
+     "namn": "Asperöskolan F-3",
+     "lat": 57.648593,
+     "lng": 11.799175,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 37,
+     "namn": "Johannebergsskolan Estetiska F-6",
+     "lat": 57.690012,
+     "lng": 11.984809,
+     "stadier": [
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 38,
+     "namn": "Skälltorpsskolan 7-9",
+     "lat": 57.749259,
+     "lng": 11.985084,
+     "stadier": [
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 39,
+     "namn": "Trulsegårdsskolan 7-9",
+     "lat": 57.75618,
+     "lng": 11.833107,
+     "stadier": [
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 40,
+     "namn": "Tångenskolan F-6",
+     "lat": 57.75925,
+     "lng": 11.932895,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 41,
+     "namn": "Svenska Balettskolan 4-9",
+     "lat": 57.749669,
+     "lng": 11.984411,
+     "stadier": [
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 42,
+     "namn": "Bagaregårdsskolan F-6",
+     "lat": 57.717966,
+     "lng": 12.010368,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 43,
+     "namn": "Sisjöskolan F-3",
+     "lat": 57.63331,
+     "lng": 11.957044,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 44,
+     "namn": "Backegårdsskolan F-6",
+     "lat": 57.751005,
+     "lng": 12.066844,
+     "stadier": [
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 45,
+     "namn": "Bergsjöskolan F-9",
+     "lat": 57.755697,
+     "lng": 12.068639,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 47,
+     "namn": "Långedragsskolan F-6",
+     "lat": 57.672663,
+     "lng": 11.85991,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 48,
+     "namn": "Rambergsskolan F-6",
+     "lat": 57.71631,
+     "lng": 11.939601,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 49,
+     "namn": "Solbackeskolan F-6",
+     "lat": 57.760535,
+     "lng": 12.068096,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 51,
+     "namn": "Bräckeskolan F-6",
+     "lat": 57.705214,
+     "lng": 11.906559,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 52,
+     "namn": "Lillebyskolan F-6",
+     "lat": 57.73704,
+     "lng": 11.791531,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 53,
+     "namn": "Gamlestadsskolan F-9",
+     "lat": 57.732221,
+     "lng": 12.011668,
+     "stadier": [
+      "lag",
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 55,
+     "namn": "Gunnaredsskolan F-3",
+     "lat": 57.798521,
+     "lng": 12.057288,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 57,
+     "namn": "Gårdstensskolan 4-9",
+     "lat": 57.801317,
+     "lng": 12.04398,
+     "stadier": [
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 59,
+     "namn": "Kärrdalsskolan F-5",
+     "lat": 57.744144,
+     "lng": 11.918062,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 61,
+     "namn": "Lövgärdesskolan 4-9",
+     "lat": 57.816511,
+     "lng": 12.041607,
+     "stadier": [
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 62,
+     "namn": "Rosendalsskolan F-6",
+     "lat": 57.713876,
+     "lng": 12.047505,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 65,
+     "namn": "Bjurslättsskolan F-6",
+     "lat": 57.723953,
+     "lng": 11.93496,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 67,
+     "namn": "Rannebergsskolan F-3",
+     "lat": 57.803268,
+     "lng": 12.068082,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 69,
+     "namn": "Landamäreskolan F-3",
+     "lat": 57.73638,
+     "lng": 11.894972,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 71,
+     "namn": "Utmarksskolan 4-9",
+     "lat": 57.762097,
+     "lng": 12.044634,
+     "stadier": [
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 73,
+     "namn": "Lärjeskolan F-9",
+     "lat": 57.767548,
+     "lng": 12.027133,
+     "stadier": [
+      "lag",
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 76,
+     "namn": "Gustaviskolan F-6",
+     "lat": 57.70216,
+     "lng": 11.963054,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 77,
+     "namn": "Askimsskolan F-6",
+     "lat": 57.636049,
+     "lng": 11.941299,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 78,
+     "namn": "Toleredsskolan F-9",
+     "lat": 57.73146,
+     "lng": 11.919707,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 79,
+     "namn": "Björkåsskolan F-6",
+     "lat": 57.655102,
+     "lng": 11.92964,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 80,
+     "namn": "Bergumsskolan F-9",
+     "lat": 57.805055,
+     "lng": 12.169332,
+     "stadier": [
+      "lag",
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 81,
+     "namn": "Flatåsskolan F-6",
+     "lat": 57.663995,
+     "lng": 11.926307,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 82,
+     "namn": "Backaskolan F-6",
+     "lat": 57.740773,
+     "lng": 11.978341,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 83,
+     "namn": "Frejaskolan F-9",
+     "lat": 57.654043,
+     "lng": 11.891269,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 87,
+     "namn": "Nordhemsskolan 1-9",
+     "lat": 57.69401,
+     "lng": 11.950318,
+     "stadier": [
+      "lag",
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 90,
+     "namn": "Sjumilaskolan F-6",
+     "lat": 57.725308,
+     "lng": 11.891496,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 91,
+     "namn": "Åkeredsskolan F-6",
+     "lat": 57.631907,
+     "lng": 11.892996,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 92,
+     "namn": "Hällsviksskolan F-3",
+     "lat": 57.702524,
+     "lng": 11.737771,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 93,
+     "namn": "Kärraskolan F-9",
+     "lat": 57.792556,
+     "lng": 11.993801,
+     "stadier": [
+      "lag",
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 95,
+     "namn": "Nytorpsskolan 4-9",
+     "lat": 57.77815,
+     "lng": 12.030017,
+     "stadier": [
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 97,
+     "namn": "Lerlyckeskolan F-6",
+     "lat": 57.729356,
+     "lng": 11.91515,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 98,
+     "namn": "Skogomeskolan F-6",
+     "lat": 57.766104,
+     "lng": 11.947519,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 101,
+     "namn": "Dalaskolan F-6",
+     "lat": 57.678473,
+     "lng": 11.9012,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 102,
+     "namn": "Noleredsskolan F-6",
+     "lat": 57.719428,
+     "lng": 11.759181,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 103,
+     "namn": "Fjällskolan F-6",
+     "lat": 57.695029,
+     "lng": 11.939151,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 104,
+     "namn": "Västerhedsskolan F-3",
+     "lat": 57.672136,
+     "lng": 11.920526,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 105,
+     "namn": "Jättestensskolan F-9",
+     "lat": 57.719377,
+     "lng": 11.90162,
+     "stadier": [
+      "lag",
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 106,
+     "namn": "Bärbyskolan F-6",
+     "lat": 57.793847,
+     "lng": 11.908831,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 108,
+     "namn": "Vättleskolan 4-9",
+     "lat": 57.802089,
+     "lng": 12.063092,
+     "stadier": [
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 110,
+     "namn": "Härlandatjärnskolan F-9",
+     "lat": 57.71268,
+     "lng": 12.057343,
+     "stadier": [
+      "lag",
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 111,
+     "namn": "Johannebergsskolan Montessori F-5",
+     "lat": 57.690012,
+     "lng": 11.984809,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 112,
+     "namn": "Fjällboskolan F-5",
+     "lat": 57.739538,
+     "lng": 12.061699,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 113,
+     "namn": "Långmosseskolan F-3",
+     "lat": 57.800134,
+     "lng": 12.029968,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 115,
+     "namn": "Lundenskolan F-9",
+     "lat": 57.708017,
+     "lng": 12.010228,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 117,
+     "namn": "Herrgårdsskolan F-6",
+     "lat": 57.707908,
+     "lng": 11.930554,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 118,
+     "namn": "Emmaskolan F-3",
+     "lat": 57.776792,
+     "lng": 12.041615,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 120,
+     "namn": "Slottsbergsskolan F-6",
+     "lat": 57.656382,
+     "lng": 11.905234,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 121,
+     "namn": "Nygårdsskolan F-9",
+     "lat": 57.591619,
+     "lng": 11.94585,
+     "stadier": [
+      "lag",
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 122,
+     "namn": "Skytteskolan F-9",
+     "lat": 57.671218,
+     "lng": 11.935209,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 123,
+     "namn": "Annedalsskolan F-6",
+     "lat": 57.693849,
+     "lng": 11.961368,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 124,
+     "namn": "Ängåsskolan F-6",
+     "lat": 57.645452,
+     "lng": 11.907077,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 125,
+     "namn": "Donsöskolan F-6",
+     "lat": 57.597236,
+     "lng": 11.802011,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 126,
+     "namn": "Brottkärrsskolan F-6",
+     "lat": 57.59947,
+     "lng": 11.947198,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 127,
+     "namn": "Klarebergsskolan F-9",
+     "lat": 57.795054,
+     "lng": 11.988788,
+     "stadier": [
+      "lag",
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 128,
+     "namn": "Talldungeskolan F-3",
+     "lat": 57.764655,
+     "lng": 12.039834,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 129,
+     "namn": "Utbynässkolan F-3",
+     "lat": 57.736771,
+     "lng": 12.0482,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 132,
+     "namn": "Gunnilseskolan F-6",
+     "lat": 57.787076,
+     "lng": 12.08874,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 133,
+     "namn": "Gärdsmosseskolan F-6",
+     "lat": 57.760409,
+     "lng": 12.049225,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 135,
+     "namn": "Björsaredsskolan F-3",
+     "lat": 57.795516,
+     "lng": 12.140227,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 137,
+     "namn": "Brännöskolan F-3",
+     "lat": 57.640328,
+     "lng": 11.779843,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 138,
+     "namn": "Påvelundsskolan F-9",
+     "lat": 57.666444,
+     "lng": 11.876383,
+     "stadier": [
+      "lag",
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 140,
+     "namn": "Skutehagsskolan F-6",
+     "lat": 57.707117,
+     "lng": 11.761943,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 141,
+     "namn": "Kvibergsskolan F-9",
+     "lat": 57.735552,
+     "lng": 12.03739,
+     "stadier": [
+      "lag",
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 142,
+     "namn": "Fiskebäcksskolan F-9",
+     "lat": 57.65349,
+     "lng": 11.866993,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 143,
+     "namn": "Eriksboskolan F-6",
+     "lat": 57.769066,
+     "lng": 12.023254,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 145,
+     "namn": "Lilla Trulsegårdsskolan F-3",
+     "lat": 57.755808,
+     "lng": 11.833316,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 146,
+     "namn": "Styrsöskolan F-9",
+     "lat": 57.613167,
+     "lng": 11.789293,
+     "stadier": [
+      "lag",
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 151,
+     "namn": "Hjuviksskolan F-3",
+     "lat": 57.705477,
+     "lng": 11.71298,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 152,
+     "namn": "Lindåsskolan F-9",
+     "lat": 57.565623,
+     "lng": 11.944922,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 154,
+     "namn": "Torslandaskolan 7-9",
+     "lat": 57.727064,
+     "lng": 11.771155,
+     "stadier": [
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 158,
+     "namn": "Sandeklevsskolan F-9",
+     "lat": 57.758082,
+     "lng": 12.060293,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 159,
+     "namn": "Önneredsskolan F-9",
+     "lat": 57.638905,
+     "lng": 11.883101,
+     "stadier": [
+      "lag",
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 162,
+     "namn": "Nordlyckeskolan 7-9",
+     "lat": 57.716688,
+     "lng": 11.757076,
+     "stadier": [
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 163,
+     "namn": "Gärdsåsskolan 4-9",
+     "lat": 57.752217,
+     "lng": 12.033867,
+     "stadier": [
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 164,
+     "namn": "Skårsskolan F-6",
+     "lat": 57.689721,
+     "lng": 12.007357,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 168,
+     "namn": "Brunnsboskolan F-9",
+     "lat": 57.730856,
+     "lng": 11.969962,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 169,
+     "namn": "Trollängsskolan F-6",
+     "lat": 57.631308,
+     "lng": 11.939408,
+     "stadier": [
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 170,
+     "namn": "Hovåsskolan F-9",
+     "lat": 57.61952,
+     "lng": 11.940776,
+     "stadier": [
+      "lag",
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "kandidat",
+     "id": "35-kungsladugard-sanna-candidate",
+     "namn": "Kandidatsite Kungsladugård-Sanna",
+     "lat": 57.688321,
+     "lng": 11.905709,
+     "stadier": [
+      "hog"
+     ]
+    },
+    {
+     "typ": "kandidat",
+     "id": "54-bratthammar-naset-onnered-candidate",
+     "namn": "Kandidatsite Bratthammar-Näset-Önnered",
+     "lat": 57.626529,
+     "lng": 11.891798,
+     "stadier": [
+      "hog"
+     ]
+    },
+    {
+     "typ": "kandidat",
+     "id": "16-norra-angered-candidate",
+     "namn": "Kandidatsite Norra Angered",
+     "lat": 57.812175,
+     "lng": 12.029879,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "kandidat",
+     "id": "50-stora-hogsbo-candidate",
+     "namn": "Kandidatsite Stora Högsbo",
+     "lat": 57.673718,
+     "lng": 11.933209,
+     "stadier": [
+      "hog"
+     ]
+    },
+    {
+     "typ": "kandidat",
+     "id": "79-ostra-biskopsgarden-candidate",
+     "namn": "Kandidatsite Östra Biskopsgården",
+     "lat": 57.7339,
+     "lng": 11.899128,
+     "stadier": [
+      "hog"
+     ]
+    },
+    {
+     "typ": "kandidat",
+     "id": "33-guldheden-landala-candidate",
+     "namn": "Kandidatsite Guldheden-Landala",
+     "lat": 57.696078,
+     "lng": 11.965167,
+     "stadier": [
+      "hog"
+     ]
+    },
+    {
+     "typ": "kandidat",
+     "id": "31-kalleback-skar-karralund-candidate",
+     "namn": "Kandidatsite Kallebäck-Skår-Kärralund",
+     "lat": 57.706023,
+     "lng": 12.020609,
+     "stadier": [
+      "hog"
+     ]
+    },
+    {
+     "typ": "kandidat",
+     "id": "72-kvillebacken-candidate",
+     "namn": "Kandidatsite Kvillebäcken",
+     "lat": 57.722463,
+     "lng": 11.926194,
+     "stadier": [
+      "hog"
+     ]
+    },
+    {
+     "typ": "kandidat",
+     "id": "11-bergsjon-candidate",
+     "namn": "Kandidatsite Bergsjön",
+     "lat": 57.753505,
+     "lng": 12.064844,
+     "stadier": [
+      "hog"
+     ]
+    }
+   ],
+   "utanfor": [
+    {
+     "id": 3,
+     "namn": "Sannaskolan 7-9",
+     "lat": 57.684498,
+     "lng": 11.913634
+    },
+    {
+     "id": 4,
+     "namn": "Näsetskolan F-6",
+     "lat": 57.624029,
+     "lng": 11.893798
+    },
+    {
+     "id": 5,
+     "namn": "Lilla Gårdstensskolan F-3",
+     "lat": 57.809675,
+     "lng": 12.031879
+    },
+    {
+     "id": 10,
+     "namn": "Svartedalsskolan 4-9",
+     "lat": 57.7314,
+     "lng": 11.901128
+    },
+    {
+     "id": 14,
+     "namn": "Torpaskolan F-9",
+     "lat": 57.725333,
+     "lng": 12.036798
+    },
+    {
+     "id": 23,
+     "namn": "Lundbyskolan 7-9",
+     "lat": 57.719963,
+     "lng": 11.928194
+    },
+    {
+     "id": 33,
+     "namn": "Hagaskolan F-5",
+     "lat": 57.697457,
+     "lng": 11.958298
+    },
+    {
+     "id": 56,
+     "namn": "Oscar Fredriksskolan F-6",
+     "lat": 57.696448,
+     "lng": 11.946221
+    },
+    {
+     "id": 60,
+     "namn": "Hagenskolan F-6",
+     "lat": 57.676212,
+     "lng": 11.883721
+    },
+    {
+     "id": 64,
+     "namn": "Nya skolan Länsmansgården F-3",
+     "lat": 57.732334,
+     "lng": 11.885742
+    },
+    {
+     "id": 75,
+     "namn": "Ryaskolan F-6",
+     "lat": 57.713716,
+     "lng": 11.888737
+    },
+    {
+     "id": 85,
+     "namn": "Kålltorpsskolan 7-9",
+     "lat": 57.715964,
+     "lng": 12.032658
+    },
+    {
+     "id": 99,
+     "namn": "Ramsdalsskolan F-3",
+     "lat": 57.749814,
+     "lng": 12.029215
+    },
+    {
+     "id": 114,
+     "namn": "Karl Johansskolan F-6",
+     "lat": 57.695072,
+     "lng": 11.929401
+    },
+    {
+     "id": 119,
+     "namn": "Vättnedalsskolan F-6",
+     "lat": 57.645004,
+     "lng": 11.904577
+    },
+    {
+     "id": 130,
+     "namn": "Tretjärnsskolan F-3",
+     "lat": 57.811495,
+     "lng": 12.043649
+    },
+    {
+     "id": 134,
+     "namn": "Montessoriskolan Elyseum 6-9",
+     "lat": 57.704473,
+     "lng": 11.980814
+    },
+    {
+     "id": 136,
+     "namn": "Santosskolan 7-9",
+     "lat": 57.704065,
+     "lng": 11.932745
+    },
+    {
+     "id": 147,
+     "namn": "Torslandaskolan F-6",
+     "lat": 57.729123,
+     "lng": 11.77025
+    },
+    {
+     "id": 149,
+     "namn": "Ånässkolan F-6",
+     "lat": 57.71864,
+     "lng": 12.003639
+    },
+    {
+     "id": 150,
+     "namn": "Glöstorpsskolan 7-9",
+     "lat": 57.753355,
+     "lng": 11.926391
+    },
+    {
+     "id": 153,
+     "namn": "Hultskolan F-6",
+     "lat": 57.636547,
+     "lng": 11.925451
+    },
+    {
+     "id": 160,
+     "namn": "Kungsladugårdsskolan F-6",
+     "lat": 57.685401,
+     "lng": 11.921755
+    },
+    {
+     "id": 166,
+     "namn": "Bergsgårdsskolan F-6",
+     "lat": 57.770912,
+     "lng": 12.014338
+    }
+   ]
+  },
+  "2040": {
+   "stadier": {
+    "lag": {
+     "idag": 108,
+     "golv": 26,
+     "minsta": 92,
+     "brist": 26,
+     "meanKm": 0.21,
+     "maxKm": 2.0,
+     "otackbara": [],
+     "elever": 18241
+    },
+    "mellan": {
+     "idag": 95,
+     "golv": 10,
+     "minsta": 75,
+     "brist": 0,
+     "meanKm": 0.33,
+     "maxKm": 4.0,
+     "otackbara": [],
+     "elever": 11933
+    },
+    "hog": {
+     "idag": 45,
+     "golv": 6,
+     "minsta": 35,
+     "brist": 0,
+     "meanKm": 0.72,
+     "maxKm": 6.0,
+     "otackbara": [],
+     "elever": 6288
+    }
+   },
+   "natverk": [
+    {
+     "typ": "skola",
+     "id": 0,
+     "namn": "EfUS 1 Utby",
+     "lat": 57.742883,
+     "lng": 12.071287,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 1,
+     "namn": "Ellen Keyskolan F-6",
+     "lat": 57.7465,
+     "lng": 11.967436,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 2,
+     "namn": "Sandarnaskolan F-6",
+     "lat": 57.685821,
+     "lng": 11.907709,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 4,
+     "namn": "Näsetskolan F-6",
+     "lat": 57.624029,
+     "lng": 11.893798,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 5,
+     "namn": "Lilla Gårdstensskolan F-3",
+     "lat": 57.809675,
+     "lng": 12.031879,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 7,
+     "namn": "Parkskolan F-6",
+     "lat": 57.711746,
+     "lng": 12.031732,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 13,
+     "namn": "Taubeskolan F-6",
+     "lat": 57.69908,
+     "lng": 11.901756,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 15,
+     "namn": "Guldhedsskolan F-9",
+     "lat": 57.68695,
+     "lng": 11.970373,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 16,
+     "namn": "Rävebergsskolan F-3",
+     "lat": 57.817627,
+     "lng": 12.032027,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 18,
+     "namn": "Kärralundsskolan F-9",
+     "lat": 57.703523,
+     "lng": 12.022609,
+     "stadier": [
+      "lag",
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 20,
+     "namn": "Björlandaskolan F-6",
+     "lat": 57.763025,
+     "lng": 11.835151,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 26,
+     "namn": "Högenskolan F-3",
+     "lat": 57.6454,
+     "lng": 11.875225,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 28,
+     "namn": "Nya Varvetskolan F-6",
+     "lat": 57.679451,
+     "lng": 11.891449,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 32,
+     "namn": "Mossebergsskolan F-2",
+     "lat": 57.681868,
+     "lng": 11.972769,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 34,
+     "namn": "Gunnestorpsskolan F-6",
+     "lat": 57.749206,
+     "lng": 11.921404,
+     "stadier": [
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 35,
+     "namn": "Asperöskolan F-3",
+     "lat": 57.648593,
+     "lng": 11.799175,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 37,
+     "namn": "Johannebergsskolan Estetiska F-6",
+     "lat": 57.690012,
+     "lng": 11.984809,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 38,
+     "namn": "Skälltorpsskolan 7-9",
+     "lat": 57.749259,
+     "lng": 11.985084,
+     "stadier": [
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 39,
+     "namn": "Trulsegårdsskolan 7-9",
+     "lat": 57.75618,
+     "lng": 11.833107,
+     "stadier": [
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 40,
+     "namn": "Tångenskolan F-6",
+     "lat": 57.75925,
+     "lng": 11.932895,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 41,
+     "namn": "Svenska Balettskolan 4-9",
+     "lat": 57.749669,
+     "lng": 11.984411,
+     "stadier": [
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 42,
+     "namn": "Bagaregårdsskolan F-6",
+     "lat": 57.717966,
+     "lng": 12.010368,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 43,
+     "namn": "Sisjöskolan F-3",
+     "lat": 57.63331,
+     "lng": 11.957044,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 44,
+     "namn": "Backegårdsskolan F-6",
+     "lat": 57.751005,
+     "lng": 12.066844,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 45,
+     "namn": "Bergsjöskolan F-9",
+     "lat": 57.755697,
+     "lng": 12.068639,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 47,
+     "namn": "Långedragsskolan F-6",
+     "lat": 57.672663,
+     "lng": 11.85991,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 48,
+     "namn": "Rambergsskolan F-6",
+     "lat": 57.71631,
+     "lng": 11.939601,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 49,
+     "namn": "Solbackeskolan F-6",
+     "lat": 57.760535,
+     "lng": 12.068096,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 51,
+     "namn": "Bräckeskolan F-6",
+     "lat": 57.705214,
+     "lng": 11.906559,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 52,
+     "namn": "Lillebyskolan F-6",
+     "lat": 57.73704,
+     "lng": 11.791531,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 53,
+     "namn": "Gamlestadsskolan F-9",
+     "lat": 57.732221,
+     "lng": 12.011668,
+     "stadier": [
+      "lag",
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 55,
+     "namn": "Gunnaredsskolan F-3",
+     "lat": 57.798521,
+     "lng": 12.057288,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 57,
+     "namn": "Gårdstensskolan 4-9",
+     "lat": 57.801317,
+     "lng": 12.04398,
+     "stadier": [
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 59,
+     "namn": "Kärrdalsskolan F-5",
+     "lat": 57.744144,
+     "lng": 11.918062,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 61,
+     "namn": "Lövgärdesskolan 4-9",
+     "lat": 57.816511,
+     "lng": 12.041607,
+     "stadier": [
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 62,
+     "namn": "Rosendalsskolan F-6",
+     "lat": 57.713876,
+     "lng": 12.047505,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 65,
+     "namn": "Bjurslättsskolan F-6",
+     "lat": 57.723953,
+     "lng": 11.93496,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 67,
+     "namn": "Rannebergsskolan F-3",
+     "lat": 57.803268,
+     "lng": 12.068082,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 69,
+     "namn": "Landamäreskolan F-3",
+     "lat": 57.73638,
+     "lng": 11.894972,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 71,
+     "namn": "Utmarksskolan 4-9",
+     "lat": 57.762097,
+     "lng": 12.044634,
+     "stadier": [
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 73,
+     "namn": "Lärjeskolan F-9",
+     "lat": 57.767548,
+     "lng": 12.027133,
+     "stadier": [
+      "lag",
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 76,
+     "namn": "Gustaviskolan F-6",
+     "lat": 57.70216,
+     "lng": 11.963054,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 77,
+     "namn": "Askimsskolan F-6",
+     "lat": 57.636049,
+     "lng": 11.941299,
+     "stadier": [
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 78,
+     "namn": "Toleredsskolan F-9",
+     "lat": 57.73146,
+     "lng": 11.919707,
+     "stadier": [
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 79,
+     "namn": "Björkåsskolan F-6",
+     "lat": 57.655102,
+     "lng": 11.92964,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 80,
+     "namn": "Bergumsskolan F-9",
+     "lat": 57.805055,
+     "lng": 12.169332,
+     "stadier": [
+      "lag",
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 81,
+     "namn": "Flatåsskolan F-6",
+     "lat": 57.663995,
+     "lng": 11.926307,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 82,
+     "namn": "Backaskolan F-6",
+     "lat": 57.740773,
+     "lng": 11.978341,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 83,
+     "namn": "Frejaskolan F-9",
+     "lat": 57.654043,
+     "lng": 11.891269,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 87,
+     "namn": "Nordhemsskolan 1-9",
+     "lat": 57.69401,
+     "lng": 11.950318,
+     "stadier": [
+      "lag",
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 90,
+     "namn": "Sjumilaskolan F-6",
+     "lat": 57.725308,
+     "lng": 11.891496,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 91,
+     "namn": "Åkeredsskolan F-6",
+     "lat": 57.631907,
+     "lng": 11.892996,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 93,
+     "namn": "Kärraskolan F-9",
+     "lat": 57.792556,
+     "lng": 11.993801,
+     "stadier": [
+      "lag",
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 95,
+     "namn": "Nytorpsskolan 4-9",
+     "lat": 57.77815,
+     "lng": 12.030017,
+     "stadier": [
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 97,
+     "namn": "Lerlyckeskolan F-6",
+     "lat": 57.729356,
+     "lng": 11.91515,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 98,
+     "namn": "Skogomeskolan F-6",
+     "lat": 57.766104,
+     "lng": 11.947519,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 101,
+     "namn": "Dalaskolan F-6",
+     "lat": 57.678473,
+     "lng": 11.9012,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 102,
+     "namn": "Noleredsskolan F-6",
+     "lat": 57.719428,
+     "lng": 11.759181,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 103,
+     "namn": "Fjällskolan F-6",
+     "lat": 57.695029,
+     "lng": 11.939151,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 104,
+     "namn": "Västerhedsskolan F-3",
+     "lat": 57.672136,
+     "lng": 11.920526,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 105,
+     "namn": "Jättestensskolan F-9",
+     "lat": 57.719377,
+     "lng": 11.90162,
+     "stadier": [
+      "lag",
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 106,
+     "namn": "Bärbyskolan F-6",
+     "lat": 57.793847,
+     "lng": 11.908831,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 108,
+     "namn": "Vättleskolan 4-9",
+     "lat": 57.802089,
+     "lng": 12.063092,
+     "stadier": [
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 110,
+     "namn": "Härlandatjärnskolan F-9",
+     "lat": 57.71268,
+     "lng": 12.057343,
+     "stadier": [
+      "lag",
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 111,
+     "namn": "Johannebergsskolan Montessori F-5",
+     "lat": 57.690012,
+     "lng": 11.984809,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 112,
+     "namn": "Fjällboskolan F-5",
+     "lat": 57.739538,
+     "lng": 12.061699,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 113,
+     "namn": "Långmosseskolan F-3",
+     "lat": 57.800134,
+     "lng": 12.029968,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 115,
+     "namn": "Lundenskolan F-9",
+     "lat": 57.708017,
+     "lng": 12.010228,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 117,
+     "namn": "Herrgårdsskolan F-6",
+     "lat": 57.707908,
+     "lng": 11.930554,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 118,
+     "namn": "Emmaskolan F-3",
+     "lat": 57.776792,
+     "lng": 12.041615,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 120,
+     "namn": "Slottsbergsskolan F-6",
+     "lat": 57.656382,
+     "lng": 11.905234,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 121,
+     "namn": "Nygårdsskolan F-9",
+     "lat": 57.591619,
+     "lng": 11.94585,
+     "stadier": [
+      "lag",
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 122,
+     "namn": "Skytteskolan F-9",
+     "lat": 57.671218,
+     "lng": 11.935209,
+     "stadier": [
+      "lag",
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 123,
+     "namn": "Annedalsskolan F-6",
+     "lat": 57.693849,
+     "lng": 11.961368,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 124,
+     "namn": "Ängåsskolan F-6",
+     "lat": 57.645452,
+     "lng": 11.907077,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 125,
+     "namn": "Donsöskolan F-6",
+     "lat": 57.597236,
+     "lng": 11.802011,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 126,
+     "namn": "Brottkärrsskolan F-6",
+     "lat": 57.59947,
+     "lng": 11.947198,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 127,
+     "namn": "Klarebergsskolan F-9",
+     "lat": 57.795054,
+     "lng": 11.988788,
+     "stadier": [
+      "lag",
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 128,
+     "namn": "Talldungeskolan F-3",
+     "lat": 57.764655,
+     "lng": 12.039834,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 129,
+     "namn": "Utbynässkolan F-3",
+     "lat": 57.736771,
+     "lng": 12.0482,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 130,
+     "namn": "Tretjärnsskolan F-3",
+     "lat": 57.811495,
+     "lng": 12.043649,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 132,
+     "namn": "Gunnilseskolan F-6",
+     "lat": 57.787076,
+     "lng": 12.08874,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 133,
+     "namn": "Gärdsmosseskolan F-6",
+     "lat": 57.760409,
+     "lng": 12.049225,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 135,
+     "namn": "Björsaredsskolan F-3",
+     "lat": 57.795516,
+     "lng": 12.140227,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 137,
+     "namn": "Brännöskolan F-3",
+     "lat": 57.640328,
+     "lng": 11.779843,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 138,
+     "namn": "Påvelundsskolan F-9",
+     "lat": 57.666444,
+     "lng": 11.876383,
+     "stadier": [
+      "lag",
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 140,
+     "namn": "Skutehagsskolan F-6",
+     "lat": 57.707117,
+     "lng": 11.761943,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 141,
+     "namn": "Kvibergsskolan F-9",
+     "lat": 57.735552,
+     "lng": 12.03739,
+     "stadier": [
+      "lag",
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 142,
+     "namn": "Fiskebäcksskolan F-9",
+     "lat": 57.65349,
+     "lng": 11.866993,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 143,
+     "namn": "Eriksboskolan F-6",
+     "lat": 57.769066,
+     "lng": 12.023254,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 145,
+     "namn": "Lilla Trulsegårdsskolan F-3",
+     "lat": 57.755808,
+     "lng": 11.833316,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 146,
+     "namn": "Styrsöskolan F-9",
+     "lat": 57.613167,
+     "lng": 11.789293,
+     "stadier": [
+      "lag",
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 149,
+     "namn": "Ånässkolan F-6",
+     "lat": 57.71864,
+     "lng": 12.003639,
+     "stadier": [
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 150,
+     "namn": "Glöstorpsskolan 7-9",
+     "lat": 57.753355,
+     "lng": 11.926391,
+     "stadier": [
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 151,
+     "namn": "Hjuviksskolan F-3",
+     "lat": 57.705477,
+     "lng": 11.71298,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 152,
+     "namn": "Lindåsskolan F-9",
+     "lat": 57.565623,
+     "lng": 11.944922,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 153,
+     "namn": "Hultskolan F-6",
+     "lat": 57.636547,
+     "lng": 11.925451,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 154,
+     "namn": "Torslandaskolan 7-9",
+     "lat": 57.727064,
+     "lng": 11.771155,
+     "stadier": [
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 158,
+     "namn": "Sandeklevsskolan F-9",
+     "lat": 57.758082,
+     "lng": 12.060293,
+     "stadier": [
+      "lag",
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 159,
+     "namn": "Önneredsskolan F-9",
+     "lat": 57.638905,
+     "lng": 11.883101,
+     "stadier": [
+      "lag",
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 163,
+     "namn": "Gärdsåsskolan 4-9",
+     "lat": 57.752217,
+     "lng": 12.033867,
+     "stadier": [
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 164,
+     "namn": "Skårsskolan F-6",
+     "lat": 57.689721,
+     "lng": 12.007357,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 166,
+     "namn": "Bergsgårdsskolan F-6",
+     "lat": 57.770912,
+     "lng": 12.014338,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 168,
+     "namn": "Brunnsboskolan F-9",
+     "lat": 57.730856,
+     "lng": 11.969962,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 169,
+     "namn": "Trollängsskolan F-6",
+     "lat": 57.631308,
+     "lng": 11.939408,
+     "stadier": [
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 170,
+     "namn": "Hovåsskolan F-9",
+     "lat": 57.61952,
+     "lng": 11.940776,
+     "stadier": [
+      "lag",
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "kandidat",
+     "id": "35-kungsladugard-sanna-candidate",
+     "namn": "Kandidatsite Kungsladugård-Sanna",
+     "lat": 57.688321,
+     "lng": 11.905709,
+     "stadier": [
+      "hog"
+     ]
+    },
+    {
+     "typ": "kandidat",
+     "id": "54-bratthammar-naset-onnered-candidate",
+     "namn": "Kandidatsite Bratthammar-Näset-Önnered",
+     "lat": 57.626529,
+     "lng": 11.891798,
+     "stadier": [
+      "hog"
+     ]
+    },
+    {
+     "typ": "kandidat",
+     "id": "16-norra-angered-candidate",
+     "namn": "Kandidatsite Norra Angered",
+     "lat": 57.812175,
+     "lng": 12.029879,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "kandidat",
+     "id": "79-ostra-biskopsgarden-candidate",
+     "namn": "Kandidatsite Östra Biskopsgården",
+     "lat": 57.7339,
+     "lng": 11.899128,
+     "stadier": [
+      "hog"
+     ]
+    },
+    {
+     "typ": "kandidat",
+     "id": "33-guldheden-landala-candidate",
+     "namn": "Kandidatsite Guldheden-Landala",
+     "lat": 57.696078,
+     "lng": 11.965167,
+     "stadier": [
+      "hog"
+     ]
+    },
+    {
+     "typ": "kandidat",
+     "id": "31-kalleback-skar-karralund-candidate",
+     "namn": "Kandidatsite Kallebäck-Skår-Kärralund",
+     "lat": 57.706023,
+     "lng": 12.020609,
+     "stadier": [
+      "hog"
+     ]
+    },
+    {
+     "typ": "kandidat",
+     "id": "72-kvillebacken-candidate",
+     "namn": "Kandidatsite Kvillebäcken",
+     "lat": 57.722463,
+     "lng": 11.926194,
+     "stadier": [
+      "hog"
+     ]
+    },
+    {
+     "typ": "kandidat",
+     "id": "11-bergsjon-candidate",
+     "namn": "Kandidatsite Bergsjön",
+     "lat": 57.753505,
+     "lng": 12.064844,
+     "stadier": [
+      "hog"
+     ]
+    },
+    {
+     "typ": "kandidat",
+     "id": "56-frolunda-torg-tofta-candidate",
+     "namn": "Kandidatsite Frölunda Torg-Tofta",
+     "lat": 57.658882,
+     "lng": 11.903234,
+     "stadier": [
+      "hog"
+     ]
+    },
+    {
+     "typ": "kandidat",
+     "id": "52-billdal-candidate",
+     "namn": "Kandidatsite Billdal",
+     "lat": 57.594119,
+     "lng": 11.94385,
+     "stadier": [
+      "lag"
+     ]
+    }
+   ],
+   "utanfor": [
+    {
+     "id": 3,
+     "namn": "Sannaskolan 7-9",
+     "lat": 57.684498,
+     "lng": 11.913634
+    },
+    {
+     "id": 10,
+     "namn": "Svartedalsskolan 4-9",
+     "lat": 57.7314,
+     "lng": 11.901128
+    },
+    {
+     "id": 14,
+     "namn": "Torpaskolan F-9",
+     "lat": 57.725333,
+     "lng": 12.036798
+    },
+    {
+     "id": 23,
+     "namn": "Lundbyskolan 7-9",
+     "lat": 57.719963,
+     "lng": 11.928194
+    },
+    {
+     "id": 30,
+     "namn": "Frölundaskolan F-9",
+     "lat": 57.657039,
+     "lng": 11.914983
+    },
+    {
+     "id": 33,
+     "namn": "Hagaskolan F-5",
+     "lat": 57.697457,
+     "lng": 11.958298
+    },
+    {
+     "id": 56,
+     "namn": "Oscar Fredriksskolan F-6",
+     "lat": 57.696448,
+     "lng": 11.946221
+    },
+    {
+     "id": 60,
+     "namn": "Hagenskolan F-6",
+     "lat": 57.676212,
+     "lng": 11.883721
+    },
+    {
+     "id": 64,
+     "namn": "Nya skolan Länsmansgården F-3",
+     "lat": 57.732334,
+     "lng": 11.885742
+    },
+    {
+     "id": 75,
+     "namn": "Ryaskolan F-6",
+     "lat": 57.713716,
+     "lng": 11.888737
+    },
+    {
+     "id": 85,
+     "namn": "Kålltorpsskolan 7-9",
+     "lat": 57.715964,
+     "lng": 12.032658
+    },
+    {
+     "id": 92,
+     "namn": "Hällsviksskolan F-3",
+     "lat": 57.702524,
+     "lng": 11.737771
+    },
+    {
+     "id": 99,
+     "namn": "Ramsdalsskolan F-3",
+     "lat": 57.749814,
+     "lng": 12.029215
+    },
+    {
+     "id": 114,
+     "namn": "Karl Johansskolan F-6",
+     "lat": 57.695072,
+     "lng": 11.929401
+    },
+    {
+     "id": 119,
+     "namn": "Vättnedalsskolan F-6",
+     "lat": 57.645004,
+     "lng": 11.904577
+    },
+    {
+     "id": 134,
+     "namn": "Montessoriskolan Elyseum 6-9",
+     "lat": 57.704473,
+     "lng": 11.980814
+    },
+    {
+     "id": 136,
+     "namn": "Santosskolan 7-9",
+     "lat": 57.704065,
+     "lng": 11.932745
+    },
+    {
+     "id": 147,
+     "namn": "Torslandaskolan F-6",
+     "lat": 57.729123,
+     "lng": 11.77025
+    },
+    {
+     "id": 160,
+     "namn": "Kungsladugårdsskolan F-6",
+     "lat": 57.685401,
+     "lng": 11.921755
+    },
+    {
+     "id": 162,
+     "namn": "Nordlyckeskolan 7-9",
+     "lat": 57.716688,
+     "lng": 11.757076
+    }
+   ]
+  },
+  "2050": {
+   "stadier": {
+    "lag": {
+     "idag": 108,
+     "golv": 26,
+     "minsta": 95,
+     "brist": 304,
+     "meanKm": 0.29,
+     "maxKm": 2.0,
+     "otackbara": [],
+     "elever": 19080
+    },
+    "mellan": {
+     "idag": 95,
+     "golv": 10,
+     "minsta": 80,
+     "brist": 0,
+     "meanKm": 0.37,
+     "maxKm": 4.0,
+     "otackbara": [],
+     "elever": 12478
+    },
+    "hog": {
+     "idag": 45,
+     "golv": 6,
+     "minsta": 38,
+     "brist": 0,
+     "meanKm": 0.97,
+     "maxKm": 6.0,
+     "otackbara": [],
+     "elever": 6716
+    }
+   },
+   "natverk": [
+    {
+     "typ": "skola",
+     "id": 0,
+     "namn": "EfUS 1 Utby",
+     "lat": 57.742883,
+     "lng": 12.071287,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 1,
+     "namn": "Ellen Keyskolan F-6",
+     "lat": 57.7465,
+     "lng": 11.967436,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 2,
+     "namn": "Sandarnaskolan F-6",
+     "lat": 57.685821,
+     "lng": 11.907709,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 4,
+     "namn": "Näsetskolan F-6",
+     "lat": 57.624029,
+     "lng": 11.893798,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 5,
+     "namn": "Lilla Gårdstensskolan F-3",
+     "lat": 57.809675,
+     "lng": 12.031879,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 7,
+     "namn": "Parkskolan F-6",
+     "lat": 57.711746,
+     "lng": 12.031732,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 13,
+     "namn": "Taubeskolan F-6",
+     "lat": 57.69908,
+     "lng": 11.901756,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 14,
+     "namn": "Torpaskolan F-9",
+     "lat": 57.725333,
+     "lng": 12.036798,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 15,
+     "namn": "Guldhedsskolan F-9",
+     "lat": 57.68695,
+     "lng": 11.970373,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 16,
+     "namn": "Rävebergsskolan F-3",
+     "lat": 57.817627,
+     "lng": 12.032027,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 18,
+     "namn": "Kärralundsskolan F-9",
+     "lat": 57.703523,
+     "lng": 12.022609,
+     "stadier": [
+      "lag",
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 20,
+     "namn": "Björlandaskolan F-6",
+     "lat": 57.763025,
+     "lng": 11.835151,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 26,
+     "namn": "Högenskolan F-3",
+     "lat": 57.6454,
+     "lng": 11.875225,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 28,
+     "namn": "Nya Varvetskolan F-6",
+     "lat": 57.679451,
+     "lng": 11.891449,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 30,
+     "namn": "Frölundaskolan F-9",
+     "lat": 57.657039,
+     "lng": 11.914983,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 32,
+     "namn": "Mossebergsskolan F-2",
+     "lat": 57.681868,
+     "lng": 11.972769,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 34,
+     "namn": "Gunnestorpsskolan F-6",
+     "lat": 57.749206,
+     "lng": 11.921404,
+     "stadier": [
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 37,
+     "namn": "Johannebergsskolan Estetiska F-6",
+     "lat": 57.690012,
+     "lng": 11.984809,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 38,
+     "namn": "Skälltorpsskolan 7-9",
+     "lat": 57.749259,
+     "lng": 11.985084,
+     "stadier": [
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 39,
+     "namn": "Trulsegårdsskolan 7-9",
+     "lat": 57.75618,
+     "lng": 11.833107,
+     "stadier": [
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 40,
+     "namn": "Tångenskolan F-6",
+     "lat": 57.75925,
+     "lng": 11.932895,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 41,
+     "namn": "Svenska Balettskolan 4-9",
+     "lat": 57.749669,
+     "lng": 11.984411,
+     "stadier": [
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 42,
+     "namn": "Bagaregårdsskolan F-6",
+     "lat": 57.717966,
+     "lng": 12.010368,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 44,
+     "namn": "Backegårdsskolan F-6",
+     "lat": 57.751005,
+     "lng": 12.066844,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 45,
+     "namn": "Bergsjöskolan F-9",
+     "lat": 57.755697,
+     "lng": 12.068639,
+     "stadier": [
+      "lag",
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 47,
+     "namn": "Långedragsskolan F-6",
+     "lat": 57.672663,
+     "lng": 11.85991,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 48,
+     "namn": "Rambergsskolan F-6",
+     "lat": 57.71631,
+     "lng": 11.939601,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 49,
+     "namn": "Solbackeskolan F-6",
+     "lat": 57.760535,
+     "lng": 12.068096,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 51,
+     "namn": "Bräckeskolan F-6",
+     "lat": 57.705214,
+     "lng": 11.906559,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 52,
+     "namn": "Lillebyskolan F-6",
+     "lat": 57.73704,
+     "lng": 11.791531,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 53,
+     "namn": "Gamlestadsskolan F-9",
+     "lat": 57.732221,
+     "lng": 12.011668,
+     "stadier": [
+      "lag",
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 55,
+     "namn": "Gunnaredsskolan F-3",
+     "lat": 57.798521,
+     "lng": 12.057288,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 56,
+     "namn": "Oscar Fredriksskolan F-6",
+     "lat": 57.696448,
+     "lng": 11.946221,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 57,
+     "namn": "Gårdstensskolan 4-9",
+     "lat": 57.801317,
+     "lng": 12.04398,
+     "stadier": [
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 59,
+     "namn": "Kärrdalsskolan F-5",
+     "lat": 57.744144,
+     "lng": 11.918062,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 61,
+     "namn": "Lövgärdesskolan 4-9",
+     "lat": 57.816511,
+     "lng": 12.041607,
+     "stadier": [
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 62,
+     "namn": "Rosendalsskolan F-6",
+     "lat": 57.713876,
+     "lng": 12.047505,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 65,
+     "namn": "Bjurslättsskolan F-6",
+     "lat": 57.723953,
+     "lng": 11.93496,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 67,
+     "namn": "Rannebergsskolan F-3",
+     "lat": 57.803268,
+     "lng": 12.068082,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 69,
+     "namn": "Landamäreskolan F-3",
+     "lat": 57.73638,
+     "lng": 11.894972,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 71,
+     "namn": "Utmarksskolan 4-9",
+     "lat": 57.762097,
+     "lng": 12.044634,
+     "stadier": [
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 73,
+     "namn": "Lärjeskolan F-9",
+     "lat": 57.767548,
+     "lng": 12.027133,
+     "stadier": [
+      "lag",
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 76,
+     "namn": "Gustaviskolan F-6",
+     "lat": 57.70216,
+     "lng": 11.963054,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 77,
+     "namn": "Askimsskolan F-6",
+     "lat": 57.636049,
+     "lng": 11.941299,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 78,
+     "namn": "Toleredsskolan F-9",
+     "lat": 57.73146,
+     "lng": 11.919707,
+     "stadier": [
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 79,
+     "namn": "Björkåsskolan F-6",
+     "lat": 57.655102,
+     "lng": 11.92964,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 80,
+     "namn": "Bergumsskolan F-9",
+     "lat": 57.805055,
+     "lng": 12.169332,
+     "stadier": [
+      "lag",
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 81,
+     "namn": "Flatåsskolan F-6",
+     "lat": 57.663995,
+     "lng": 11.926307,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 82,
+     "namn": "Backaskolan F-6",
+     "lat": 57.740773,
+     "lng": 11.978341,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 83,
+     "namn": "Frejaskolan F-9",
+     "lat": 57.654043,
+     "lng": 11.891269,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 87,
+     "namn": "Nordhemsskolan 1-9",
+     "lat": 57.69401,
+     "lng": 11.950318,
+     "stadier": [
+      "lag",
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 90,
+     "namn": "Sjumilaskolan F-6",
+     "lat": 57.725308,
+     "lng": 11.891496,
+     "stadier": [
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 91,
+     "namn": "Åkeredsskolan F-6",
+     "lat": 57.631907,
+     "lng": 11.892996,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 93,
+     "namn": "Kärraskolan F-9",
+     "lat": 57.792556,
+     "lng": 11.993801,
+     "stadier": [
+      "lag",
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 95,
+     "namn": "Nytorpsskolan 4-9",
+     "lat": 57.77815,
+     "lng": 12.030017,
+     "stadier": [
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 97,
+     "namn": "Lerlyckeskolan F-6",
+     "lat": 57.729356,
+     "lng": 11.91515,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 98,
+     "namn": "Skogomeskolan F-6",
+     "lat": 57.766104,
+     "lng": 11.947519,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 99,
+     "namn": "Ramsdalsskolan F-3",
+     "lat": 57.749814,
+     "lng": 12.029215,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 101,
+     "namn": "Dalaskolan F-6",
+     "lat": 57.678473,
+     "lng": 11.9012,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 102,
+     "namn": "Noleredsskolan F-6",
+     "lat": 57.719428,
+     "lng": 11.759181,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 103,
+     "namn": "Fjällskolan F-6",
+     "lat": 57.695029,
+     "lng": 11.939151,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 104,
+     "namn": "Västerhedsskolan F-3",
+     "lat": 57.672136,
+     "lng": 11.920526,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 105,
+     "namn": "Jättestensskolan F-9",
+     "lat": 57.719377,
+     "lng": 11.90162,
+     "stadier": [
+      "lag",
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 106,
+     "namn": "Bärbyskolan F-6",
+     "lat": 57.793847,
+     "lng": 11.908831,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 108,
+     "namn": "Vättleskolan 4-9",
+     "lat": 57.802089,
+     "lng": 12.063092,
+     "stadier": [
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 110,
+     "namn": "Härlandatjärnskolan F-9",
+     "lat": 57.71268,
+     "lng": 12.057343,
+     "stadier": [
+      "lag",
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 111,
+     "namn": "Johannebergsskolan Montessori F-5",
+     "lat": 57.690012,
+     "lng": 11.984809,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 112,
+     "namn": "Fjällboskolan F-5",
+     "lat": 57.739538,
+     "lng": 12.061699,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 113,
+     "namn": "Långmosseskolan F-3",
+     "lat": 57.800134,
+     "lng": 12.029968,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 115,
+     "namn": "Lundenskolan F-9",
+     "lat": 57.708017,
+     "lng": 12.010228,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 117,
+     "namn": "Herrgårdsskolan F-6",
+     "lat": 57.707908,
+     "lng": 11.930554,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 118,
+     "namn": "Emmaskolan F-3",
+     "lat": 57.776792,
+     "lng": 12.041615,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 120,
+     "namn": "Slottsbergsskolan F-6",
+     "lat": 57.656382,
+     "lng": 11.905234,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 121,
+     "namn": "Nygårdsskolan F-9",
+     "lat": 57.591619,
+     "lng": 11.94585,
+     "stadier": [
+      "lag",
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 122,
+     "namn": "Skytteskolan F-9",
+     "lat": 57.671218,
+     "lng": 11.935209,
+     "stadier": [
+      "lag",
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 123,
+     "namn": "Annedalsskolan F-6",
+     "lat": 57.693849,
+     "lng": 11.961368,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 124,
+     "namn": "Ängåsskolan F-6",
+     "lat": 57.645452,
+     "lng": 11.907077,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 126,
+     "namn": "Brottkärrsskolan F-6",
+     "lat": 57.59947,
+     "lng": 11.947198,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 127,
+     "namn": "Klarebergsskolan F-9",
+     "lat": 57.795054,
+     "lng": 11.988788,
+     "stadier": [
+      "lag",
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 128,
+     "namn": "Talldungeskolan F-3",
+     "lat": 57.764655,
+     "lng": 12.039834,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 129,
+     "namn": "Utbynässkolan F-3",
+     "lat": 57.736771,
+     "lng": 12.0482,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 130,
+     "namn": "Tretjärnsskolan F-3",
+     "lat": 57.811495,
+     "lng": 12.043649,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 132,
+     "namn": "Gunnilseskolan F-6",
+     "lat": 57.787076,
+     "lng": 12.08874,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 133,
+     "namn": "Gärdsmosseskolan F-6",
+     "lat": 57.760409,
+     "lng": 12.049225,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 135,
+     "namn": "Björsaredsskolan F-3",
+     "lat": 57.795516,
+     "lng": 12.140227,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 137,
+     "namn": "Brännöskolan F-3",
+     "lat": 57.640328,
+     "lng": 11.779843,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 138,
+     "namn": "Påvelundsskolan F-9",
+     "lat": 57.666444,
+     "lng": 11.876383,
+     "stadier": [
+      "lag",
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 140,
+     "namn": "Skutehagsskolan F-6",
+     "lat": 57.707117,
+     "lng": 11.761943,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 141,
+     "namn": "Kvibergsskolan F-9",
+     "lat": 57.735552,
+     "lng": 12.03739,
+     "stadier": [
+      "lag",
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 142,
+     "namn": "Fiskebäcksskolan F-9",
+     "lat": 57.65349,
+     "lng": 11.866993,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 143,
+     "namn": "Eriksboskolan F-6",
+     "lat": 57.769066,
+     "lng": 12.023254,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 145,
+     "namn": "Lilla Trulsegårdsskolan F-3",
+     "lat": 57.755808,
+     "lng": 11.833316,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 146,
+     "namn": "Styrsöskolan F-9",
+     "lat": 57.613167,
+     "lng": 11.789293,
+     "stadier": [
+      "lag",
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 149,
+     "namn": "Ånässkolan F-6",
+     "lat": 57.71864,
+     "lng": 12.003639,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 150,
+     "namn": "Glöstorpsskolan 7-9",
+     "lat": 57.753355,
+     "lng": 11.926391,
+     "stadier": [
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 151,
+     "namn": "Hjuviksskolan F-3",
+     "lat": 57.705477,
+     "lng": 11.71298,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 152,
+     "namn": "Lindåsskolan F-9",
+     "lat": 57.565623,
+     "lng": 11.944922,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 153,
+     "namn": "Hultskolan F-6",
+     "lat": 57.636547,
+     "lng": 11.925451,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 154,
+     "namn": "Torslandaskolan 7-9",
+     "lat": 57.727064,
+     "lng": 11.771155,
+     "stadier": [
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 158,
+     "namn": "Sandeklevsskolan F-9",
+     "lat": 57.758082,
+     "lng": 12.060293,
+     "stadier": [
+      "lag",
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 159,
+     "namn": "Önneredsskolan F-9",
+     "lat": 57.638905,
+     "lng": 11.883101,
+     "stadier": [
+      "lag",
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 163,
+     "namn": "Gärdsåsskolan 4-9",
+     "lat": 57.752217,
+     "lng": 12.033867,
+     "stadier": [
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 164,
+     "namn": "Skårsskolan F-6",
+     "lat": 57.689721,
+     "lng": 12.007357,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 166,
+     "namn": "Bergsgårdsskolan F-6",
+     "lat": 57.770912,
+     "lng": 12.014338,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 169,
+     "namn": "Trollängsskolan F-6",
+     "lat": 57.631308,
+     "lng": 11.939408,
+     "stadier": [
+      "mellan"
+     ]
+    },
+    {
+     "typ": "skola",
+     "id": 170,
+     "namn": "Hovåsskolan F-9",
+     "lat": 57.61952,
+     "lng": 11.940776,
+     "stadier": [
+      "lag",
+      "mellan",
+      "hog"
+     ]
+    },
+    {
+     "typ": "kandidat",
+     "id": "35-kungsladugard-sanna-candidate",
+     "namn": "Kandidatsite Kungsladugård-Sanna",
+     "lat": 57.688321,
+     "lng": 11.905709,
+     "stadier": [
+      "hog"
+     ]
+    },
+    {
+     "typ": "kandidat",
+     "id": "54-bratthammar-naset-onnered-candidate",
+     "namn": "Kandidatsite Bratthammar-Näset-Önnered",
+     "lat": 57.626529,
+     "lng": 11.891798,
+     "stadier": [
+      "hog"
+     ]
+    },
+    {
+     "typ": "kandidat",
+     "id": "16-norra-angered-candidate",
+     "namn": "Kandidatsite Norra Angered",
+     "lat": 57.812175,
+     "lng": 12.029879,
+     "stadier": [
+      "lag",
+      "mellan"
+     ]
+    },
+    {
+     "typ": "kandidat",
+     "id": "50-stora-hogsbo-candidate",
+     "namn": "Kandidatsite Stora Högsbo",
+     "lat": 57.673718,
+     "lng": 11.933209,
+     "stadier": [
+      "hog"
+     ]
+    },
+    {
+     "typ": "kandidat",
+     "id": "79-ostra-biskopsgarden-candidate",
+     "namn": "Kandidatsite Östra Biskopsgården",
+     "lat": 57.7339,
+     "lng": 11.899128,
+     "stadier": [
+      "hog"
+     ]
+    },
+    {
+     "typ": "kandidat",
+     "id": "33-guldheden-landala-candidate",
+     "namn": "Kandidatsite Guldheden-Landala",
+     "lat": 57.696078,
+     "lng": 11.965167,
+     "stadier": [
+      "hog"
+     ]
+    },
+    {
+     "typ": "kandidat",
+     "id": "31-kalleback-skar-karralund-candidate",
+     "namn": "Kandidatsite Kallebäck-Skår-Kärralund",
+     "lat": 57.706023,
+     "lng": 12.020609,
+     "stadier": [
+      "hog"
+     ]
+    },
+    {
+     "typ": "kandidat",
+     "id": "72-kvillebacken-candidate",
+     "namn": "Kandidatsite Kvillebäcken",
+     "lat": 57.722463,
+     "lng": 11.926194,
+     "stadier": [
+      "hog"
+     ]
+    },
+    {
+     "typ": "kandidat",
+     "id": "11-bergsjon-candidate",
+     "namn": "Kandidatsite Bergsjön",
+     "lat": 57.753505,
+     "lng": 12.064844,
+     "stadier": [
+      "hog"
+     ]
+    },
+    {
+     "typ": "kandidat",
+     "id": "15-centrala-angered-candidate",
+     "namn": "Kandidatsite Centrala Angered",
+     "lat": 57.801021,
+     "lng": 12.055288,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "kandidat",
+     "id": "80-vastra-biskopsgarden-candidate",
+     "namn": "Kandidatsite Västra Biskopsgården",
+     "lat": 57.734834,
+     "lng": 11.883742,
+     "stadier": [
+      "hog"
+     ]
+    },
+    {
+     "typ": "kandidat",
+     "id": "14-sodra-angered-candidate",
+     "namn": "Kandidatsite Södra Angered",
+     "lat": 57.770048,
+     "lng": 12.025133,
+     "stadier": [
+      "lag"
+     ]
+    },
+    {
+     "typ": "kandidat",
+     "id": "56-frolunda-torg-tofta-candidate",
+     "namn": "Kandidatsite Frölunda Torg-Tofta",
+     "lat": 57.658882,
+     "lng": 11.903234,
+     "stadier": [
+      "hog"
+     ]
+    },
+    {
+     "typ": "kandidat",
+     "id": "52-billdal-candidate",
+     "namn": "Kandidatsite Billdal",
+     "lat": 57.594119,
+     "lng": 11.94385,
+     "stadier": [
+      "lag"
+     ]
+    }
+   ],
+   "utanfor": [
+    {
+     "id": 3,
+     "namn": "Sannaskolan 7-9",
+     "lat": 57.684498,
+     "lng": 11.913634
+    },
+    {
+     "id": 10,
+     "namn": "Svartedalsskolan 4-9",
+     "lat": 57.7314,
+     "lng": 11.901128
+    },
+    {
+     "id": 23,
+     "namn": "Lundbyskolan 7-9",
+     "lat": 57.719963,
+     "lng": 11.928194
+    },
+    {
+     "id": 33,
+     "namn": "Hagaskolan F-5",
+     "lat": 57.697457,
+     "lng": 11.958298
+    },
+    {
+     "id": 35,
+     "namn": "Asperöskolan F-3",
+     "lat": 57.648593,
+     "lng": 11.799175
+    },
+    {
+     "id": 43,
+     "namn": "Sisjöskolan F-3",
+     "lat": 57.63331,
+     "lng": 11.957044
+    },
+    {
+     "id": 60,
+     "namn": "Hagenskolan F-6",
+     "lat": 57.676212,
+     "lng": 11.883721
+    },
+    {
+     "id": 64,
+     "namn": "Nya skolan Länsmansgården F-3",
+     "lat": 57.732334,
+     "lng": 11.885742
+    },
+    {
+     "id": 75,
+     "namn": "Ryaskolan F-6",
+     "lat": 57.713716,
+     "lng": 11.888737
+    },
+    {
+     "id": 85,
+     "namn": "Kålltorpsskolan 7-9",
+     "lat": 57.715964,
+     "lng": 12.032658
+    },
+    {
+     "id": 92,
+     "namn": "Hällsviksskolan F-3",
+     "lat": 57.702524,
+     "lng": 11.737771
+    },
+    {
+     "id": 114,
+     "namn": "Karl Johansskolan F-6",
+     "lat": 57.695072,
+     "lng": 11.929401
+    },
+    {
+     "id": 119,
+     "namn": "Vättnedalsskolan F-6",
+     "lat": 57.645004,
+     "lng": 11.904577
+    },
+    {
+     "id": 125,
+     "namn": "Donsöskolan F-6",
+     "lat": 57.597236,
+     "lng": 11.802011
+    },
+    {
+     "id": 134,
+     "namn": "Montessoriskolan Elyseum 6-9",
+     "lat": 57.704473,
+     "lng": 11.980814
+    },
+    {
+     "id": 136,
+     "namn": "Santosskolan 7-9",
+     "lat": 57.704065,
+     "lng": 11.932745
+    },
+    {
+     "id": 147,
+     "namn": "Torslandaskolan F-6",
+     "lat": 57.729123,
+     "lng": 11.77025
+    },
+    {
+     "id": 160,
+     "namn": "Kungsladugårdsskolan F-6",
+     "lat": 57.685401,
+     "lng": 11.921755
+    },
+    {
+     "id": 162,
+     "namn": "Nordlyckeskolan 7-9",
+     "lat": 57.716688,
+     "lng": 11.757076
+    },
+    {
+     "id": 168,
+     "namn": "Brunnsboskolan F-9",
+     "lat": 57.730856,
+     "lng": 11.969962
+    }
+   ]
+  }
+ }
+}
