@@ -4,6 +4,7 @@ import { THEME_EXPR, THEME_LABELS, LEGENDS } from '../lib/constants'
 import { BEFOLKNING } from '../data/prognos'
 import { BASE_YEAR } from '../data/schools'
 import { planFlowsGeoJSON, planClosedGeoJSON } from '../lib/skolval'
+import { spreadPositions } from '../lib/geo'
 import CANDIDATES from '../data/generated/candidates.json'
 import NATPLAN from '../data/generated/natplan.json'
 
@@ -37,31 +38,11 @@ const CAND_FC = {
   })),
 }
 
-// Många skolenheter delar läge (grundskola + anpassad grundskola i samma hus).
-// Sprid samlokaliserade markörer i en liten ring så båda syns och går att klicka
-// — endast presentation, skolornas koordinater i datan är oförändrade.
-const SPREAD_DEG = 0.0013 // ~140 m radie
-
-function spreadGeometry(schools) {
-  const groups = new Map()
-  for (const s of schools) {
-    const key = s.lat.toFixed(4) + ',' + s.lng.toFixed(4)
-    ;(groups.get(key) || groups.set(key, []).get(key)).push(s)
-  }
-  const pos = new Map()
-  for (const grp of groups.values()) {
-    if (grp.length === 1) { pos.set(grp[0].id, [grp[0].lng, grp[0].lat]); continue }
-    const cosLat = Math.cos((grp[0].lat * Math.PI) / 180) || 1
-    grp.forEach((s, i) => {
-      const ang = (2 * Math.PI * i) / grp.length
-      pos.set(s.id, [s.lng + (SPREAD_DEG * Math.cos(ang)) / cosLat, s.lat + SPREAD_DEG * Math.sin(ang)])
-    })
-  }
-  return pos
-}
-
-function toGeoJSON(schools, projFn, year) {
-  const pos = spreadGeometry(schools)
+// Samlokaliserade enheter sprids i en PIXELKONSTANT ring (lib/geo.js) — punkterna
+// bakas därför om per zoomnivå (zoomend) så de kryper ihop mot byggnadens
+// verkliga läge när man zoomar in.
+function toGeoJSON(schools, projFn, year, zoom) {
+  const pos = spreadPositions(schools, zoom)
   return {
     type: 'FeatureCollection',
     features: schools.map((s) => {
@@ -122,6 +103,8 @@ export default function MapView({
   selectRef.current = onSelect
   const projRef = useRef({ projFn, year, scenario, rate })
   projRef.current = { projFn, year, scenario, rate }
+  const schoolsRef = useRef(schools) // för zoomend-ombakningen (pixelkonstant spridning)
+  schoolsRef.current = schools
   const areasRaw = useRef(null) // oförändrad geojson, bakas om per år
 
   // Initiera kartan en gång
@@ -212,7 +195,7 @@ export default function MapView({
       })
       map.on('mouseleave', 'closed', () => closedPopup.remove())
 
-      map.addSource('schools', { type: 'geojson', data: toGeoJSON(schools, projRef.current.projFn, projRef.current.year) })
+      map.addSource('schools', { type: 'geojson', data: toGeoJSON(schools, projRef.current.projFn, projRef.current.year, map.getZoom()) })
       map.addLayer({
         id: 'pt', type: 'circle', source: 'schools',
         paint: {
@@ -252,7 +235,13 @@ export default function MapView({
       })
       map.on('mouseleave', 'cand', () => { map.getCanvas().style.cursor = ''; popup.remove() })
       setReady(true)
-      map.getSource('schools').setData(toGeoJSON(schools, projRef.current.projFn, projRef.current.year))
+      map.getSource('schools').setData(toGeoJSON(schools, projRef.current.projFn, projRef.current.year, map.getZoom()))
+
+      // Pixelkonstant spridning: baka om punkterna när zoomnivån ändrats
+      map.on('zoomend', () => {
+        const p = projRef.current
+        map.getSource('schools')?.setData(toGeoJSON(schoolsRef.current, p.projFn, p.year, map.getZoom()))
+      })
 
       // Ladda områdespolygoner (primärområde) en gång
       fetch(`${import.meta.env.BASE_URL}geo/mellanomraden.geojson`)
@@ -272,7 +261,7 @@ export default function MapView({
   // Uppdatera punkter när filter, scenario eller horisont ändras
   useEffect(() => {
     if (ready && mapRef.current.getSource('schools')) {
-      mapRef.current.getSource('schools').setData(toGeoJSON(schools, projFn, year))
+      mapRef.current.getSource('schools').setData(toGeoJSON(schools, projFn, year, mapRef.current.getZoom()))
     }
   }, [ready, schools, projFn, year])
 
