@@ -26,6 +26,10 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      # Projektfilen → projekt.json: uppdaterad CSV i repot publiceras automatiskt.
+      # Valideringen stoppar deployen om filen är trasig (radnummer i loggen).
+      - name: Bygg projektdata ur projektfilen
+        run: python3 scripts/build_projekt.py data/projektfil_mall.csv
       - run: npm test
       - run: npm run build
       - uses: actions/upload-pages-artifact@v3

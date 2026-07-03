@@ -1,5 +1,17 @@
 # Projektfil — format för fastighets kommande projekt
 
+## Så uppdaterar du projekten i appen (inget lokalt verktyg behövs)
+
+1. Redigera projekten i Excel som vanligt, **Spara som → CSV** i det här formatet.
+2. Ersätt `data/projektfil_mall.csv` i repot — enklast via GitHubs webbgränssnitt
+   (öppna filen → pennikonen/"Upload files" → commit).
+3. Klart. Deployen bygger, **validerar** och publicerar automatiskt. Är filen
+   trasig stoppas publiceringen och felen (med radnummer) syns i Actions-loggen
+   — den gamla versionen ligger kvar tills felet är rättat.
+
+Lokalt utvecklingsflöde: `python scripts/build_projekt.py` och committa
+`projekt.json` som vanligt.
+
 Mall: [`projektfil_mall.csv`](projektfil_mall.csv) (semikolonseparerad — sparas
 direkt ur svensk Excel med "Spara som → CSV").
 
