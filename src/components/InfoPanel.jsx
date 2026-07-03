@@ -45,7 +45,45 @@ function Origins({ school }) {
   )
 }
 
-export default function InfoPanel({ school, onClose, onOpenBuilding, whatifClosed, onWhatIfClose }) {
+// Konsekvensruta när skolan är stängd i what-if: det viktigaste, destillerat.
+// Samma siffror som what-if-kortet i Översikt — se lib/whatif.js.
+function WhatIfSummary({ school, whatif }) {
+  const c = whatif?.closures.find((x) => x.school.id === school.id)
+  if (!c) return null
+  const eq = whatif.equity?.perClosure.get(school.id)
+  const placed = c.reassign.reduce((t, r) => t + r.n, 0)
+  const unplaced = c.students - placed
+  const top = c.reassign.slice().sort((a, b) => b.n - a.n).slice(0, 3)
+  return (
+    <div className="p-wisum">
+      <b>Om {school.namn} stängs</b>
+      <ul>
+        <li>
+          <b>{c.students}</b> elever flyttas —{' '}
+          {unplaced > 0
+            ? <b style={{ color: '#dc2626' }}>{unplaced} får inte plats inom närhetsnormen</b>
+            : <span style={{ color: '#15803d' }}>alla får plats inom närhetsnormen</span>}
+        </li>
+        {top.length > 0 && (
+          <li>Främst till {top.map((r) => `${r.namn} (${r.n})`).join(', ')}
+            {c.reassign.length > 3 ? ` + ${c.reassign.length - 3} skolor till` : ''}</li>
+        )}
+        {eq && (
+          <li>Elevernas resväg i snitt {eq.kmBefore} →{' '}
+            <b style={{ color: eq.kmAfter > eq.kmBefore ? '#dc2626' : '#15803d' }}>{eq.kmAfter} km</b>
+            {' '}· längsta flytt mellan skolorna {c.maxKm} km</li>
+        )}
+        <li>Frigör <b>{(c.savedKr / 1e6).toFixed(1)} Mkr/år</b> hyra
+          {c.avoidedDebt ? <> · undviker {Math.round(c.avoidedDebt)} Mkr underhållsskuld</> : null}</li>
+      </ul>
+      <div className="p-wisum-foot">
+        Detaljer i Översikt → What-if · <span className="mockflag">exempeldata · fågelväg</span>
+      </div>
+    </div>
+  )
+}
+
+export default function InfoPanel({ school, onClose, onOpenBuilding, whatifClosed, onWhatIfClose, whatif }) {
   const isClosed = school && whatifClosed?.has(school.id)
   const komm = school && school.huvudman === 'Kommunal'
   const origin = school ? SCHOOL_ORIGINS[school.id] : null
@@ -74,6 +112,7 @@ export default function InfoPanel({ school, onClose, onOpenBuilding, whatifClose
                 {isClosed ? 'Ångra what-if-stängning' : 'Stäng i what-if — vad händer?'}
               </button>
             )}
+            {isClosed && <WhatIfSummary school={school} whatif={whatif} />}
             <Field label="Stadsområde" value={school.stadsomrade} />
             <Field label="Mellanområde" value={school.mellanomrade} />
             <Field label="Skolform" value={school.skolform} />

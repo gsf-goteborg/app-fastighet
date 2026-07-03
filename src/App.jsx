@@ -170,7 +170,7 @@ export default function App() {
 
         <InfoPanel school={selected} onClose={() => setSelectedId(null)}
           onOpenBuilding={(id) => { setByggId(id); setView('bygg'); setSelectedId(null) }}
-          whatifClosed={whatif.closedIds} onWhatIfClose={toggleClose} />
+          whatifClosed={whatif.closedIds} onWhatIfClose={toggleClose} whatif={whatif} />
       </main>
     </div>
   )
