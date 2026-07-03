@@ -54,6 +54,11 @@ export default function WhatIfBar({ actions, whatif, onRemove, onReset, onAddBar
           {whatif.movedStudents > 0 && <span>{whatif.movedStudents} elever flyttas</span>}
           {eq && <span>likvärdighet <b className={dEq > 0.05 ? 'neg' : 'pos'}>{dEq >= 0 ? '+' : ''}{dEq.toFixed(1)} p.e.</b></span>}
           {whatif.builtCap > 0 && <span>+{whatif.builtCap} platser</span>}
+          {whatif.projektHyraTkr !== 0 && (
+            <span>Δhyra <b className={whatif.projektHyraTkr > 0 ? 'neg' : 'pos'}>
+              {whatif.projektHyraTkr > 0 ? '+' : ''}{(whatif.projektHyraTkr / 1000).toFixed(1)} Mkr/år
+            </b></span>
+          )}
           {whatif.barnTotal > 0 && <span>+{whatif.barnTotal} elever (prognos)</span>}
           {whatif.unplaced > 0 && <b className="neg">⚠ {whatif.unplaced} elever får inte plats inom normen</b>}
         </span>

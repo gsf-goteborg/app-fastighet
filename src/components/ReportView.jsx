@@ -2,6 +2,7 @@ import { createPortal } from 'react-dom'
 import { RENOV } from '../lib/constants'
 import { MILP_MAX_SCHOOLS } from '../lib/optimizer'
 import { actionLabel } from '../lib/whatif'
+import { beslutadeDeltaTotalt } from '../data/projekt'
 import { SCHOOLS, BASE_YEAR } from '../data/schools'
 
 /* Utskriftsvänligt "underlag för diskussion" — spårbarhet enligt vision.md:
@@ -17,6 +18,7 @@ const DATA_STATUS = [
   ['Elevhärkomst & resvägar', 'Exempelmodell (gravitationsmodell, fågelväg × schablon)', 'test'],
   ['Skolval & fristående-avhopp', 'Exempelmodell (avståndsmock)', 'test'],
   ['Byggnadsår, skick, BTA, underhållsskuld, energiklass', 'SYNTETISKT — driver stäng-rankningen', 'synth'],
+  ['Kommande projekt (kapacitet/hyra)', 'Exempeldata (projektfil-mall) — byts mot fastighets skarpa fil', 'test'],
   ['Avstånd i radievillkoret', 'Fågelväg byggnad→byggnad (ej vägnät — fel över Göta älv)', 'synth'],
 ]
 
@@ -51,6 +53,14 @@ export default function ReportView({ onClose, ctx }) {
               <tr><td>Reservmarginal per stadsområde × stadie</td><td><b>{reserve} %</b></td></tr>
               <tr><td>Urval</td><td><b>{schools.length}</b> av {SCHOOLS.length} skolenheter (aktiva filter i verktyget)</td></tr>
               <tr><td>Lösare</td><td>{plan.optimal ? 'MILP — optimal för valt urval' : `girig heuristik (urval > ${MILP_MAX_SCHOOLS} skolor) — ej bevisat optimal`}</td></tr>
+              {(() => {
+                const t = beslutadeDeltaTotalt(year)
+                return (
+                  <tr><td>Beslutade projekt inräknade (gap-analysen)</td>
+                    <td><b>{t.n}</b> st · {t.total >= 0 ? '+' : ''}{t.total.toLocaleString('sv')} platser ·
+                      hyresförändring {t.hyraTkr >= 0 ? '+' : ''}{(t.hyraTkr / 1000).toFixed(1)} Mkr/år vid {year}</td></tr>
+                )
+              })()}
             </tbody>
           </table>
         </section>

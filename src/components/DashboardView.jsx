@@ -6,8 +6,10 @@ import { equityOfPlan } from '../lib/likvardighet'
 import { choiceRedistribution } from '../lib/skolval'
 import { friAttrition } from '../data/fristaende'
 import { SCHOOL_ORIGINS } from '../data/origins'
+import { beslutadeDeltaPerOmrade } from '../data/projekt'
 import ReportView from './ReportView'
 import NatplanCard from './NatplanCard'
+import ProjektCard from './ProjektCard'
 
 // Restidsklasser (km) för tillgänglighetsfördelning
 const TRAVEL_BINS = [[0, 1], [1, 2], [2, 4], [4, 6], [6, Infinity]]
@@ -29,7 +31,7 @@ export default function DashboardView({
   scenario, setScenario, customRate, setCustomRate, year, setYear,
   radii, setRadii, reserve, setReserve, rate, years, projFn, plan, robustness,
   horizon, setHorizon, // kort = nästa läsår, lang = 5–25 år (lyft till App så flikbyte inte nollställer)
-  whatif,
+  whatif, toggleProjekt,
 }) {
   const setRadius = (st, v) => setRadii({ ...radii, [st]: Math.max(0.5, +v || radii[st]) })
 
@@ -105,16 +107,19 @@ export default function DashboardView({
       ['≈ lärartjänster', teachers(spilldProj) + '  st'],
     ]
 
+    // Beslutade projekt (projektfilen) ingår i baslägets kapacitet vid horisonten
+    const projOmr = beslutadeDeltaPerOmrade(year)
     const rows = AREAS.map((a) => {
       const g = schools.filter((s) => s.stadsomrade === a)
       const c = sum(g, 'pedKapacitet')
       const risk = atRisk ? sum(g.filter((s) => s.renovbehov === 5), 'pedKapacitet') : 0
-      const cEff = c - risk
+      const projAdd = projOmr[a]?.total || 0
+      const cEff = c - risk + projAdd
       const e = sum(g, 'elever')
       const proj = g.reduce((t, s) => t + pe(s), 0)
       const gap = proj - cEff // positiv = brist, negativ = överskott
       const units = Math.round(gap / refSize)
-      return { a, n: g.length, c, cEff, risk, e, proj, gap, units, belProj: cEff ? Math.round((proj / cEff) * 100) : 0 }
+      return { a, n: g.length, c, cEff, risk, projAdd, e, proj, gap, units, belProj: cEff ? Math.round((proj / cEff) * 100) : 0 }
     })
     const totGap = rows.reduce((t, r) => t + r.gap, 0)
     const totUnits = rows.reduce((t, r) => t + r.units, 0)
@@ -528,7 +533,11 @@ export default function DashboardView({
               <tr key={r.a}>
                 <td><b>{r.a}</b></td>
                 <td>{r.n}</td>
-                <td>{r.c.toLocaleString('sv')}{r.risk ? <span style={{ color: '#dc2626' }}> (−{r.risk} risk)</span> : null}</td>
+                <td>
+                  {r.c.toLocaleString('sv')}
+                  {r.risk ? <span style={{ color: '#dc2626' }}> (−{r.risk} risk)</span> : null}
+                  {r.projAdd ? <span style={{ color: '#16a34a' }}> ({r.projAdd > 0 ? '+' : ''}{r.projAdd} projekt)</span> : null}
+                </td>
                 <td>{r.e.toLocaleString('sv')}</td>
                 <td>{r.proj.toLocaleString('sv')}</td>
                 <td style={{ color: occColor(r.belProj) }}>{r.belProj}%</td>
@@ -832,6 +841,8 @@ export default function DashboardView({
           )}
         </div>
       </div>
+
+      <ProjektCard year={year} whatif={whatif} toggleProjekt={toggleProjekt} />
 
       <NatplanCard year={year} />
 

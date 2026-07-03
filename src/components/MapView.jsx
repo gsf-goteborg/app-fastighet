@@ -5,8 +5,22 @@ import { BEFOLKNING } from '../data/prognos'
 import { BASE_YEAR } from '../data/schools'
 import { planFlowsGeoJSON, planClosedGeoJSON } from '../lib/skolval'
 import { spreadPositions } from '../lib/geo'
+import { PROJEKT } from '../data/projekt'
 import CANDIDATES from '../data/generated/candidates.json'
 import NATPLAN from '../data/generated/natplan.json'
+
+// Fastighets kommande projekt (statisk källa; status styr färgen)
+const PROJEKT_FC = {
+  type: 'FeatureCollection',
+  features: PROJEKT.map((p) => ({
+    type: 'Feature',
+    geometry: { type: 'Point', coordinates: [p.lng, p.lat] },
+    properties: {
+      namn: p.objekt, atgard: p.atgard, status: p.status, klart: p.klartKvartal,
+      platser: p.delta.lag + p.delta.mellan + p.delta.hog, kommentar: p.kommentar,
+    },
+  })),
+}
 
 // Framtida skolnät (spopt-batch): närmaste beräknade horisont + geojson
 const NAT_HOR = Object.keys(NATPLAN.horisonter).map(Number)
@@ -93,6 +107,7 @@ export default function MapView({
   const [showAreas, setShowAreas] = useState(false)
   const [showCand, setShowCand] = useState(false)
   const [showNat, setShowNat] = useState(false)
+  const [showProj, setShowProj] = useState(false)
 
   const containerRef = useRef(null)
   const mapRef = useRef(null)
@@ -187,6 +202,30 @@ export default function MapView({
           .addTo(map)
       })
       map.on('mouseleave', 'natplan', () => natPopup.remove())
+
+      // Fastighets kommande projekt (projektfilen), av som standard
+      map.addSource('projekt', { type: 'geojson', data: PROJEKT_FC })
+      map.addLayer({
+        id: 'projekt', type: 'circle', source: 'projekt',
+        layout: { visibility: 'none' },
+        paint: {
+          'circle-radius': ['interpolate', ['linear'], ['zoom'], 10, 7, 14, 13],
+          'circle-color': ['match', ['get', 'status'], 'beslutad', '#16a34a', 'planerad', '#f47815', '#94a3b8'],
+          'circle-stroke-width': 2.5,
+          'circle-stroke-color': '#fff',
+          'circle-opacity': 0.9,
+        },
+      })
+      const projPopup = new maplibregl.Popup({ closeButton: false, offset: 12 })
+      map.on('mouseenter', 'projekt', (e) => {
+        const p = e.features[0].properties
+        projPopup.setLngLat(e.lngLat).setHTML(
+          `<b>${p.namn}</b><br>${p.atgard} · ${p.status} · klart ${p.klart}`
+          + `<br>${p.platser >= 0 ? '+' : ''}${p.platser} platser`
+          + (p.kommentar ? `<br><span style="color:#64748b">${p.kommentar}</span>` : ''),
+        ).addTo(map)
+      })
+      map.on('mouseleave', 'projekt', () => projPopup.remove())
 
       // What-if-lager: användarens stängningar/byggen — alltid synliga när
       // åtgärder finns (data + synlighet sätts i effekten nedan)
@@ -324,6 +363,13 @@ export default function MapView({
     mapRef.current.getLayer('cand') &&
       mapRef.current.setLayoutProperty('cand', 'visibility', showCand ? 'visible' : 'none')
   }, [ready, showCand])
+
+  // Slå på/av projektlagret
+  useEffect(() => {
+    if (!ready) return
+    mapRef.current.getLayer('projekt') &&
+      mapRef.current.setLayoutProperty('projekt', 'visibility', showProj ? 'visible' : 'none')
+  }, [ready, showProj])
 
   // Framtida nät-lagret: ersätter skolpunkterna medan det är på (annars dubbla prickar)
   useEffect(() => {
@@ -482,6 +528,20 @@ export default function MapView({
                 : 'Inga stängningar i planen vid vald horisont/scenario — justera under Översikt (t.ex. längre horisont eller minskande elevtal).'}
               {' '}<span className="mockflag">exempelmodell</span>
             </div>
+          </div>
+        )}
+
+        <label className="mapctl-check">
+          <input type="checkbox" checked={showProj} onChange={(e) => setShowProj(e.target.checked)} />
+          Kommande projekt ({PROJEKT.length})
+        </label>
+        {showProj && (
+          <div className="legend">
+            <div className="row"><span className="dot" style={{ background: '#16a34a' }} />Beslutad</div>
+            <div className="row"><span className="dot" style={{ background: '#f47815' }} />Planerad</div>
+            <div className="row"><span className="dot" style={{ background: '#94a3b8' }} />Utredning</div>
+            <div className="legend-note">Fastighets projektfil — hovra för detaljer.
+              Beslutade ingår i baslägets kapacitet (Översikt). <span className="mockflag">exempel</span></div>
           </div>
         )}
 

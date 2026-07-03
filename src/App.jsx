@@ -54,6 +54,10 @@ export default function App() {
     a.some((x) => x.typ === 'bygg' && x.siteId === siteId)
       ? a.filter((x) => !(x.typ === 'bygg' && x.siteId === siteId))
       : [...a, { typ: 'bygg', siteId }])
+  const toggleProjekt = (projektId) => setActions((a) =>
+    a.some((x) => x.typ === 'projekt' && x.projektId === projektId)
+      ? a.filter((x) => !(x.typ === 'projekt' && x.projektId === projektId))
+      : [...a, { typ: 'projekt', projektId }])
 
   // Befolkningsbaserad framskrivning byggs en gång över hela skolbeståndet
   // (demografin är oberoende av filtret). Scenariot "Befolkningsprognos"
@@ -103,7 +107,7 @@ export default function App() {
   const planState = {
     scenario, setScenario, customRate, setCustomRate, year, setYear,
     radii, setRadii, reserve, setReserve, rate, years, projFn, plan, robustness,
-    horizon, setHorizon, whatif,
+    horizon, setHorizon, whatif, toggleProjekt,
   }
 
   return (

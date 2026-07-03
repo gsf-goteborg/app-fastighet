@@ -83,7 +83,16 @@ vara oberoende kan en egen tile-källa/MapTiler-nyckel pekas in i `MapView.jsx`.
     vyer läser (karta, gap, plan). Scenarioraden visar diff mot basläget (hyra,
     flyttade elever, likvärdighet, ej placerade); eget kort i Översikt och sektion
     i rapporten. Vad som saknas: sparade/namngivna scenarier och A/B-jämförelse.
-13. **Framtida skolnät — normativ nätdesign med spopt (Fas 1)** — svarar på "var BORDE
+13. **Kommande projekt (fastighets projektfil)** — `scripts/build_projekt.py` läser
+    `data/projektfil_mall.csv` (format: `data/projektfil_README.md`), validerar och
+    skriver `projekt.json`. **Beslutade** projekt ingår i baslägets kapacitetsbild:
+    gap-tabellen i Långsiktig justeras per stadsområde vid vald horisont (paviljonger
+    räknas bort efter slutkvartal); rapportens antaganden redovisar vad som räknats in.
+    **Planerade/utredningar** kan prövas i what-if ("Pröva i what-if" i projektkortet:
+    avveckling → stängning, tillbyggnad/nybyggnad → mottagarkapacitet + hyresdelta).
+    Kartlager "Kommande projekt" färgat efter status. Kvarstår: projekten in i
+    lokalekonomikortet, optimeringen och spopt-nätdesignen; byt mallen mot skarpt uttag.
+14. **Framtida skolnät — normativ nätdesign med spopt (Fas 1)** — svarar på "var BORDE
     skolorna ligga?" i stället för konsolideringens "vilka kan stängas?". Batch:
     `python scripts/build_natplan.py` (kräver `pip install -r backend/requirements.txt`)
     kör per horisont (2030/2040/2050) × stadie: LSCP-golv (spopt), minsta genomförbara
@@ -111,7 +120,7 @@ vara oberoende kan en egen tile-källa/MapTiler-nyckel pekas in i `MapView.jsx`.
 | Områdesgeometri (stads-/mellan-/primär-/basområde) | `public/geo/*.geojson` | klar (officiell indelning, EPSG:4326) |
 | Byggnadsmodeller rumsnivå (3D-vyn) | `src/data/byggnad.js` (`BUILDING_MODELS`) | syntetisk exempelmodell — fylls av lasermätning |
 | Framtida skolnät (spopt-batch) | `scripts/build_natplan.py` → `src/data/generated/natplan.json` | Fas 1-prototyp — schablonavstånd, byts mot vägnät |
-| Fastighets projektfil (kommande projekt) | mall + format: `data/projektfil_mall.csv` + `data/projektfil_README.md` | format klart — väntar på skarp fil; sedan build_data-steg + "Beslutade projekt"-lager |
+| Fastighets projektfil (kommande projekt) | `data/projektfil_mall.csv` → `scripts/build_projekt.py` → `src/data/generated/projekt.json` → `src/data/projekt.js` | exempeldata — byt CSV mot skarpt uttag och kör om skriptet |
 
 Motorerna och komponenterna är oförändrade vid databyte — bara datafilerna byts.
 

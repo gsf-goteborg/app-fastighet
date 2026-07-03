@@ -1,6 +1,7 @@
 import { SCHOOLS } from '../data/schools'
 import { AREA_INTAKE } from '../data/origins'
 import { STAGE_KEYS } from '../data/prognos'
+import { PROJEKT } from '../data/projekt'
 import { haversineKm } from './geo'
 import { equityOfPlan } from './likvardighet'
 import CANDIDATES from '../data/generated/candidates.json'
@@ -8,10 +9,13 @@ import CANDIDATES from '../data/generated/candidates.json'
 /* ===========================================================================
    WHAT-IF — användarens eget scenario, till skillnad från optimeringens förslag.
 
-   Åtgärdslista (App-state), tre åtgärdstyper:
-     { typ: 'stang', schoolId }              — stäng en skola
-     { typ: 'bygg',  siteId }                — bygg en kandidatsite
-     { typ: 'barn',  omrade, antal, franAr } — exploatering: fler barn i område
+   Åtgärdslista (App-state), fyra åtgärdstyper:
+     { typ: 'stang',   schoolId }              — stäng en skola
+     { typ: 'bygg',    siteId }                — bygg en kandidatsite
+     { typ: 'barn',    omrade, antal, franAr } — exploatering: fler barn i område
+     { typ: 'projekt', projektId }             — pröva ett EJ beslutat projekt ur
+                                                 projektfilen (avveckling → stängning,
+                                                 tillbyggnad/nybyggnad → mottagarkapacitet)
 
    buildWhatIf() räknar konsekvenserna med samma motorer som planen:
    dagens elever på stängda skolor omfördelas kapacitetsmedvetet per stadie
@@ -25,6 +29,7 @@ import CANDIDATES from '../data/generated/candidates.json'
 =========================================================================== */
 
 export const CANDIDATES_BY_ID = new Map(CANDIDATES.map((c) => [c.id, c]))
+export const PROJEKT_BY_ID = new Map(PROJEKT.map((p) => [p.projektId, p]))
 
 // Kandidatsite → pseudo-skola (mottagare i omflyttningen). Kapaciteten delas
 // grade-viktat över sitens stadier (F–3 = 4 årskurser, 4–6/7–9 = 3).
@@ -88,9 +93,28 @@ export function buildWhatIf(actions, radii) {
   const closedIds = actions.filter((a) => a.typ === 'stang').map((a) => a.schoolId)
   const builtIds = actions.filter((a) => a.typ === 'bygg').map((a) => a.siteId)
   const barn = actions.filter((a) => a.typ === 'barn')
+  const projekt = actions.filter((a) => a.typ === 'projekt')
+    .map((a) => PROJEKT_BY_ID.get(a.projektId)).filter(Boolean)
+
+  // Projekt-avveckling av en befintlig enhet = stängning i scenariot
+  for (const p of projekt) {
+    if (p.atgard === 'avveckling' && p.enhetId != null && !closedIds.includes(p.enhetId)) {
+      closedIds.push(p.enhetId)
+    }
+  }
   const closedSet = new Set(closedIds)
 
   const built = builtIds.map((id) => candidateAsSchool(CANDIDATES_BY_ID.get(id))).filter(Boolean)
+  // Projekt med kapacitetstillskott blir extra mottagarkapacitet: på enheten
+  // om projektet hör till en, annars som nytt läge på projektets koordinat.
+  const projektReceivers = projekt
+    .filter((p) => p.atgard !== 'avveckling')
+    .map((p) => ({
+      s: p.enhetId != null
+        ? SCHOOLS[p.enhetId]
+        : { id: p.projektId, namn: p.objekt, lat: p.lat, lng: p.lng },
+      spare: Object.fromEntries(STAGE_KEYS.map((st) => [st, Math.max(0, p.delta[st])])),
+    }))
   const receivers = [
     ...SCHOOLS
       .filter((s) => s.ordinarieGrundskola && !closedSet.has(s.id))
@@ -99,6 +123,7 @@ export function buildWhatIf(actions, radii) {
         spare: Object.fromEntries(STAGE_KEYS.map((st) => [st, Math.max(0, s.stageKap[st] - s.stageElever[st])])),
       })),
     ...built.map((s) => ({ s, spare: { ...s.stageKap } })),
+    ...projektReceivers,
   ]
 
   const { closures, extraLoad, unplaced } = reassignAll(closedIds.map((id) => SCHOOLS[id]), receivers, radii)
@@ -113,15 +138,24 @@ export function buildWhatIf(actions, radii) {
     })
     .sort((a, b) => b.belaggAfter - a.belaggAfter)
 
+  // Hyresdelta för prövade projekt. Avvecklingar räknas INTE här — stängningen
+  // frigör redan hela årshyran via savedKr (annars dubbelräkning).
+  const projektHyraTkr = projekt
+    .filter((p) => p.atgard !== 'avveckling')
+    .reduce((t, p) => t + p.deltaHyraTkr, 0)
+
   return {
     actions, closures, built, barn, unplaced, equity, receiverLoad,
     closedIds: closedSet,
     builtIds: new Set(builtIds),
+    projektIds: new Set(projekt.map((p) => p.projektId)),
     savedKr: closures.reduce((t, c) => t + c.savedKr, 0),
     avoidedDebt: closures.reduce((t, c) => t + c.avoidedDebt, 0),
     movedStudents: closures.reduce((t, c) => t + c.students, 0),
-    builtCap: built.reduce((t, s) => t + s.pedKapacitet, 0),
+    builtCap: built.reduce((t, s) => t + s.pedKapacitet, 0)
+      + projektReceivers.reduce((t, r) => t + STAGE_KEYS.reduce((x, st) => x + r.spare[st], 0), 0),
     barnTotal: barn.reduce((t, a) => t + a.antal, 0),
+    projektHyraTkr,
   }
 }
 
@@ -157,6 +191,10 @@ export function actionLabel(a) {
   if (a.typ === 'bygg') {
     const c = CANDIDATES_BY_ID.get(a.siteId)
     return `Bygg ${c.name} (${c.proposedCapacity} pl)`
+  }
+  if (a.typ === 'projekt') {
+    const p = PROJEKT_BY_ID.get(a.projektId)
+    return `Pröva ${p.atgard} ${p.objekt} (${p.projektId})`
   }
   return `+${a.antal} barn ${a.omrade} från ${a.franAr}`
 }
