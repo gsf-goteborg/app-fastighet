@@ -108,6 +108,7 @@ export default function MapView({
   const [showCand, setShowCand] = useState(false)
   const [showNat, setShowNat] = useState(false)
   const [showProj, setShowProj] = useState(false)
+  const [hideSchools, setHideSchools] = useState(false) // fokus på överlagren (projekt/siter)
 
   const containerRef = useRef(null)
   const mapRef = useRef(null)
@@ -371,15 +372,23 @@ export default function MapView({
       mapRef.current.setLayoutProperty('projekt', 'visibility', showProj ? 'visible' : 'none')
   }, [ready, showProj])
 
-  // Framtida nät-lagret: ersätter skolpunkterna medan det är på (annars dubbla prickar)
+  // Framtida nät-lagret (ersätter skolpunkterna medan det är på — annars dubbla prickar)
   useEffect(() => {
     if (!ready) return
     const map = mapRef.current
     if (!map.getLayer('natplan')) return
     if (showNat) map.getSource('natplan').setData(natplanGeoJSON(year))
     map.setLayoutProperty('natplan', 'visibility', showNat ? 'visible' : 'none')
-    map.getLayer('pt') && map.setLayoutProperty('pt', 'visibility', showNat ? 'none' : 'visible')
   }, [ready, showNat, year])
+
+  // Skolpunkternas synlighet: döljs av "Dölj skolpunkter" (fokus på projekt/
+  // siter/what-if) och medan Framtida nät-lagret ersätter dem
+  useEffect(() => {
+    if (!ready) return
+    const map = mapRef.current
+    map.getLayer('pt') &&
+      map.setLayoutProperty('pt', 'visibility', showNat || hideSchools ? 'none' : 'visible')
+  }, [ready, showNat, hideSchools])
 
   // What-if-lagret: alltid på när åtgärder finns (tom data = osynligt)
   const EMPTY_FC = { type: 'FeatureCollection', features: [] }
@@ -463,6 +472,15 @@ export default function MapView({
         </div>
         {theme === 'forandring' && (
           <div className="legend-note">Prognos till {year} · år och scenario väljs under Översikt</div>
+        )}
+
+        <label className="mapctl-check">
+          <input type="checkbox" checked={hideSchools} onChange={(e) => setHideSchools(e.target.checked)} />
+          Dölj skolpunkter
+        </label>
+        {hideSchools && (
+          <div className="legend-note">Skolorna är dolda — bra för att se projekt,
+            kandidatsiter eller what-if-lager mot bakgrundskartan.</div>
         )}
 
         <label className="mapctl-check">
