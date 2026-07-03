@@ -130,6 +130,8 @@ export default function App() {
           ))}
         </div>
         <span className="badge">⚠︎ Showcase · exempeldata</span>
+        <a className="guide-link" href="guide.html" target="_blank" rel="noreferrer"
+          title="Öppna användarguiden i ny flik">? Guide</a>
       </header>
 
       <WhatIfBar

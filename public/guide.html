@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Användarguide — Skolportfölj Göteborg</title>
+<style>
+  :root {
+    --gbg-blue:#005293; --gbg-blue-dark:#00395f; --gbg-blue-light:#82bbdb;
+    --gbg-green:#6a9a1f; --gbg-green-light:#9ec038;
+    --gbg-purple:#7f3f98; --gbg-orange:#f47815;
+    --gbg-red:#e8364a; --gbg-yellow:#fbc46d; --gbg-yellow-light:#fee7b8;
+    --ink:#0f172a; --muted:#64748b; --line:#e2e8f0; --bg:#f6f8fa;
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; color:var(--ink); background:var(--bg); line-height:1.6; }
+  header { background:var(--gbg-blue); color:#fff; padding:28px 20px; }
+  header .inner { max-width:820px; margin:0 auto; }
+  header h1 { margin:0; font-size:26px; letter-spacing:-.01em; }
+  header p { margin:6px 0 0; color:#fff; opacity:.95; font-size:15px; }
+  main { max-width:820px; margin:0 auto; padding:24px 20px 60px; }
+  .varning { background:var(--gbg-yellow-light); border:1px solid var(--gbg-yellow); border-radius:10px; padding:14px 16px; font-size:14px; color:#000; margin:0 0 26px; }
+  h2 { font-size:20px; margin:38px 0 10px; padding-bottom:6px; border-bottom:2px solid var(--gbg-blue); }
+  h3 { font-size:15px; margin:22px 0 6px; }
+  p, li { font-size:14.5px; }
+  .kort { background:#fff; border:1px solid var(--line); border-radius:12px; padding:16px 20px; margin:14px 0; }
+  .flik { display:inline-block; background:var(--gbg-blue); color:#fff; font-weight:700; font-size:13px; padding:3px 12px; border-radius:8px; }
+  .knapp { display:inline-block; background:#fff; border:1px solid var(--line); font-weight:600; font-size:12.5px; padding:2px 9px; border-radius:8px; white-space:nowrap; }
+  .flagga { display:inline-block; font-size:11px; font-weight:700; text-transform:uppercase; padding:1px 7px; border-radius:5px; }
+  .flagga.exempel { background:var(--gbg-yellow-light); color:#000; border:1px solid var(--gbg-yellow); }
+  .flagga.syntetiskt { background:#fee2e2; color:#000; border:1px solid var(--gbg-red); }
+  .prick { display:inline-block; width:11px; height:11px; border-radius:50%; vertical-align:middle; margin-right:2px; border:2px solid #fff; box-shadow:0 0 0 1px rgba(0,0,0,.15); }
+  ol.prova { counter-reset:steg; list-style:none; padding:0; }
+  ol.prova li { counter-increment:steg; position:relative; padding:10px 14px 10px 52px; background:#fff; border:1px solid var(--line); border-radius:10px; margin:8px 0; }
+  ol.prova li::before { content:counter(steg); position:absolute; left:14px; top:50%; transform:translateY(-50%); width:26px; height:26px; border-radius:50%; background:var(--gbg-blue); color:#fff; font-weight:700; font-size:13px; display:flex; align-items:center; justify-content:center; }
+  table { border-collapse:collapse; width:100%; font-size:13.5px; background:#fff; border:1px solid var(--line); border-radius:10px; overflow:hidden; }
+  th { background:var(--gbg-blue); color:#fff; text-align:left; padding:8px 12px; font-size:12px; }
+  td { padding:8px 12px; border-top:1px solid var(--line); vertical-align:top; }
+  .tips { border-left:4px solid var(--gbg-purple); background:#fff; padding:10px 14px; border-radius:0 10px 10px 0; margin:12px 0; font-size:13.5px; }
+  footer { max-width:820px; margin:0 auto; padding:0 20px 40px; color:var(--muted); font-size:12.5px; }
+  a { color:var(--gbg-blue); }
+</style>
+</head>
+<body>
+<header>
+  <div class="inner">
+    <h1>Skolportfölj Göteborg — användarguide</h1>
+    <p>Planeringsverktyg för fastighetsavdelningen: skolor, elevprognoser och lokalbestånd i samma bild.</p>
+  </div>
+</header>
+<main>
+
+<div class="varning">
+  ⚠︎ <b>Allt i verktyget är exempeldata.</b> Siffrorna visar <i>hur verktyget fungerar</i>, inte hur verkligheten ser ut.
+  Använd det för att utvärdera arbetssättet — inte som underlag för beslut. Mer om märkningen längst ner i guiden.
+</div>
+
+<h2>Vad är verktyget?</h2>
+<p>
+  Appen samlar Göteborgs kommunala grundskolor på en karta och kopplar ihop dem med elevprognoser,
+  kapacitet, lokalkostnader och kommande projekt. Den hjälper dig svara på två olika sorters frågor:
+</p>
+<div class="kort">
+  <b>Kortsiktigt:</b> Får alla nya elever plats nästa läsår? Hur många klasser behöver öppnas eller stängas?<br>
+  <b>Långsiktigt (5–25 år):</b> Var växer och krymper elevunderlaget? Vilka skolor bör byggas ut, rustas eller avvecklas — och vad betyder det för elevernas resvägar och för ekonomin?
+</div>
+
+<h2>Så hittar du runt</h2>
+<p>Appen har fyra flikar i sidhuvudet. Till vänster finns <b>filter och sök</b> som påverkar alla flikar samtidigt — skriv några bokstäver i sökrutan så får du förslag direkt, och klicka på ett förslag för att öppna skolan.</p>
+<p>Klickar du på en skola (i kartan, tabellen eller sökningen) öppnas en <b>informationspanel</b> med skolans alla uppgifter — kapacitet, beläggning, elevernas härkomst, byggnadens skick med mera.</p>
+
+<h3><span class="flik">Karta</span></h3>
+<div class="kort">
+  <p>Alla skolor som prickar på kartan. Uppe till vänster väljer du <b>färgläggning</b> — till exempel prognostiserad elevförändring (grönt växer, rött krymper), byggnadens skick eller beläggningsgrad.</p>
+  <p>Under färgvalet finns <b>lager</b> du kan tända och släcka:</p>
+  <ul>
+    <li><b>Dölj skolpunkter</b> — rensa kartan för att se lagren nedan tydligare</li>
+    <li><b>Områdesprognos</b> — färgar stadens mellanområden efter hur barnkullarna väntas förändras</li>
+    <li><b>Framtida nät (optimerat)</b> — datorns förslag på vilket skolnät som räcker vid vald horisont: <span class="prick" style="background:#16a34a"></span>behövs i nätet, <span class="prick" style="background:#4f6f18"></span>föreslaget nytt läge, <span class="prick" style="background:#64748b"></span>behövs inte</li>
+    <li><b>Omfördelning vid stängning</b> — linjer som visar vart eleverna tar vägen om föreslagna skolor stängs</li>
+    <li><b>Kommande projekt</b> — fastighets byggprojekt: <span class="prick" style="background:#16a34a"></span>beslutade, <span class="prick" style="background:#f47815"></span>planerade, <span class="prick" style="background:#94a3b8"></span>utredningar</li>
+    <li><b>Kandidatsiter</b> — tänkbara lägen för nybyggnad och expansion. Klicka på en site för att "bygga" den i ett eget scenario (se What-if nedan)</li>
+  </ul>
+</div>
+
+<h3><span class="flik">Tabell</span></h3>
+<div class="kort">
+  <p>Samma skolor som lista. Klicka på en kolumnrubrik för att sortera, klicka på en rad för detaljer,
+  och använd <span class="knapp">Exportera CSV</span> för att ta med urvalet till Excel.</p>
+</div>
+
+<h3><span class="flik">Översikt</span></h3>
+<div class="kort">
+  <p>Analysvyn. Välj först <b>planeringshorisont</b> högst upp:</p>
+  <p><b>Kortsiktig — nästa läsår.</b> Simulerad intagning per skola (önska skola), förväntat tapp till
+  fristående skolor, och en signal per skola: räcker klasserna eller behöver en öppnas/stängas?</p>
+  <p><b>Långsiktig — 5–25 år.</b> Här väljer du scenario (t.ex. befolkningsprognos eller snabb minskning)
+  och årtal, och får: lokalekonomi (vad tomma platser kostar), kapacitet mot elevprognos per stadsområde,
+  elevernas resvägar, förslag på konsolidering med robusthetstest, kommande projekt och det optimerade
+  framtida skolnätet.</p>
+  <p>Knappen <span class="knapp">Exportera underlag för diskussion</span> skapar en utskriftsvänlig
+  sammanställning av allt ovan — med datum, antaganden och datakällornas status — att ta med till möten.</p>
+</div>
+
+<h3><span class="flik">Byggnad 3D</span></h3>
+<div class="kort">
+  <p>En tredimensionell modell av ett skolhus på rumsnivå (idag en exempelskola). Färglägg rummen efter
+  <b>funktion</b>, <b>skick</b> eller <b>nyttjande</b>, dra isär våningsplanen med sprängskiss-reglaget och
+  klicka på ett rum för detaljer. Visar vad som blir möjligt när lokalerna mäts upp med lasermätare.</p>
+</div>
+
+<h2>What-if — pröva dina egna idéer</h2>
+<div class="kort">
+  <p>Verktygets förslag är en sak — dina hypoteser en annan. Med what-if bygger du ett eget scenario och
+  ser konsekvenserna direkt:</p>
+  <ul>
+    <li><b>Stäng en skola:</b> öppna skolan och tryck <span class="knapp">Stäng i what-if — vad händer?</span>.
+      Du får genast en sammanfattning: hur många elever flyttas, vart de tar vägen, vad som händer med
+      resvägarna och vad som frigörs i hyra.</li>
+    <li><b>Bygg en kandidatsite:</b> tänd lagret Kandidatsiter på kartan och klicka på en site.</li>
+    <li><b>Fler barn i ett område:</b> knappen <span class="knapp">+ barn i område</span> i scenarioraden —
+      t.ex. ett nybyggnadsområde. Prognosen i alla vyer räknas om.</li>
+    <li><b>Pröva ett planerat projekt:</b> i Översiktens projektlista kan projekt som ännu inte är beslutade
+      läggas in i scenariot med ett klick.</li>
+  </ul>
+  <p>Allt du lagt till syns i den <b>lila scenarioraden</b> under sidhuvudet, med en summering av effekten
+  (pengar, elever, resvägar). Ta bort en åtgärd med krysset, eller börja om med <span class="knapp">Återställ</span>.
+  Ditt scenario följer med till kartan, Översikten och rapporten.</p>
+</div>
+
+<h2>Vad betyder märkningen på siffrorna?</h2>
+<table>
+  <tr><th>Märkning</th><th>Betydelse</th></tr>
+  <tr>
+    <td><span class="flagga exempel">exempel</span></td>
+    <td>Testdata eller exempelmodell — rimlig till formen, men inte verklighetens tal.</td>
+  </tr>
+  <tr>
+    <td><span class="flagga syntetiskt">syntetiskt</span></td>
+    <td>Helt påhittad uppgift (t.ex. byggnadsår, skick, underhållsskuld). Visar var riktig data ska in — ska aldrig styra ett beslut.</td>
+  </tr>
+</table>
+<p class="tips">💡 Tumregel: verktyget visar just nu <b>rätt frågor och rätt mekanik</b> med fel siffror.
+När de skarpa datakällorna kopplas in försvinner flaggorna, en källa i taget.</p>
+
+<h2>Prova på fem minuter</h2>
+<ol class="prova">
+  <li>Skriv <b>tre bokstäver</b> i sökrutan och öppna en skola via förslagen. Titta igenom informationspanelen.</li>
+  <li>Gå till <b>Översikt → Långsiktig</b>, välj scenariot <b>Snabb minskning</b> och årtal <b>2050</b>. Se hur gap, konsolideringsförslag och likvärdighet ändras.</li>
+  <li>Tryck på en skola i konsolideringsförslaget och välj <span class="knapp">Stäng i what-if</span>. Läs sammanfattningen.</li>
+  <li>Byt till <b>Karta</b> — din stängning syns med röd ring och flyttlinjer. Tänd lagret <b>Framtida nät (optimerat)</b> och jämför med datorns förslag.</li>
+  <li>Tillbaka i Översikt: tryck <span class="knapp">Exportera underlag för diskussion</span> och se hur ditt scenario följer med i rapporten.</li>
+</ol>
+
+<h2>Vanliga frågor</h2>
+<div class="kort">
+  <p><b>Varför föreslås inga stängningar?</b> Med dagens elevtal är skolorna nära fulla — förslag dyker upp
+  först vid längre horisont eller scenarier med minskande elevtal. Det är korrekt, inte ett fel.</p>
+  <p><b>Varför ligger två prickar bredvid varandra vid samma skola?</b> Skolenheter som delar byggnad
+  (t.ex. grundskola och anpassad grundskola) visas sida vid sida så att båda går att klicka.</p>
+  <p><b>Varför kan vissa skolor inte stängas i what-if?</b> Enheter som delar hus med en annan skola kan
+  inte stängas var för sig — och anpassad grundskola ingår aldrig i konsolidering, dess platser är inte
+  utbytbara mot vanliga grundskoleplatser.</p>
+  <p><b>Kartan är tom/grå?</b> Bakgrundskartan hämtas från internet — kontrollera nätverket och ladda om sidan.</p>
+</div>
+
+</main>
+<footer>
+  Skolportfölj Göteborg · showcase med exempeldata · <a href="./">Till appen</a>
+</footer>
+</body>
+</html>
