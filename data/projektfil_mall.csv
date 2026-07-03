@@ -1,0 +1,7 @@
+projekt_id;objekt;enhet_id;skolform;stadier;atgard;status;klart_kvartal;slut_kvartal;delta_platser_lag;delta_platser_mellan;delta_platser_hog;delta_hyra_tkr_ar;lat;lng;planeringsinriktning;uppdaterad
+P-2026-001;Kvibergsskolan;141;Grundskola;4-6,7-9;tillbyggnad;beslutad;2028Q3;;0;60;90;3400;;;Tillbyggnad hus B två våningar, upphandling klar;2026-06-15
+P-2026-002;Ny skola Frihamnen;;Grundskola;F-3,4-6;nybyggnad;planerad;2031Q3;;240;180;0;12800;57.7080;11.9510;Detaljplan pågår, samordnas med bostadsetapp 2;2026-06-15
+P-2026-003;Lärjeskolan;73;Grundskola;F-3;paviljong;beslutad;2026Q3;2029Q2;56;0;0;950;;;Två moduler under ombyggnad av hus A, avvecklas när etappen är klar;2026-06-15
+P-2026-004;Härlandatjärnskolan;110;Grundskola;F-3,4-6,7-9;renovering;beslutad;2029Q1;;0;0;0;1800;;;Ventilation + stammar, hyresjustering efter åtgärd, evakuering ej beslutad;2026-06-15
+P-2026-005;Frejaskolan;83;Grundskola;F-3,4-6,7-9;avveckling;utredning;2032Q1;;-98;-84;-88;-2000;;;Utredning konsolidering Sydväst, inget beslut;2026-06-15
+P-2026-006;Påvelundsskolan;138;Anpassad grundskola;4-6;tillbyggnad;planerad;2030Q1;;0;24;0;1600;;;Anpassad grundskola två klassrum, behovsprövning pågår;2026-06-15

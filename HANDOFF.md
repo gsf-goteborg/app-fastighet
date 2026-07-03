@@ -111,6 +111,7 @@ vara oberoende kan en egen tile-källa/MapTiler-nyckel pekas in i `MapView.jsx`.
 | Områdesgeometri (stads-/mellan-/primär-/basområde) | `public/geo/*.geojson` | klar (officiell indelning, EPSG:4326) |
 | Byggnadsmodeller rumsnivå (3D-vyn) | `src/data/byggnad.js` (`BUILDING_MODELS`) | syntetisk exempelmodell — fylls av lasermätning |
 | Framtida skolnät (spopt-batch) | `scripts/build_natplan.py` → `src/data/generated/natplan.json` | Fas 1-prototyp — schablonavstånd, byts mot vägnät |
+| Fastighets projektfil (kommande projekt) | mall + format: `data/projektfil_mall.csv` + `data/projektfil_README.md` | format klart — väntar på skarp fil; sedan build_data-steg + "Beslutade projekt"-lager |
 
 Motorerna och komponenterna är oförändrade vid databyte — bara datafilerna byts.
 
