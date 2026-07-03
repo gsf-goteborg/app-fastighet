@@ -234,3 +234,55 @@ tbody tr:hover { background:#f8fafc; cursor:pointer; }
 .search-opt { padding:7px 9px; border-radius:7px; cursor:pointer; font-size:13px; }
 .search-opt.hi { background:var(--bg); }
 .search-opt .sub { font-size:11px; color:var(--muted); margin-top:1px; }
+
+/* =========================================================================
+   Mobil (≤ 800px). Desktopupplevelsen är oförändrad: allt nedan ligger
+   bakom brytpunkten, förutom att de mobila knapparna göms på desktop.
+========================================================================= */
+.filter-toggle { display:none; font-family:inherit; font-size:13px; font-weight:600; border:1px solid var(--line); background:#fff; color:var(--ink); padding:7px 12px; border-radius:9px; cursor:pointer; white-space:nowrap; }
+.side-close { display:none; }
+.side-backdrop { display:none; }
+
+@media (max-width: 800px) {
+  #app { grid-template-columns:1fr; }
+
+  /* Header: brand + varning på rad 1, filterknapp + flikar på rad 2 */
+  header { flex-wrap:wrap; padding:8px 12px; gap:6px 10px; }
+  header .sub { display:none; }
+  header .brand { order:0; }
+  .badge { order:1; margin-left:auto; font-size:10px; padding:3px 7px; }
+  .filter-toggle { display:inline-flex; order:2; }
+  .tabs { order:3; flex:1; min-width:0; margin-left:0; overflow-x:auto; }
+  .tabs button { padding:7px 11px; white-space:nowrap; }
+
+  /* Filterspalten blir en utfällbar låda över innehållet */
+  aside.filters { position:fixed; top:0; bottom:0; left:0; z-index:60; width:min(320px, 86vw); transform:translateX(-105%); transition:transform .25s ease; box-shadow:8px 0 30px rgba(0,0,0,.25); }
+  aside.filters.mobile-open { transform:translateX(0); }
+  .side-backdrop { display:block; position:fixed; inset:0; z-index:55; background:rgba(15,23,42,.45); opacity:0; pointer-events:none; transition:opacity .25s; }
+  .side-backdrop.show { opacity:1; pointer-events:auto; }
+  .side-close { display:block; width:100%; margin-bottom:14px; padding:10px; font-family:inherit; font-size:14px; font-weight:600; color:#fff; background:var(--primary); border:0; border-radius:9px; cursor:pointer; }
+
+  /* Infopanelen blir bottensheet */
+  .panel { top:auto; bottom:0; left:0; right:0; width:100%; max-width:100%; height:auto; max-height:72vh; border-left:0; border-top:1px solid var(--line); border-radius:16px 16px 0 0; transform:translateY(105%); box-shadow:0 -10px 30px rgba(0,0,0,.2); }
+  .panel.open { transform:translateY(0); }
+
+  /* Översikt: tabellerna scrollar i sitt kort i stället för att spränga bredden */
+  .dash { padding:12px; }
+  .card { padding:14px; overflow-x:auto; }
+  .kpi .v { font-size:21px; }
+  .econ-arrow { transform:rotate(90deg); justify-content:center; }
+
+  /* Kart- och 3D-kontroller: kompaktare så kartan syns */
+  .mapctl { max-width:52vw; max-height:56vh; overflow-y:auto; padding:8px 10px; }
+  .planbox { max-width:58vw; font-size:11px; }
+  .bygg-ctl { max-width:56vw; }
+  .bygg-warn { max-width:38vw; font-size:10px; padding:7px 9px; }
+  .bygg-room { width:auto; left:12px; right:12px; top:auto; bottom:104px; }
+  .bygg-kpi { min-width:118px; padding:8px 10px; }
+  .bygg-kpi > b { font-size:16px; }
+
+  /* Rapport */
+  .report-overlay { padding:10px 6px; }
+  .report { padding:18px 14px; }
+  .report-head { flex-wrap:wrap; }
+}

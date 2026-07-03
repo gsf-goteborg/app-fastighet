@@ -24,6 +24,7 @@ export default function App() {
   const [theme, setTheme] = useState('forandring') // led med prognosen — stadens signaturvy
   const [selectedId, setSelectedId] = useState(null)
   const [byggId, setByggId] = useState(+Object.keys(BUILDING_MODELS)[0]) // skola i 3D-byggnadsvyn
+  const [sideOpen, setSideOpen] = useState(false) // filterlåda (mobil) — på desktop alltid synlig spalt
 
   // Planeringstillstånd lyfts hit så karta och översikt delar samma plan
   const [scenario, setScenario] = useState('Befolkningsprognos')
@@ -95,6 +96,9 @@ export default function App() {
             <div className="sub">Fastighetsavdelningen · planeringsverktyg</div>
           </div>
         </div>
+        <button className="filter-toggle" onClick={() => setSideOpen((o) => !o)}>
+          ☰ Filter{filtered.length < SCHOOLS.length ? ` · ${filtered.length}` : ''}
+        </button>
         <div className="tabs">
           {TABS.map(([v, label]) => (
             <button key={v} className={view === v ? 'active' : ''} onClick={() => { setView(v); setSelectedId(null) }}>{label}</button>
@@ -103,11 +107,15 @@ export default function App() {
         <span className="badge">⚠︎ Showcase · exempeldata</span>
       </header>
 
+      {/* Mobil: mörk bakgrund bakom filterlådan, klick stänger */}
+      <div className={'side-backdrop' + (sideOpen ? ' show' : '')} onClick={() => setSideOpen(false)} />
+
       <Sidebar
         filters={filters} setFilters={setFilters}
         search={search} setSearch={setSearch}
         shown={filtered.length} total={SCHOOLS.length}
-        onSelect={setSelectedId}
+        onSelect={(id) => { setSelectedId(id); setSideOpen(false) }}
+        mobileOpen={sideOpen} onClose={() => setSideOpen(false)}
       />
 
       <main>

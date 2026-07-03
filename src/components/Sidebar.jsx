@@ -22,7 +22,10 @@ function suggestionsFor(q) {
   return [...starts, ...contains].slice(0, MAX_SUGGESTIONS)
 }
 
-export default function Sidebar({ filters, setFilters, search, setSearch, shown, total, onSelect }) {
+export default function Sidebar({
+  filters, setFilters, search, setSearch, shown, total, onSelect,
+  mobileOpen, onClose, // mobil: spalten blir en utfällbar låda
+}) {
   const [open, setOpen] = useState(false)
   const [hi, setHi] = useState(-1) // markerat förslag (tangentbord)
   const reset = () => { setFilters(emptyFilters()); setSearch('') }
@@ -44,7 +47,9 @@ export default function Sidebar({ filters, setFilters, search, setSearch, shown,
   }
 
   return (
-    <aside className="filters">
+    <aside className={'filters' + (mobileOpen ? ' mobile-open' : '')}>
+      {/* Syns bara på mobil (CSS) */}
+      <button className="side-close" onClick={onClose}>Visa {shown} skolor ✓</button>
       <div className="search-wrap">
         <input
           type="search"
