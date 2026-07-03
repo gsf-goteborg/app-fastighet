@@ -1,6 +1,7 @@
 import { createPortal } from 'react-dom'
 import { RENOV } from '../lib/constants'
 import { MILP_MAX_SCHOOLS } from '../lib/optimizer'
+import { actionLabel } from '../lib/whatif'
 import { SCHOOLS, BASE_YEAR } from '../data/schools'
 
 /* Utskriftsvänligt "underlag för diskussion" — spårbarhet enligt vision.md:
@@ -20,7 +21,7 @@ const DATA_STATUS = [
 ]
 
 export default function ReportView({ onClose, ctx }) {
-  const { scenario, year, radii, reserve, schools, plan, robustness, equity, skolval } = ctx
+  const { scenario, year, radii, reserve, schools, plan, robustness, equity, skolval, whatif } = ctx
   const now = new Date()
   const stamp = now.toLocaleDateString('sv-SE') + ' ' + now.toLocaleTimeString('sv-SE', { hour: '2-digit', minute: '2-digit' })
 
@@ -119,6 +120,41 @@ export default function ReportView({ onClose, ctx }) {
             </table>
             <p className="report-fine">Avstånd = fågelväg × omvägsfaktor (schablon) tills vägnätsavstånd kopplas in;
               före/efter mäts med samma måttstock.</p>
+          </section>
+        )}
+
+        {whatif?.actions.length > 0 && (
+          <section>
+            <h2>What-if — användarens scenario ({whatif.actions.length} åtgärder)</h2>
+            <p>Åtgärder prövade utöver optimeringens förslag: {whatif.actions.map(actionLabel).join(' · ')}.</p>
+            {whatif.closures.length > 0 && (
+              <table className="gaptable">
+                <thead><tr><th>Stängs</th><th>Elever</th><th>Tas emot av</th><th>Resväg snitt</th><th>Frigjord hyra</th></tr></thead>
+                <tbody>
+                  {whatif.closures.map((c) => {
+                    const eq = whatif.equity?.perClosure.get(c.school.id)
+                    return (
+                      <tr key={c.school.id}>
+                        <td><b>{c.school.namn}</b></td>
+                        <td>{c.students}</td>
+                        <td>{c.reassign.map((r) => `${r.namn} (${r.n})`).join(', ') || '–'}</td>
+                        <td>{eq ? `${eq.kmBefore} → ${eq.kmAfter} km` : '–'}</td>
+                        <td>{mkr(c.savedKr)} Mkr/år</td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            )}
+            <p className="report-fine">
+              Sammantaget: {whatif.savedKr > 0 ? `−${mkr(whatif.savedKr)} Mkr/år hyra · ` : ''}
+              {whatif.movedStudents > 0 ? `${whatif.movedStudents} elever flyttas · ` : ''}
+              {whatif.builtCap > 0 ? `+${whatif.builtCap} platser byggs · ` : ''}
+              {whatif.barnTotal > 0 ? `+${whatif.barnTotal} elever i prognosen · ` : ''}
+              {whatif.equity ? `andel över närhetsnormen ${whatif.equity.totalBeforePct.toFixed(1)} % → ${whatif.equity.totalAfterPct.toFixed(1)} %` : ''}
+              {whatif.unplaced > 0 ? ` · OBS: ${whatif.unplaced} elever får inte plats inom normen` : ''}.
+              Omflyttning per stadie inom närhetsnormen; skolval/ekonomi enligt samma exempeldata som ovan.
+            </p>
           </section>
         )}
 

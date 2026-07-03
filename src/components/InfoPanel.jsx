@@ -45,7 +45,8 @@ function Origins({ school }) {
   )
 }
 
-export default function InfoPanel({ school, onClose, onOpenBuilding }) {
+export default function InfoPanel({ school, onClose, onOpenBuilding, whatifClosed, onWhatIfClose }) {
+  const isClosed = school && whatifClosed?.has(school.id)
   const komm = school && school.huvudman === 'Kommunal'
   const origin = school ? SCHOOL_ORIGINS[school.id] : null
   const intake = school ? getIntake().get(school.id) : null
@@ -65,6 +66,12 @@ export default function InfoPanel({ school, onClose, onOpenBuilding }) {
             {onOpenBuilding && BUILDING_MODELS[school.id] && (
               <button className="btn primary p-bygg" onClick={() => onOpenBuilding(school.id)}>
                 Analysera byggnaden i 3D →
+              </button>
+            )}
+            {onWhatIfClose && (school.konsoliderbar || isClosed) && (
+              <button className={'btn p-bygg' + (isClosed ? '' : ' p-whatif')}
+                onClick={() => onWhatIfClose(school.id)}>
+                {isClosed ? 'Ångra what-if-stängning' : 'Stäng i what-if — vad händer?'}
               </button>
             )}
             <Field label="Stadsområde" value={school.stadsomrade} />

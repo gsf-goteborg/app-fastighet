@@ -73,7 +73,17 @@ vara oberoende kan en egen tile-källa/MapTiler-nyckel pekas in i `MapView.jsx`.
     horisont, radier, reserv, lösare), plan + likvärdighet + robusthet samt en
     datastatus-/spårbarhetstabell (uppdatera `DATA_STATUS` när källor byts in).
     Skrivs ut/sparas som PDF via webbläsaren.
-12. **Framtida skolnät — normativ nätdesign med spopt (Fas 1)** — svarar på "var BORDE
+12. **What-if — användarens eget scenario** (`src/lib/whatif.js`, scenariorad i
+    `WhatIfBar.jsx`) — åtgärdslista i App-state med tre åtgärdstyper: *stäng skola*
+    (knapp i infopanelen, konsoliderbara), *bygg kandidatsite* (klick på siten i
+    kartan) och *+barn i område* (formulär i scenarioraden). Stängningars elever
+    omfördelas kapacitetsmedvetet per stadie inom närhetsnormen (byggda siter kan
+    ta emot); likvärdighetslinsen och kartans flödeslager (tilldelning + IIA-skolval)
+    återanvänds; "+barn" blir en prognosjustering via områdets elevmönster som ALLA
+    vyer läser (karta, gap, plan). Scenarioraden visar diff mot basläget (hyra,
+    flyttade elever, likvärdighet, ej placerade); eget kort i Översikt och sektion
+    i rapporten. Vad som saknas: sparade/namngivna scenarier och A/B-jämförelse.
+13. **Framtida skolnät — normativ nätdesign med spopt (Fas 1)** — svarar på "var BORDE
     skolorna ligga?" i stället för konsolideringens "vilka kan stängas?". Batch:
     `python scripts/build_natplan.py` (kräver `pip install -r backend/requirements.txt`)
     kör per horisont (2030/2040/2050) × stadie: LSCP-golv (spopt), minsta genomförbara

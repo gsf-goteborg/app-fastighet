@@ -88,7 +88,7 @@ const FLOW_WIDTH = ['interpolate', ['linear'], ['get', 'n'], 1, 1, 40, 3.5, 150,
 
 export default function MapView({
   schools, theme, setTheme, onSelect, active, projFn, year, scenario, rate,
-  plan, showFlows, setShowFlows,
+  plan, showFlows, setShowFlows, whatif, onBuildToggle,
 }) {
   const [showAreas, setShowAreas] = useState(false)
   const [showCand, setShowCand] = useState(false)
@@ -105,6 +105,8 @@ export default function MapView({
   projRef.current = { projFn, year, scenario, rate }
   const schoolsRef = useRef(schools) // för zoomend-ombakningen (pixelkonstant spridning)
   schoolsRef.current = schools
+  const buildRef = useRef(onBuildToggle) // kandidatsite-klick → bygg i what-if
+  buildRef.current = onBuildToggle
   const areasRaw = useRef(null) // oförändrad geojson, bakas om per år
 
   // Initiera kartan en gång
@@ -186,6 +188,40 @@ export default function MapView({
       })
       map.on('mouseleave', 'natplan', () => natPopup.remove())
 
+      // What-if-lager: användarens stängningar/byggen — alltid synliga när
+      // åtgärder finns (data + synlighet sätts i effekten nedan)
+      map.addSource('wi-flows', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } })
+      map.addLayer({
+        id: 'wi-assign', type: 'line', source: 'wi-flows',
+        filter: ['==', ['get', 'typ'], 'tilldelning'],
+        layout: { 'line-cap': 'round' },
+        paint: { 'line-color': '#005293', 'line-width': FLOW_WIDTH, 'line-opacity': 0.75 },
+      })
+      map.addLayer({
+        id: 'wi-choice', type: 'line', source: 'wi-flows',
+        filter: ['==', ['get', 'typ'], 'skolval'],
+        paint: { 'line-color': '#f47815', 'line-width': FLOW_WIDTH, 'line-opacity': 0.85, 'line-dasharray': [1.5, 1.5] },
+      })
+      map.addSource('wi-points', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } })
+      map.addLayer({
+        id: 'wi-points', type: 'circle', source: 'wi-points',
+        paint: {
+          'circle-radius': ['interpolate', ['linear'], ['zoom'], 10, 9, 14, 15],
+          'circle-color': ['match', ['get', 'roll'], 'bygg', '#4f6f18', '#fff'],
+          'circle-opacity': 0.92,
+          'circle-stroke-width': 3,
+          'circle-stroke-color': ['match', ['get', 'roll'], 'bygg', '#fbc46d', '#dc2626'],
+        },
+      })
+      const wiPopup = new maplibregl.Popup({ closeButton: false, offset: 12 })
+      map.on('mouseenter', 'wi-points', (e) => {
+        const p = e.features[0].properties
+        wiPopup.setLngLat(e.lngLat)
+          .setHTML(`<b>${p.namn}</b><br>${p.roll === 'bygg' ? 'Byggs i what-if · ' + p.info : 'Stängs i what-if · ' + p.info}`)
+          .addTo(map)
+      })
+      map.on('mouseleave', 'wi-points', () => wiPopup.remove())
+
       const closedPopup = new maplibregl.Popup({ closeButton: false, offset: 12 })
       map.on('mouseenter', 'closed', (e) => {
         const p = e.features[0].properties
@@ -234,6 +270,8 @@ export default function MapView({
         ).addTo(map)
       })
       map.on('mouseleave', 'cand', () => { map.getCanvas().style.cursor = ''; popup.remove() })
+      // Klick på kandidatsite → bygg/ångra i what-if
+      map.on('click', 'cand', (e) => buildRef.current?.(e.features[0].properties.id))
       setReady(true)
       map.getSource('schools').setData(toGeoJSON(schools, projRef.current.projFn, projRef.current.year, map.getZoom()))
 
@@ -296,6 +334,35 @@ export default function MapView({
     map.setLayoutProperty('natplan', 'visibility', showNat ? 'visible' : 'none')
     map.getLayer('pt') && map.setLayoutProperty('pt', 'visibility', showNat ? 'none' : 'visible')
   }, [ready, showNat, year])
+
+  // What-if-lagret: alltid på när åtgärder finns (tom data = osynligt)
+  const EMPTY_FC = { type: 'FeatureCollection', features: [] }
+  const wiData = useMemo(() => {
+    if (!whatif || (!whatif.closures.length && !whatif.built.length)) return null
+    const pt = (p, roll, info) => ({
+      type: 'Feature',
+      geometry: { type: 'Point', coordinates: [p.lng, p.lat] },
+      properties: { namn: p.namn, roll, info },
+    })
+    return {
+      flows: planFlowsGeoJSON({ closures: whatif.closures }),
+      points: {
+        type: 'FeatureCollection',
+        features: [
+          ...whatif.closures.map((c) => pt(c.school, 'stang', `${c.students} elever flyttas`)),
+          ...whatif.built.map((s) => pt(s, 'bygg', `${s.pedKapacitet} platser`)),
+        ],
+      },
+    }
+  }, [whatif])
+  useEffect(() => {
+    if (!ready) return
+    const map = mapRef.current
+    if (!map.getSource('wi-flows')) return
+    map.getSource('wi-flows').setData(wiData ? wiData.flows : EMPTY_FC)
+    map.getSource('wi-points').setData(wiData ? wiData.points : EMPTY_FC)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready, wiData])
 
   // Omfördelningslagret: data + synlighet (skolvalsomvalet räknas bara när lagret är på)
   const flowData = useMemo(
@@ -360,6 +427,24 @@ export default function MapView({
           <div className="legend-note">Befolkning i skolålder per mellanområde, förändring till {year} ({scenario.toLowerCase()}). Grå = ingen prognosdata.</div>
         )}
 
+        {wiData && (
+          <div className="legend" style={{ marginTop: 10 }}>
+            <div className="row" style={{ fontWeight: 700 }}>What-if-scenario</div>
+            {whatif.closures.length > 0 && (
+              <div className="row"><span className="dot" style={{ background: '#fff', boxShadow: '0 0 0 2px #dc2626' }} />Stängs i what-if ({whatif.closures.length})</div>
+            )}
+            {whatif.built.length > 0 && (
+              <div className="row"><span className="dot" style={{ background: '#4f6f18', boxShadow: '0 0 0 2px #fbc46d' }} />Byggs i what-if ({whatif.built.length})</div>
+            )}
+            {whatif.closures.length > 0 && (
+              <>
+                <div className="row"><span className="flowline" style={{ background: '#005293' }} />Tilldelning</div>
+                <div className="row"><span className="flowline dashed" />Skolval (omval)</div>
+              </>
+            )}
+          </div>
+        )}
+
         <label className="mapctl-check">
           <input type="checkbox" checked={showNat} onChange={(e) => setShowNat(e.target.checked)} />
           Framtida nät (optimerat)
@@ -408,7 +493,7 @@ export default function MapView({
           <div className="legend">
             <div className="row"><span className="dot" style={{ background: '#cf5e00' }} />Expansion (befintligt läge)</div>
             <div className="row"><span className="dot" style={{ background: '#4f6f18' }} />Nybyggnad</div>
-            <div className="legend-note">Hovra för kapacitet och stadier. <span className="mockflag">exempel</span></div>
+            <div className="legend-note">Hovra för kapacitet och stadier — <b>klicka för att bygga i what-if</b>. <span className="mockflag">exempel</span></div>
           </div>
         )}
       </div>

@@ -3,8 +3,10 @@ import { SCHOOLS, SCENARIOS, BASE_YEAR } from './data/schools'
 import { emptyFilters, applyFilters } from './lib/filters'
 import { planConsolidation, STAGE_RADIUS } from './lib/optimizer'
 import { buildProjector } from './lib/framskrivning'
+import { buildWhatIf, makeProjAdjust } from './lib/whatif'
 import { BUILDING_MODELS } from './data/byggnad'
 import Sidebar from './components/Sidebar'
+import WhatIfBar from './components/WhatIfBar'
 
 // three.js är stort — ladda 3D-vyn först när fliken öppnas
 const BuildingView = lazy(() => import('./components/BuildingView'))
@@ -40,16 +42,35 @@ export default function App() {
   const rate = scenario === 'Egen' ? customRate / 100 : SCENARIOS[scenario]
   const years = year - BASE_YEAR
 
+  // WHAT-IF: användarens egna åtgärder (stäng/bygg/+barn) — se lib/whatif.js
+  const [actions, setActions] = useState([])
+  const [barnFormOpen, setBarnFormOpen] = useState(false)
+  const whatif = useMemo(() => buildWhatIf(actions, radii), [actions, radii])
+  const toggleClose = (schoolId) => setActions((a) =>
+    a.some((x) => x.typ === 'stang' && x.schoolId === schoolId)
+      ? a.filter((x) => !(x.typ === 'stang' && x.schoolId === schoolId))
+      : [...a, { typ: 'stang', schoolId }])
+  const toggleBuild = (siteId) => setActions((a) =>
+    a.some((x) => x.typ === 'bygg' && x.siteId === siteId)
+      ? a.filter((x) => !(x.typ === 'bygg' && x.siteId === siteId))
+      : [...a, { typ: 'bygg', siteId }])
+
   // Befolkningsbaserad framskrivning byggs en gång över hela skolbeståndet
   // (demografin är oberoende av filtret). Scenariot "Befolkningsprognos"
   // använder kohortmodellen; övriga scenarier en uniform takt.
   const cohort = useMemo(() => buildProjector(SCHOOLS), [])
-  const projFn = useMemo(
+  const baseProjFn = useMemo(
     () => scenario === 'Befolkningsprognos'
       ? (s, y) => cohort.project(s, y)
       : (s, y) => Math.round(s.elever * Math.pow(1 + rate, y - BASE_YEAR)),
     [scenario, rate, cohort],
   )
+  // What-if-åtgärden "+barn i område" läggs ovanpå prognosen — alla vyer
+  // som läser projFn (karta, översikt, plan) reagerar automatiskt.
+  const projFn = useMemo(() => {
+    const adjust = makeProjAdjust(actions)
+    return adjust ? (s, y) => baseProjFn(s, y) + adjust(s, y) : baseProjFn
+  }, [baseProjFn, actions])
 
   // Omfördelningslager på kartan (flöden från stängda skolor) — kräver planen
   const [showFlows, setShowFlows] = useState(false)
@@ -82,7 +103,7 @@ export default function App() {
   const planState = {
     scenario, setScenario, customRate, setCustomRate, year, setYear,
     radii, setRadii, reserve, setReserve, rate, years, projFn, plan, robustness,
-    horizon, setHorizon,
+    horizon, setHorizon, whatif,
   }
 
   return (
@@ -107,6 +128,14 @@ export default function App() {
         <span className="badge">⚠︎ Showcase · exempeldata</span>
       </header>
 
+      <WhatIfBar
+        actions={actions} whatif={whatif}
+        onRemove={(i) => setActions((a) => a.filter((_, j) => j !== i))}
+        onReset={() => setActions([])}
+        onAddBarn={(a) => setActions((prev) => [...prev, a])}
+        formOpen={barnFormOpen} setFormOpen={setBarnFormOpen}
+      />
+
       {/* Mobil: mörk bakgrund bakom filterlådan, klick stänger */}
       <div className={'side-backdrop' + (sideOpen ? ' show' : '')} onClick={() => setSideOpen(false)} />
 
@@ -126,6 +155,7 @@ export default function App() {
             onSelect={setSelectedId} active={view === 'map'}
             projFn={projFn} year={year} scenario={scenario} rate={rate}
             plan={plan} showFlows={showFlows} setShowFlows={setShowFlows}
+            whatif={whatif} onBuildToggle={toggleBuild}
           />
         </div>
         {view === 'table' && <ErrorBoundary><TableView schools={filtered} onSelect={setSelectedId} /></ErrorBoundary>}
@@ -139,7 +169,8 @@ export default function App() {
         )}
 
         <InfoPanel school={selected} onClose={() => setSelectedId(null)}
-          onOpenBuilding={(id) => { setByggId(id); setView('bygg'); setSelectedId(null) }} />
+          onOpenBuilding={(id) => { setByggId(id); setView('bygg'); setSelectedId(null) }}
+          whatifClosed={whatif.closedIds} onWhatIfClose={toggleClose} />
       </main>
     </div>
   )

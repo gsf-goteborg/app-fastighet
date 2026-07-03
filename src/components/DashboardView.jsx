@@ -29,6 +29,7 @@ export default function DashboardView({
   scenario, setScenario, customRate, setCustomRate, year, setYear,
   radii, setRadii, reserve, setReserve, rate, years, projFn, plan, robustness,
   horizon, setHorizon, // kort = nästa läsår, lang = 5–25 år (lyft till App så flikbyte inte nollställer)
+  whatif,
 }) {
   const setRadius = (st, v) => setRadii({ ...radii, [st]: Math.max(0.5, +v || radii[st]) })
 
@@ -264,7 +265,72 @@ export default function DashboardView({
 
       {showReport && (
         <ReportView onClose={() => setShowReport(false)}
-          ctx={{ scenario, year, radii, reserve, schools, plan, robustness, equity, skolval }} />
+          ctx={{ scenario, year, radii, reserve, schools, plan, robustness, equity, skolval, whatif }} />
+      )}
+
+      {/* WHAT-IF — användarens eget scenario, syns i båda planeringshorisonterna */}
+      {whatif?.actions.length > 0 && (
+        <div className="card" style={{ borderLeft: '3px solid var(--gbg-purple)' }}>
+          <h2>What-if — ditt scenario ({whatif.actions.length} åtgärd{whatif.actions.length > 1 ? 'er' : ''})</h2>
+          <p className="hint">
+            Konsekvenser av åtgärderna i scenarioraden: dagens elever på stängda skolor omfördelas
+            kapacitetsmedvetet per stadie inom närhetsnormen ({radii.lag}/{radii.mellan}/{radii.hog} km);
+            byggda siter kan ta emot; "+barn" påverkar prognosen i alla vyer.
+            <span className="mockflag">exempeldata · fågelväg</span>
+          </p>
+          {whatif.unplaced > 0 && (
+            <p className="hint" style={{ background: '#fee2e2', color: '#b91c1c', border: '1px solid #fecaca', borderRadius: 8, padding: '8px 10px' }}>
+              ⚠︎ <b>{whatif.unplaced} elever får inte plats</b> inom närhetsnormen med detta scenario —
+              öka radien, bygg en site eller ångra en stängning.
+            </p>
+          )}
+          {whatif.closures.length > 0 && (
+            <table className="gaptable">
+              <thead>
+                <tr><th>Stängs</th><th>Elever</th><th>Tas emot av</th><th>Resväg snitt</th><th>Frigjord hyra</th></tr>
+              </thead>
+              <tbody>
+                {whatif.closures.map((c) => {
+                  const eq = whatif.equity?.perClosure.get(c.school.id)
+                  return (
+                    <tr key={c.school.id} onClick={() => onSelect(c.school.id)} style={{ cursor: 'pointer' }}>
+                      <td><b>{c.school.namn}</b></td>
+                      <td>{c.students}</td>
+                      <td style={{ fontSize: 12, color: 'var(--muted)' }}>{c.reassign.map((r) => `${r.namn} (${r.n})`).join(', ') || '–'}</td>
+                      <td style={{ whiteSpace: 'nowrap' }}>
+                        {eq ? <>{eq.kmBefore} → <b style={{ color: eq.kmAfter > eq.kmBefore ? '#dc2626' : '#16a34a' }}>{eq.kmAfter}</b> km</> : '–'}
+                      </td>
+                      <td>{mkr(c.savedKr)} Mkr/år</td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          )}
+          {whatif.receiverLoad.length > 0 && (
+            <p className="hint" style={{ marginTop: 10 }}>
+              <b>Mottagarnas nya beläggning:</b>{' '}
+              {whatif.receiverLoad.slice(0, 8).map(({ s, extra, belaggAfter }) => (
+                <span key={s.id} style={{ marginRight: 10, whiteSpace: 'nowrap' }}>
+                  {s.namn} +{extra} → <b style={{ color: occColor(belaggAfter) }}>{belaggAfter}%</b>
+                </span>
+              ))}
+              {whatif.receiverLoad.length > 8 && `… +${whatif.receiverLoad.length - 8} till`}
+            </p>
+          )}
+          {whatif.built.length > 0 && (
+            <p className="hint" style={{ marginTop: 6 }}>
+              <b>Byggs:</b> {whatif.built.map((s) => `${s.namn} (${s.pedKapacitet} pl)`).join(', ')} — tomma
+              siter som kan ta emot i omflyttningen och möta "+barn"-scenarier.
+            </p>
+          )}
+          {whatif.barn.length > 0 && (
+            <p className="hint" style={{ marginTop: 6 }}>
+              <b>Fler barn:</b> {whatif.barn.map((a) => `${a.omrade} +${a.antal} från ${a.franAr}`).join(', ')} —
+              inlagt i prognosen (fördelas via områdets elevmönster); alla tal för {year} ovan inkluderar detta.
+            </p>
+          )}
+        </div>
       )}
 
       {horizon === 'kort' && (
